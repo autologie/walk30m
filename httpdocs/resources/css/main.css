@@ -1,0 +1,334 @@
+
+body {
+	margin: 0px;
+	font-family: 'メイリオ',helvetica,arial,sans-serif;
+	position: relative;
+}
+
+a {
+	color: #039;
+}
+
+#progressbar {
+	position: fixed;
+	width: 100%;
+	height: 3px;
+	background-color: rgba(255, 255, 255, 0.5);
+	z-index: 10000;
+}
+
+#progressbar .progress {
+	width: 0px;
+	height: 100%;
+	position: relative;
+	background-color: rgba(0, 128, 0, 0.5);
+	overflow: hidden;
+}
+#progressbar .progress .inner {
+	position: absolute;
+	background-color: rgba(0, 128, 0, 0.5);
+	height: 100%;
+	width: 500px;
+	left: -500pxe;
+	left: 0;
+	animation-duration: 3s;
+	animation-name: slide;
+	animation-iteration-count: infinite;
+}
+
+@keyframes slide {
+	from {
+		left: -500px;
+	}
+	to {
+		left: calc(100% + 100px);
+	}
+}
+
+#contents-wrap {
+	position: relative;
+	margin: 0em auto;
+	width: 96%;
+	max-width: 1200px;
+}
+
+div#app-header {
+	vertical-align: middle;
+}
+
+div#app-logo {
+	display: inline-block;
+	float: left;
+	width: 120px;
+	height: 56px;
+	background-image: url(../images/walking4.png);
+	background-repeat: no-repeat;
+}
+
+h1#app-title {
+	color: #333;
+	letter-spacing: 0.5em;
+	font-size: 20px;
+	margin: 0em 0em 0.5em 120px;
+	color: #456;
+	padding-top: 1em;
+}
+
+h2 {
+	color: #8b4;
+}
+
+h2:before {
+	content: ' ';
+	display: inline-block;
+	width: 40px;
+	height: 24px;
+	background-image: url(../images/header_icon.png);
+	background-repeat: no-repeat;
+}
+
+h3 {
+	color: #244;
+}
+
+#map-wrap {
+	width: 100%;
+	position: relative;
+}
+
+#messagebox,
+#config-panel,
+#route-detail,
+#contextmenu {
+	background-color: #fff;
+	border-radius: 6px;
+	border: 2px solid #cb9;
+}
+	
+#map-canvas {
+	width: 100%;
+	height: 720px;
+}
+
+#control {
+	width: 100%;
+	margin: 1em 0em 0.5em 0em;
+}
+.control input,
+.control select {
+	margin: 0em 0.2em 0.3em 0.2em;
+	font-family: 'メイリオ',helvetica,arial,sans-serif;
+	padding: 0.2em 0.4em;
+	background-color: #f8f8f8;
+	font-size: 15px;
+	border: 0px;
+	border-radius: 4px;
+}
+
+.control input:not([type=button]):hover,
+.control select:not([type=button]):hover {
+	background-color: #cee;
+}
+
+.balloon-content {
+	padding: 0.5em;
+	font-size: 15px;
+	max-width: 200px;
+	font-family: 'メイリオ',helvetica,arial,sans-serif;
+}
+.balloon-content p.address {
+	font-weight: bold;
+	margin: 0.2em 0em;
+}
+
+.balloon-content.gnavi h4 {
+	margin-top: 0px;
+}
+
+.balloon-content.gnavi p,
+.balloon-content.gnavi .category,
+.balloon-content.gnavi .provide-info {
+	font-size: 0.9em;
+}
+
+.footer {
+	text-align: right;
+	margin: 1em 0em 0em 0em;
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+	padding: 0.8em 1em 0.5em 1em;
+	background: #f4f4f4;
+}
+
+.footer .btn {
+	margin-left: 1em;
+}
+
+#control .control-item {
+	display: inline-block;
+	padding: 0em 0.3em 0em 0em;
+}
+
+#control-time {
+	width: 60px;
+	text-align: right;
+}
+
+.control input#control-setting {
+	position: absolute;
+	right: 0px;
+	top: 0px;
+	background-position-x: 4px;
+	background-position-y: 4px;
+	width: 30px;
+	background-image: url(../images/settings-20-20_gray.png);
+	background-repeat: no-repeat;
+	background-color: #fff;
+}
+
+.control input#control-setting:hover {
+	background-image: url(../images/settings-20-20.png);
+}
+
+div.sample-btn {
+	display: inline-block;
+	margin: 0.2em 0.4em;
+	cursor: default;
+}
+
+.sample-btn,
+input.btn {
+	color: #fff;
+	background-color: #088;
+	border-radius: 4px;
+	padding: 0.2em 0.6em;
+	cursor: pointer;
+}
+
+input.btn.large {
+	padding: 0.4em 1.2em;
+}
+
+.btn:disabled {
+	background-color: #5aa;
+	color: #f8f8f8;
+}
+
+.btn:not(:disabled):hover {
+	background-color: #3aa;
+}
+
+.floating {
+	display: none;
+	position: fixed;
+}
+
+#config-panel {
+	top: 60px;
+	max-width: 600px;
+	width: 90%;
+	overflow-y: auto;
+}
+
+#config-panel label {
+	display: block;
+}
+
+#config-panel .control-item {
+	display: block;
+	padding: 0.3em 1em;
+}
+
+#contextmenu {
+	position: absolute;
+	font-family: 'メイリオ';
+	left: 0px;
+	top: 0px;
+	display: none;
+}
+
+#contextmenu ul {
+	list-style-type: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+#contextmenu li:first-child {
+	border-top-right-radius: 4px;
+	border-top-left-radius: 4px;
+}
+
+#contextmenu li:not(:last-child) {
+	border-bottom: 1px solid #cb9;
+}
+
+#contextmenu li:last-child {
+	border-bottom-right-radius: 4px;
+	border-bottom-left-radius: 4px;
+}
+
+#contextmenu li a {
+	color: #000;
+	text-decoration: none;
+}
+
+#contextmenu li {
+	display: block;
+	padding: 0.5em 1em;
+	margin: 0px;
+}
+
+#contextmenu li:hover {
+	background-color: #cee;
+	cursor: pointer;
+}
+
+#description {
+	float: left;
+	margin: 0em 0em 8em 0em;
+	max-width: 800px;
+}
+
+#messagebox p {
+	margin-left: 2em;
+	margin-right: 2em;
+}
+
+#messagebox h3 {
+	margin-left: 1em;
+	margin-right: 1em;
+}
+
+#messagebox {
+	max-width: 400px;
+	width: 80%;
+}
+
+#mask {
+	background-color: #000;
+	opacity: 0.1;
+	position: fixed;
+	top: 0px;
+	left: 0px;
+	width: 100%;
+	height: 120%;
+	display: none;
+}
+
+#route-detail > div {
+	overflow-y: auto;
+	padding: 1em;
+}
+
+#route-detail h3 {
+	padding: 0em 1em;
+}
+
+#route-detail {
+	display: none;
+	position: absolute;
+	left: 10px;
+	top: 52px;
+	width: 400px;
+	max-width: 90%;
+}
