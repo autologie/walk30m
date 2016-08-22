@@ -10,24 +10,28 @@ echo "                                                         | |             _
 echo "                                                         |_|            |___/ "
 
 echo uploading static files...
-aws s3 sync --profile=walk30m --quiet ./httpdocs s3://walk30m
+mkdir tmp
+cp -r ./httpdocs/* ./tmp/
+cat ./httpdocs/index.html | sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g > ./tmp/index.html
+aws s3 sync --profile=walk30m --quiet ./tmp s3://walk30m
+rm -rf tmp
 echo done.
 
-echo deploying lambda functions...
-echo 1/2 ipInfo...
-cd ./lambda && \
-	zip -q -r deployment.zip ./ipInfo/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=ipInfo --zip-file=fileb://${cdir}/deployment.zip && \
-	rm deployment.zip && \
-	cd ../
-
-echo 2/2 createExecutionLog...
-	cd ./lambda/executionLog && \
-	zip -q -r deployment.zip ./create/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=createExecutionLog --zip-file=fileb://${cdir}/deployment.zip && \
-	rm deployment.zip && \
-	cd ../../
-echo done.
+# echo deploying lambda functions...
+# echo 1/2 ipInfo...
+# cd ./lambda && \
+# 	zip -q -r deployment.zip ./ipInfo/* && \
+# 	cdir=`pwd` && \
+# 	aws lambda update-function-code --profile=walk30m --function-name=ipInfo --zip-file=fileb://${cdir}/deployment.zip && \
+# 	rm deployment.zip && \
+# 	cd ../
+# 
+# echo 2/2 createExecutionLog...
+# 	cd ./lambda/executionLog && \
+# 	zip -q -r deployment.zip ./create/* && \
+# 	cdir=`pwd` && \
+# 	aws lambda update-function-code --profile=walk30m --function-name=createExecutionLog --zip-file=fileb://${cdir}/deployment.zip && \
+# 	rm deployment.zip && \
+# 	cd ../../
+# echo done.
 
