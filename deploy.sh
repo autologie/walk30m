@@ -10,7 +10,7 @@ echo "                                                         | |             _
 echo "                                                         |_|            |___/ "
 
 echo uploading static files...
-aws s3 cp --profile=walk30m --quiet --recursive ./httpdocs s3://walk30m
+aws s3 sync --profile=walk30m --quiet ./httpdocs s3://walk30m
 echo done.
 
 echo deploying lambda functions...
