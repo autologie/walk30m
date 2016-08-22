@@ -1,8 +1,11 @@
+<!doctype html>
 <html>
 <head>
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
 <meta name="viewport" content="initial-scale=1.0, minimum-scale=1, maximum-scale=1">
+<meta name="description" content="30分以内に歩いていける範囲を計算して地図に表示するサービスです。">
+<meta name="keywords" content="webサービス,徒歩,歩いて,どこまで,計算,散歩,観光,現在地,３０分以内,30分以内,３０分,30分,車で,地図,可視化,経路">
 <meta property="og:title" content="30分でどこまでいける？">
 <meta property="og:type" content="article">
 <meta property="og:description" content="30分以内に歩いていける範囲を計算して地図に表示するサービスです。">
@@ -11,17 +14,28 @@
 <meta property="og:site_name" content="30分でどこまでいける？">
 <title>30分でどこまでいける？</title>
 <link rel="shortcut icon" href="/resources/images/favicon-96x96.png">
+<link rel="alternate" hreflang="en" href="https://www.walk30m.com?lang=en" />
 <link rel="apple-touch-icon" href="/resources/images/apple-touch-icon.png">
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 <link rel="stylesheet" href="resources/css/newmain.css" />
-<script src="resources/lib/require.min.js"></script>
+<!--<script src="resources/lib/require.min.js"></script>-->
 <script src="resources/js/dev/locale_ja.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.7.0/underscore.js"></script>
-<script src="https://code.jquery.com/jquery-2.1.3.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.0/underscore-min.js"></script>
+<script src="https://code.jquery.com/jquery-2.1.3.min.js"></script>
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true&language=ja&key=%GOOGLE_MAPS_API_KEY%"></script>
 <script src="resources/js/lib/numeric-1.2.6.js"></script>
-<script src="resources/js/bootstrap.js"></script>
+<script src="resources/js/app.js"></script>
 <div id="fb-root"></div>
+<script>
+  (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+  (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+  })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+  ga('create', '%GA_TRACKING_ID%', 'auto');
+  ga('send', 'pageview');
+
+</script>
 <script>(function(d, s, id) {
 	  var js, fjs = d.getElementsByTagName(s)[0];
 		  if (d.getElementById(id)) return;
@@ -60,6 +74,10 @@
 					<span class="glyphicon glyphicon-map-marker"></span>
 					<span>地図上で場所を指定</span>
 				</li>
+				<li tabindex="-1" data-selmode="selmode-voice">
+					<img style="margin: -2px .3em -2px -4px; width: 1.8em;" src="resources/images/microphone.png">
+					<span>音声で入力</span>
+				</li>
 			</ul>
 			<label>から</label>
 		</div>
@@ -68,6 +86,10 @@
 			<label for="travelMode_walking">歩いて</label>
 			<input type="radio" name="travelMode" value="DRIVING" id="travelMode_driving" />
 			<label for="travelMode_driving">車で</label>
+			<!--
+			<input type="radio" name="travelMode" value="TRANSIT" id="travelMode_transit" />
+			<label for="travelMode_transit">電車・バスで</label>
+			-->
 		</div>
 		<div>
 			<!--
@@ -121,6 +143,16 @@
 				<li>徒歩圏内は歩道を含まないルートにもとづいて計算されている場合があります。</li>
 			</ul>
 			<h3>リリース履歴</h3>
+			<!--
+			<dl>
+				<dt></dt>
+				<dd>電車・バスによる検索に対応しました。</dd>
+			</dl>
+			-->
+			<dl>
+				<dt>2015.12.5</dt>
+				<dd>試験的に音声入力に対応。現在のところGoogle Chromeからのみ利用できます。</dd>
+			</dl>
 			<dl>
 				<dt>2015.11.5</dt>
 				<dd>デザインと操作性を一新しました。</dd>
@@ -191,6 +223,7 @@
 		</section>
 		<section id="message">
 			<h2>お問い合わせフォーム</h2>
+			<input type="hidden" name="uuid" />
 			<textarea rows="4"></textarea>
 			<p>ご意見・ご感想などがあればお願いしますｍ(_ _)ｍ<br>
 				返信が必要な方は本文中にメールアドレスを記載してください</p>

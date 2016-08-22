@@ -9,12 +9,24 @@ echo "  \_/\_/ \__,_|_|_|\_\____/  \___/|_| |_| |_|  \__,_|\___| .__/|_|\___/ \_
 echo "                                                         | |             __/ |"
 echo "                                                         |_|            |___/ "
 
-echo uploading static files...
+echo building frontend assets...
+rm -rf ./tmp
 mkdir tmp
-cp -r ./httpdocs/* ./tmp/
-cat ./httpdocs/index.html | sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g > ./tmp/index.html
+cp -r ./httpdocs/src/* ./tmp/
+cd ./httpdocs
+webpack > /dev/null
+cd ../
+rm -rf ./tmp/resources/js/*
+cp -r ./httpdocs/target/resources/js/* ./tmp/resources/js/
+cat ./httpdocs/src/index.html \
+	| sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
+	| sed s/%GA_TRACKING_ID%/$GA_TRACKING_ID/g \
+	> ./tmp/index.html
+echo done.
+
+echo uploading static files...
 aws s3 sync --profile=walk30m --quiet ./tmp s3://walk30m
-rm -rf tmp
+rm -rf ./tmp
 echo done.
 
 # echo deploying lambda functions...
