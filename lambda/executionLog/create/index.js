@@ -3,19 +3,22 @@ console.log('Loading function');
 
 let doc = require('dynamodb-doc');
 let dynamo = new doc.DynamoDB();
+let nodeUuid = require('node-uuid');
 
-/**
- * Provide an event that contains the following keys:
- *
- *   - operation: one of the operations in the switch statement below
- *   - tableName: required for operations that interact with DynamoDB
- *   - payload: a parameter to pass to the operation being performed
- */
 exports.handler = (event, context, callback) => {
-    console.log('Received event:', JSON.stringify(event, null, 2));
+	let uuid = nodeUuid.unparse(nodeUuid.v4(null, new Array(32), 0));
 
     dynamo.putItem({
 		TableName: "execution_log",
-		Item: event
-	}, callback);
+		Item: Object.assign(event.payload, {
+			uuid,
+			start_datetime: +new Date(event.payload.start_datetime),
+			user_agent: event.userAgent,
+			client_ip: event.sourceIp
+		})
+	}, () => {
+		let res = {uuid};
+		console.log(res);
+		callback(null, res);
+	});
 };
