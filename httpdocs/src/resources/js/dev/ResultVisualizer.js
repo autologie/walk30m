@@ -1,5 +1,6 @@
-define([ 'resources/js/dev/GeoUtil.js',
-	'resources/js/dev/Walk30mUtils.js'
+define([
+	'./GeoUtil.js',
+	'./Walk30mUtils.js'
 ], function(GeoUtil, Walk30mUtils) {
 
 	function ResultVisualizer(application, map, objectManager) {

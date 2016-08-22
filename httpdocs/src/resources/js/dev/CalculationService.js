@@ -1,6 +1,6 @@
 define([
-	'resources/js/dev/Calculation.js',
-	'resources/js/dev/GeoUtil'
+	'./Calculation.js',
+	'./GeoUtil'
 ], function(Calculation, GeoUtil) {
 	'use strict';
 	var twicePI = 2 * Math.PI;

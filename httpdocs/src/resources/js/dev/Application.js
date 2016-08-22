@@ -1,11 +1,11 @@
 define([
-	'resources/js/dev/CalculationService.js',
-	'resources/js/dev/Logger.js',
-	'resources/js/dev/GeoUtil.js',
-	'resources/js/dev/AdvancedSettingsController.js',
-	'resources/js/dev/ProgressBar.js',
-	'resources/js/dev/MapController.js',
-	'resources/js/dev/InputController.js'
+	'./CalculationService.js',
+	'./Logger.js',
+	'./GeoUtil.js',
+	'./AdvancedSettingsController.js',
+	'./ProgressBar.js',
+	'./MapController.js',
+	'./InputController.js'
 ], function(
 	CalculationService,
 	Logger,

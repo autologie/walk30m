@@ -18,7 +18,7 @@ require([
 	'window',
 	'jQuery',
 	'underscore',
-	'resources/js/dev/Application.js'
+	'./dev/Application.js'
 ], function(window, $, _, Application) {
 	_.templateSettings = {
 		interpolate: /\{\{(.+?)\}\}/g

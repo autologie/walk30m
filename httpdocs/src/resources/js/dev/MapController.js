@@ -1,8 +1,8 @@
 define([
-	'resources/js/dev/GeoUtil.js',
-	'resources/js/dev/Footprint.js',
-	'resources/js/dev/ObjectManager.js',
-	'resources/js/dev/ResultVisualizer.js'
+	'./GeoUtil.js',
+	'./Footprint.js',
+	'./ObjectManager.js',
+	'./ResultVisualizer.js'
 ], function(GeoUtils, Footprint, ObjectManager, ResultVisualizer) {
 
 	function MapController(application, $el, mapOptions) {

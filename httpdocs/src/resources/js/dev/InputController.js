@@ -1,6 +1,6 @@
 define([
-	'resources/js/dev/GeoUtil.js',
-	'resources/js/dev/ProgressBar.js'
+	'./GeoUtil.js',
+	'./ProgressBar.js'
 ], function(GeoUtil, ProgressBar) {
 	var minuteArray = _.range(1, 61).concat(_.map(_.range(1, 19), function(n) {
 		return 60 + n * 10;
