@@ -25,7 +25,7 @@ cat ./httpdocs/src/index.html \
 echo done.
 
 echo uploading static files...
-aws s3 sync --profile=walk30m --quiet ./tmp s3://walk30m
+aws s3 sync --profile=walk30m --quiet ./tmp s3://$S3_PUBLIC_BUCKET_NAME
 rm -rf ./tmp
 echo done.
 
