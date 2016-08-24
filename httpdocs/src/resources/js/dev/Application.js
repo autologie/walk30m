@@ -163,7 +163,7 @@ define([
 
 		return $.ajax({
 			type: 'POST',
-			url: '/api/messages',
+			url: 'https://hotsh9cqva.execute-api.ap-northeast-1.amazonaws.com/develop/messages',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify({
 				message: message,

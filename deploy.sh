@@ -30,9 +30,9 @@ rm -rf ./tmp
 echo done.
 
 echo deploying lambda functions...
-echo 1/3 ipInfo...
+echo 1/4 ipInfo...
 cd ./lambda && \
-	mkdir target && \
+mkdir target && \
 	cp -r ./ipInfo ./target/ && \
 	cat ./ipInfo/config.js | sed s/%IP_INFO_DB_KEY%/$IP_INFO_DB_KEY/g > ./target/ipInfo/config.js && \
 	cd ./target && \
@@ -43,20 +43,29 @@ cd ./lambda && \
 	rm -rf ./target && \
 	cd ../../
 
-echo 2/3 createExecutionLog...
-	cd ./lambda/executionLog && \
+echo 2/4 createExecutionLog...
+cd ./lambda/executionLog && \
 	zip -q -r deployment.zip ./create/* && \
 	cdir=`pwd` && \
 	aws lambda update-function-code --profile=walk30m --function-name=createExecutionLog --zip-file=fileb://${cdir}/deployment.zip && \
 	rm deployment.zip && \
 	cd ../../
 
-echo 3/3 updateExecutionLog...
-	cd ./lambda/executionLog && \
+echo 3/4 updateExecutionLog...
+cd ./lambda/executionLog && \
 	zip -q -r deployment.zip ./update/* && \
 	cdir=`pwd` && \
 	aws lambda update-function-code --profile=walk30m --function-name=updateExecutionLog --zip-file=fileb://${cdir}/deployment.zip && \
 	rm deployment.zip && \
 	cd ../../
+
+echo 4/4 createMessage...
+cd ./lambda/messages && \
+	zip -q -r deployment.zip ./create/* && \
+	cdir=`pwd` && \
+	aws lambda update-function-code --profile=walk30m --function-name=createMessage --zip-file=fileb://${cdir}/deployment.zip && \
+	rm deployment.zip && \
+	cd ../../
+
 echo done.
 
