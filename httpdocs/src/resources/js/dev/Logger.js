@@ -1,6 +1,6 @@
 define([
 ], function() {
-	var endPoint = 'https://hotsh9cqva.execute-api.ap-northeast-1.amazonaws.com/develop/execution_log/';
+	var endPoint = PUBLIC_API_URL_BASE + '/execution_log/';
 
 	function Logger(calcService) {
 		var me = this;

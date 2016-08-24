@@ -36,7 +36,7 @@ define([
 		$el.find('#extra').css({ top: Math.min($(window).height(), 700) + 'px' });
 		me.initEvents();
 
-		$.get('https://hotsh9cqva.execute-api.ap-northeast-1.amazonaws.com/develop/client_location').done(function(data) {
+		$.get(PUBLIC_API_URL_BASE + '/client_location').done(function(data) {
 			me.mapController = new MapController(me, $el.find('#map-wrapper'), {
 				center: new google.maps.LatLng(data.lat, data.lng)
 			});
@@ -163,7 +163,7 @@ define([
 
 		return $.ajax({
 			type: 'POST',
-			url: 'https://hotsh9cqva.execute-api.ap-northeast-1.amazonaws.com/develop/messages',
+			url: PUBLIC_API_URL_BASE + '/messages',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify({
 				message: message,

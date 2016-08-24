@@ -25,6 +25,9 @@ module.exports = {
 			compress: {
 				drop_debugger: false
 			}
+		}),
+		new webpack.DefinePlugin({
+			PUBLIC_API_URL_BASE: JSON.stringify(process.env.PUBLIC_API_URL_BASE)
 		})
 	],
 	devtool: 'source-map'
