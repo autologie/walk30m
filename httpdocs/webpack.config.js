@@ -14,7 +14,6 @@ module.exports = {
 	},
 	externals: {
 		'window': 'window',
-		'numeric': 'numeric',
 		'google': 'google',
 		'underscore': '_',
 		'jQuery': 'jQuery'

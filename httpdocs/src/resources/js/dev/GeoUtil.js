@@ -1,4 +1,5 @@
 define([
+	'numeric'
 ], function() {
 	'use strict';
 
