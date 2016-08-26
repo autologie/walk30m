@@ -2,8 +2,9 @@ require([
 	'window',
 	'jQuery',
 	'underscore',
-	'./dev/Application.js'
-], function(window, $, _, Application) {
+	'./dev/Application.js',
+	'./dev/locale_ja.js'
+], function(window, $, _, Application, locale) {
 	_.templateSettings = {
 		interpolate: /\{\{(.+?)\}\}/g
 	};
