@@ -19,7 +19,7 @@ exports.handler = (event, context, callback) => {
 		UpdateExpression: "set complete_datetime = :dt, result_path = :path",
 		ExpressionAttributeValues: {
 			":path": {
-				S: JSON.stringify(event.payload.extra_info)
+				S: JSON.stringify(event.payload.result_path)
 			},
 			":dt": {
 				N: (+new Date(event.payload.complete_datetime)).toString()
