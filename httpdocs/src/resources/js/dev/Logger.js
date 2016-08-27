@@ -70,9 +70,7 @@ define([
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify(data)
 		}).done(function(res) {
-			me.executions[res.uuid] = _.defaults({
-				uuid: res.uuid
-			}, data);
+			me.executions[res.uuid] = data;
 
 			task.taskId = res.uuid;
 		});
