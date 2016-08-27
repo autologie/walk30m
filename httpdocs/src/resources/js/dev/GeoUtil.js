@@ -1,6 +1,8 @@
 define([
+	'underscore',
+	'google',
 	'numeric'
-], function() {
+], function(_, google, numeric) {
 	'use strict';
 
 	var GeoUtil = {};
@@ -101,6 +103,10 @@ define([
 		if (p.lat() - origin.lat() < 0 && p.lng() - origin.lng() >= 0) { theta += 2 * Math.PI; }
 		
 		return theta;
+	};
+
+	GeoUtil.latLngToLiteral = function(latLng) {
+		return { lat: latLng.lat(), lng: latLng.lng() };
 	};
 
 	GeoUtil.rotate = function(center, prevPoint, degree) {

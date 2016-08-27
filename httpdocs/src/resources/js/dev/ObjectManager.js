@@ -1,6 +1,8 @@
+'use strict';
 define([
-], function() {
-	'use strict';
+	'underscore',
+	'google'
+], function(_, google) {
 
 	function OM(map) {
 		var me = this;
@@ -19,13 +21,14 @@ define([
 
 		me.addListener('insert_at', function(idx) {
 			var elem = me.getArray()[idx],
-				obj = elem[0],
-				cls = elem[1],
-				id = elem[2],
-				marker;
+				obj = elem[0];
 
 			if (obj.open) {
-				obj.open(me.map);
+				if (elem[3] instanceof google.maps.MVCObject) {
+					obj.open(me.map, elem[3]);
+				} else {
+					obj.open(me.map);
+				}
 			} else {
 				obj.setMap(me.map);
 			}
@@ -42,7 +45,7 @@ define([
 		}
 
 		me.forEach(function(elem, idx) {
-			if (elem[2] === id) {
+			if (elem && elem[2] === id) {
 				me.removeAt(idx);
 				return false;
 			}
@@ -50,18 +53,17 @@ define([
 	};
 
 	OM.prototype.clearObjects = function(taggedAs) {
-		var me = this,
-			toRemove = [];
+		var me = this;
 		
 		me.forEach(function(elem, idx) {
 			if (elem && (taggedAs === undefined || elem[1] === taggedAs)) {
-				toRemove.push(idx);
+				me.removeAt(idx);
+				_.defer(function() {
+					me.clearObjects(taggedAs);
+				});
+				return false;
 			}
 		});
-
-		for (var i = toRemove.length; i > 0; --i) {
-			me.removeAt(i - 1) ;
-		}
 	};
 
 	OM.prototype.findObject = function(id) {
@@ -72,11 +74,11 @@ define([
 		}).pop();
 	};
 
-	OM.prototype.showObject = function(obj, cls, id) {
+	OM.prototype.showObject = function(obj, cls, id, options) {
 		var me = this;
 		
 		me.clearObject(id);
-		me.push([ obj, cls, id ]);
+		me.push([ obj, cls, id, options ]);
 		return obj;
 	};
 

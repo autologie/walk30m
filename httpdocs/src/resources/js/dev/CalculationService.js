@@ -1,15 +1,20 @@
+'use strict';
+
 define([
+	'window',
+	'underscore',
+	'google',
 	'./Calculation.js',
 	'./GeoUtil'
-], function(Calculation, GeoUtil) {
-	'use strict';
-	var twicePI = 2 * Math.PI;
+], function(window, _, google, Calculation, GeoUtil) {
 
 	function CalculationService() {
 		var me = this;
 		
 		me.directionsService = new google.maps.DirectionsService();
 		me.isRunning = false;
+
+		me.addListener('error', _.bind(me.stop, me));
 	}
 
 	CalculationService.prototype = new google.maps.MVCObject();
@@ -63,6 +68,10 @@ define([
 			}
 		}
 
+		if (!dest || _.isNaN(dest.lat()) || _.isNaN(dest.lng())) {
+			google.maps.event.trigger(me, 'error', 'NO_DESTINATION');
+		}
+
 		me.calcRoute(dest, function(res, status) {
 			if (me.isRunning) {
 				tryDispatch(res, status);
@@ -113,7 +122,7 @@ define([
 			google.maps.event.trigger(me, 'progress', progress, added, goals);
 		});
 
-		me.startMonitorVelocity(task, 5000, 1000);
+		me.startMonitorVelocity(task, 30000, 1000);
 
 		me.currentTask = task;
 		me.isPausing = false;
@@ -168,14 +177,30 @@ define([
 	CalculationService.prototype.stop = function() {
 		var me = this;
 		
-		me.isRunning = false;
-		me.stopMonitorVelocity(me.currentTask);
-		delete me.currentTask;
+		if (me.isRunning) {
+			me.isRunning = false;
+			me.stopMonitorVelocity(me.currentTask);
+			delete me.currentTask;
+		}
 	};
 
-	CalculationService.prototype.pause = function() { this.isPausing = true; };
+	CalculationService.prototype.pause = function() {
+		var me = this;
+		
+		me.isPausing = true;
+		me.currentTask.pauseStarted = new Date();
+	};
 
-	CalculationService.prototype.resume = function() { this.isPausing = false; };
+	CalculationService.prototype.resume = function() {
+		var me = this,
+			task = me.currentTask;
+		
+		me.isPausing = false;
+		if (task && task.pauseStarted) {
+			task.pauseTime = task.pauseTime || 0;
+			task.pauseTime += (new Date() - task.pauseStarted);
+		}
+	};
 
 	CalculationService.prototype.willBeCompletedWith = function(wayPoint) {
 		var me = this;
@@ -199,7 +224,7 @@ define([
 			sec = task.config.time,
 			center = task.config.origin,
 			anglePerStep = task.config.anglePerStep,
-			nextDest, sameLocation, rotateBase;
+			nextDest;
 		
 		if (status === google.maps.DirectionsStatus.ZERO_RESULTS) {
 			nextDest = GeoUtil.divide(center, dest, 0.8);

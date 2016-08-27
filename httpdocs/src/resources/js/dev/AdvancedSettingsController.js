@@ -1,5 +1,6 @@
 define([
-], function() {
+	'underscore'
+], function(_) {
 	function AdvancedSettingsController($el) {
 		var me = this;
 
@@ -25,7 +26,8 @@ define([
 				'$optTolls': me.defaultSettings.tolls,
 				'$optHighways': me.defaultSettings.highways,
 				'$optFerries': me.defaultSettings.ferries
-			};
+			},
+			p;
 
 		me.$prefs.removeProp('checked');
 		me.$prefs.filter('[value=' + me.defaultSettings.preference + ']').prop('checked', 'checked');
@@ -38,6 +40,16 @@ define([
 				}
 			}
 		}
+	};
+
+	AdvancedSettingsController.prototype.applyValues = function(values) {
+		var me = this;
+
+		me.$optFerries.prop('checked', !values.avoidFerries);
+		me.$optHighways.prop('checked', !values.avoidHighways);
+		me.$optTolls.prop('checked', !values.avoidTolls);
+		me.$prefs.prop('checked', false);
+		me.$prefs.filter('[value=' + values.preference + ']').prop('checked', true);
 	};
 
 	AdvancedSettingsController.prototype.getValues = function() {

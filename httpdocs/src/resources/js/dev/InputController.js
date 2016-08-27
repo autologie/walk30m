@@ -1,7 +1,13 @@
+'use strict';
+
 define([
+	'window',
+	'jQuery',
+	'underscore',
+	'google',
 	'./GeoUtil.js',
 	'./ProgressBar.js'
-], function(GeoUtil, ProgressBar) {
+], function(window, $, _, google, GeoUtil, ProgressBar) {
 	var minuteArray = _.range(1, 61).concat(_.map(_.range(1, 19), function(n) {
 		return 60 + n * 10;
 	})).concat(_.map(_.range(1, 7), function(n) {
@@ -17,6 +23,7 @@ define([
 		var me = this;
 		var optionTpl = _.template('<option value="{{num}}" {{selected}}>{{num}}</option>');
 
+		me.isSpeechAvailable = undefined !== window.webkitSpeechRecognition;
 		me.mapController = mapController;
 		me.application = application;
 		me.getLocationWatchId = null;
@@ -33,6 +40,9 @@ define([
 
 		me.defaultPlaceholder = me.$location.attr('placeholder');
 
+		if (!me.isSpeechAvailable) {
+			me.$selModeList.find('[data-selmode=' + me.selMode.SPEECH + ']').addClass('disabled');
+		}
 		if (!window.navigator.geolocation) {
 			me.$selModeList.find('[data-selmode=' + me.selMode.CURRENT + ']').addClass('disabled');
 		}
@@ -49,22 +59,35 @@ define([
 					? $target
 					: $target.parents('li');
 
+			$li.blur(); // bug fix -> https://www.pivotaltracker.com/story/show/109711984
 			me.onSelModeChoosed($li.attr('data-selmode'));
 		}).keydown(_.bind(me.onKeyDownSelModeListItem, me))
 			.blur(_.bind(me.onBlurSelModeListItem, me));
 
 		me.$location.focus(function() {
 			me.toggleSelModeList(true);
+
+			if (window.matchMedia('(orientation: portrait)').matches) {
+				_.delay(function() {
+					me.application.$page.animate({
+						scrollTop: Math.round(me.$location.offset().top - 10) + 'px'
+					}, 100);
+				}, 500);
+			}
 		});
 		me.$location.blur(_.bind(me.onBlurSelModeListItem, me));
 		me.$location.keydown(_.bind(me.onKeydown, me));
-		me.$location.change(function() {
-			me.$location.removeAttr('data-latitude');
-			me.$location.removeAttr('data-longitude');
-		});
+		me.$location.change(_.bind(me.resetLatLng, me));
 		me.$time.blur(initializeScroll);
 	};
 	
+	InputController.prototype.resetLatLng = function() {
+		var me = this;
+
+		me.$location.removeAttr('data-latitude');
+		me.$location.removeAttr('data-longitude');
+	};
+
 	InputController.prototype.onBlurSelModeListItem= function() {
 		var me = this;
 
@@ -78,7 +101,6 @@ define([
 
 	InputController.prototype.onKeydown = function(ev) {
 		var me = this,
-			$currentFocus,
 			$items;
 
 		if (ev.keyCode === 13) {
@@ -87,7 +109,6 @@ define([
 		} else if (ev.keyCode === 38 || ev.keyCode === 40) {
 			// up or down
 			$items = me.$selModeList.find('li');
-			$currentFocus = $items.filter(':focus');
 
 			me.$location.blur();
 			$items.eq(ev.keyCode === 38? $items.length - 1: 0).focus();
@@ -163,7 +184,8 @@ define([
 		TEXT: 'selmode-text',
 		MAP: 'selmode-map',
 		CURRENT: 'selmode-current',
-		GEOCODE: 'selmode-geocode'
+		GEOCODE: 'selmode-geocode',
+		SPEECH: 'selmode-voice'
 	};
 
 	InputController.prototype.appendElementToLocationInput = function($el, fix) {
@@ -185,6 +207,8 @@ define([
 			doShow = !isVisible && (show !== false || show === true),
 			doHide = isVisible && (show === false || show !== true),
 			deferred = new $.Deferred();
+
+		window.console.log('InputController: toggleSelModeList', doShow, doHide);
 
 		if (doShow) {
 			me.appendElementToLocationInput(me.$selModeList, { left: -3 });
@@ -216,14 +240,21 @@ define([
 		});
 	};
 
-	InputController.prototype.selectLocationByText = function() {
+	InputController.prototype.selectLocationByText = function(data) {
 		var me = this;
 
 		me.$location.focus();
+
+		if (_.isString(data)) {
+			me.$location.val(data);
+			me.updateLocationCombo();
+		}
 	};
 
 	InputController.prototype.applyGeoLocationResult = function() {
 		var me = this,
+			crd,
+			latLng,
 			__ = _.bind(me.application.getMessage, me.application);
 
 		if (me.lastGeoLocationResult.code === 1) {
@@ -238,84 +269,93 @@ define([
 		} else if (me.lastGeoLocationResult.coords) {
 			crd = me.lastGeoLocationResult.coords;
 			latLng = new google.maps.LatLng(crd.latitude, crd.longitude);
-			me.setLatLng(latLng);
-			me.mapController.map.panTo(latLng);
+			me.setLatLng(latLng).then(function() {
+				me.mapController.map.panTo(latLng);
+				me.$location.attr('placeholder', me.defaultPlaceholder);
+			});
 
 		} else {
 			window.alert(__('geolocationError'));
 		}
 	};
 
+	InputController.prototype.initGeoLocationAPI = function(progressBar) {
+		var me = this;
+		
+		me.geoLocationWatchId = window.navigator.geolocation.watchPosition(function(pos) {
+			// on success
+			me.lastGeoLocationResult = pos;
+			progressBar.finalize();
+		}, function(err) {
+			// on error
+			me.lastGeoLocationResult = err;
+			progressBar.finalize();
+		}, {
+			enableHighAccuracy: true,
+			maximumAge: 0,
+			timeout: 5000
+		});
+
+		me.selectLocationByGeoLocation();
+	};
+
 	InputController.prototype.selectLocationByGeoLocation = function() {
 		var me = this,
-			crd, latLng, bar, $bar, initial = false;
+			bar, $bar;
 
 		if (me.lastGeoLocationResult) {
-			me.$location.attr('placeholder', me.defaultPlaceholder);
 			me.applyGeoLocationResult(me.lastGeoLocationResult);
-			me.$execBtn.focus();
+
+		} else if (me.geoLocationWatchId) {
+			_.delay(_.bind(me.selectLocationByGeoLocation, me), 100);
 
 		} else {
-			if (!me.geoLocationWatchId) {
-				initial = true;
-				$bar = me.$location.parent().find('div[role=progressbar]');
-				bar = new ProgressBar($bar);
-				me.appendElementToLocationInput($bar, { top: 8, left: 7 });
-				bar.update(99.9);
-				me.$location.attr('placeholder', me.application.getMessage('geolocationDetecting'));
-				_.delay(function() {
-					me.geoLocationWatchId = window.navigator.geolocation.watchPosition(function(pos) {
-						// on success
-						me.lastGeoLocationResult = pos;
-						bar.finalize();
-					}, function(err) {
-						// on error
-						me.lastGeoLocationResult = err;
-						bar.finalize();
-					}, {
-						enableHighAccuracy: true,
-						maximumAge: 0,
-						timeout: 5000
-					});
-				}, 500);
-			}
-			
-			_.delay(function() {
-				me.selectLocationByGeoLocation();
-			}, initial? 500: 100);
+			$bar = me.$location.parent().find('div[role=progressbar]');
+			bar = new ProgressBar($bar);
+			me.appendElementToLocationInput($bar, { top: 8, left: 7 });
+			bar.update(99.9);
+			me.$location.attr('placeholder', me.application.getMessage('geolocationDetecting'));
+
+			_.delay(_.bind(me.initGeoLocationAPI, me, bar), 1000);
 		}
 	};
 
 	InputController.prototype.setLatLng = function(loc) {
-		var me = this;
+		var me = this,
+			deferred = new $.Deferred();
 	
 		new google.maps.Geocoder().geocode({
 			location: loc
 		}, function(results, status) {
-				var filteredResults = results.filter(function(r) {
-					// exclude road name
-					return !_.contains(r.types, 'route');
-				});
+				var filteredResults = results && results.filter(function(r) {
+						// exclude road name
+						return !_.contains(r.types, 'route');
+					}),
+					addr;
 
 			if (status !== google.maps.GeocoderStatus.OK) {
 				window.alert(status);
-				return;
-			} else if (filteredResults.length === 0) {
-				addr = '不明な住所';
+				deferred.reject(status);
 			} else {
-				addr = GeoUtil.trimGeocoderAddress(filteredResults[0].formatted_address);
-			}
+				addr = filteredResults.length === 0
+					? '不明な住所'
+					: GeoUtil.trimGeocoderAddress(filteredResults[0].formatted_address);
 
-			me.$location.val(addr);
-			me.$location.attr('data-latitude', loc.lat());
-			me.$location.attr('data-longitude', loc.lng());
-			me.$location.blur();
+				me.$location.val(addr);
+				me.$location.attr('data-latitude', loc.lat());
+				me.$location.attr('data-longitude', loc.lng());
+				me.$location.blur();
+				deferred.resolve();
+			}
 		});
+
+		return deferred.promise();
 	};
 
 	InputController.prototype.onSelModeChoosed = function(mode, data) {
 		var me = this;
 		
+		window.console.log('InputController: onSelModeChoosed', mode, data);
 		me.toggleSelModeList(false);
 
 		if (mode === me.selMode.MAP) {
@@ -327,9 +367,41 @@ define([
 		} else if (mode === me.selMode.TEXT) {
 			me.selectLocationByText();
 
+		} else if (mode === me.selMode.SPEECH) {
+			me.selectLocationBySpeech();
+
 		} else if (mode === me.selMode.CURRENT) {
 			me.selectLocationByGeoLocation();
 		}
+	};
+
+	InputController.prototype.selectLocationBySpeech = function() {
+		var me  = this,
+			recognizer = new window.webkitSpeechRecognition(),
+			accepted,
+			__ = _.bind(me.application.getMessage, me.application);
+
+		recognizer.onresult = function(ev) {
+			var result = ev.results.length > 0? ev.results[0]: null;
+
+			if (result && result[0]) {
+				me.$location.attr('placeholder', me.defaultPlaceholder);
+				me.selectLocationByText(result[0].transcript);
+				accepted = result[0];
+			}
+		};
+
+		recognizer.onend = function() {
+			if (!accepted) {
+				window.alert(__('cannotRecognizeSpeech'));
+				me.$location.attr('placeholder', me.defaultPlaceholder);
+			}
+		};
+
+		me.$location.val('');
+		me.$location.attr('placeholder', __('pleaseSpeak'));
+		recognizer.lang = window.navigator.language;
+		recognizer.start();
 	};
 
 	InputController.prototype.selectLocationByGeocodeResult = function(data) {
@@ -339,6 +411,7 @@ define([
 		me.$location.attr('data-latitude', data.position.lat);
 		me.$location.attr('data-longitude', data.position.lng);
 		me.$execBtn.focus();
+		me.application.mapController.map.setCenter(new google.maps.LatLng(data.position.lat, data.position.lng));
 	};
 
 	InputController.prototype.togglePanel = function(show) {
@@ -351,18 +424,10 @@ define([
 
 		if (doShow) {
 			// me.$el.fadeIn();
-			if (me.isCancellable()) {
-				me.$cancelBtn.show();
-			}
-			$header.animate({ padding: '3.6em 0 0 120px', zoom: '100%' });
-			$header.find('h1').animate({ marginTop: '1em' });
-			me.$el.animate({ height: '100%' });
+			me.$el.removeClass('shrink');
 		} else if (doHide) {
 			// me.$el.fadeOut();
-			me.$cancelBtn.hide();
-			$header.animate({ padding: '1em 0 0 60px', zoom: '60%' });
-			$header.find('h1').animate({ marginTop: '0' });
-			me.$el.animate({ height: '50px' });
+			me.$el.addClass('shrink');
 		}
 	};
 
@@ -378,6 +443,22 @@ define([
 		});
 
 		return retVal;
+	};
+
+	InputController.prototype.applyValues = function(values) {
+		var me = this,
+			$modes = me.$el.find('input[name=travelMode]'),
+			deferred = new $.Deferred();
+
+		me.setLatLng(values.origin).then(function() {
+			me.$location.val(values.address);
+			deferred.resolve();
+		});
+		me.$time.val(Math.round(values.time / 60));
+		$modes.prop('checked', false);
+		$modes.filter('[value=' + values.mode + ']').prop('checked', true);
+
+		return deferred.promise();
 	};
 
 	InputController.prototype.getValues = function() {

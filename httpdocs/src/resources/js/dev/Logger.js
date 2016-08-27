@@ -1,5 +1,9 @@
+'use strict';
 define([
-], function() {
+	'window',
+	'underscore',
+	'jQuery'
+], function(window, _, $) {
 	var endPoint = PUBLIC_API_URL_BASE + '/execution_log/';
 
 	function Logger(calcService) {
@@ -22,12 +26,12 @@ define([
 			dataType: 'json',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify(_.defaults({
-				complete_datetime: new Date().toISOString(),
-				extra_info: _.map(_.collect(vertices.getArray(), 'endLocation'), function(latLng) {
+				completeDatetime: new Date().toISOString(),
+				resultPath: _.map(_.collect(vertices.getArray(), 'endLocation'), function(latLng) {
 					return { lat: latLng.lat(), lng: latLng.lng() };
 				})
 			}, me.executions[taskId]))
-		})
+		});
 	};
 
 	Logger.prototype.collectClientInfo = function() {
@@ -35,26 +39,27 @@ define([
 
 		return {
 			url: window.location.href,
-			viewport: [ $win.width(), $win.height() ]
+			viewport: {
+				width: $win.width(),
+				height: $win.height()
+			}
 		};
 	};
 
 	Logger.prototype.onStart = function(task) {
 		var me = this,
-			request = task.config,
-			center = request.origin,
 			data = _.defaults({
-				start_datetime: new Date().toISOString(),
-				origin_address: task.address,
-				origin_latitude: center.lat(),
-				origin_longitude: center.lng(),
-				travel_mode: task.mode,
-				avoid_ferries: request.avoidFerries? 1: 0,
-				avoid_tolls: request.avoidTolls? 1: 0,
-				avoid_highways: request.avoidHighways? 1: 0,
-				travel_time_sec: task.time,
-				query: request.keyword
-			}, me.collectClientInfo());
+				startDatetime: new Date().toISOString(),
+				isInitial: false
+			}, _.mapObject(_.omit(task.config, 'address'), function(val, key) {
+				return key === 'origin'
+					? {
+						address: task.config.address,
+						lat: val.lat(),
+						lng: val.lng()
+					}
+					: val;
+			}), me.collectClientInfo());
 
 		$.ajax({
 			url: endPoint,

@@ -1,15 +1,27 @@
+'use strict';
+
 define([
+	'window',
+	'jQuery',
+	'underscore',
+	'google',
 	'./CalculationService.js',
 	'./Logger.js',
 	'./GeoUtil.js',
+	'./Walk30mUtils.js',
 	'./AdvancedSettingsController.js',
 	'./ProgressBar.js',
 	'./MapController.js',
 	'./InputController.js'
 ], function(
+	window,
+	$,
+	_,
+	google,
 	CalculationService,
 	Logger,
 	GeoUtil,
+	Walk30mUtils,
 	AdvancedSettingsController,
 	ProgressBar,
 	MapController,
@@ -47,27 +59,111 @@ define([
 			);
 			me.progressBar = new ProgressBar($el.find('#progressbar'));
 			console.log('Application: initialized', new Date() - startDate);
+
+			me.route();
 		}).fail(function(err) {
 			window.alert(err);
 		});
-
 	}
 	
+	Application.prototype.route = function() {
+		var me = this,
+			parseQuery = function(s) {
+				var ret = s.split('=');
+				
+				return [
+					ret[0],
+					window.decodeURIComponent(ret[1])
+				];
+			},
+			splittedHash = window.location.hash.split('?'),
+			path = splittedHash[0].split('/')[1],
+			query = _.object((splittedHash[1] || '').split('&').map(parseQuery));
+
+		if (path === 'calc') {
+			me.startCalcByQuery(query.request);
+		} else if (path === 'result') {
+			me.startViewResult(query.path, query.request);
+		} else {
+			me.moveTo(path);
+		}
+	};
+
+	Application.prototype.startViewResult = function(path, request) {
+		var me = this,
+			decoded;
+
+		try {
+			request = JSON.parse(request);
+			decoded = Walk30mUtils.decodeResult(path);
+
+			me.inputController.applyValues(_.defaults({
+				origin: new google.maps.LatLng(request.origin.lat, request.origin.lng)
+			}, request)).then(function() {
+				me.advancedSettingsController.applyValues(request);
+
+				me.$cancelBtn.show();
+				me.mapController.resultVisualizer.addResult({
+					taskId: 'viewonly',
+					vertices: new google.maps.MVCArray(decoded.map(function(latLng) {
+						return {
+							endLocation: new google.maps.LatLng(latLng.lat, latLng.lng)
+						};
+					})),
+					config: request
+				});
+				me.viewMap();
+
+			});
+		} catch (ex) {
+			window.alert(me.getMessage('brokenResult'));
+			window.history.pushState(null, '', '/#!/');
+		}
+	};
+
+	Application.prototype.startCalcByQuery = function(req) {
+		var me = this;
+
+		try {
+			req = JSON.parse(req);
+			if (req && req.origin) {
+				me.inputController.applyValues(_.defaults({
+					origin: new google.maps.LatLng(req.origin.lat, req.origin.lng)
+				}, req)).then(function() {
+					me.advancedSettingsController.applyValues(req);
+					me.startCalculation();
+				});
+			} else {
+				throw new Error('Not sufficient parameters provided.');
+			}
+		} catch(ex) {
+			window.history.pushState(null, '', '/#!/');
+		}
+	};
+
 	Application.prototype.initEvents = function() {
 		var me = this;
 
+		me.calcService.addListener('start', _.bind(me.onStartCalculation, me));
 		me.calcService.addListener('complete', _.bind(me.onCompleteCalculation, me));
 		me.calcService.addListener('progress', _.bind(me.onProgressCalculation, me));
-		me.calcService.addListener('warn', _.bind(me.onWarning, me));
+		me.calcService.addListener('warn', _.bind(me.onWarning, me, me.calcService));
+		me.calcService.addListener('error', _.bind(me.onError, me, me.calcService));
 
 		me.$goToAboutLink.click(_.bind(me.onClickGoToAboutBtn, me));
 		me.$goToAdvancedSettingsLink.click(_.bind(me.onClickGoToAdvancedSettingsBtn, me));
 		me.$el.scroll(_.bind(me.onScroll, me));
-		me.$gotoTopBtn.click(_.bind(me.scrollToTop, me));
+		me.$gotoTopBtn.click(_.bind(me.moveTo, me, 'top'));
 		me.$sendMsgBtn.click(_.bind(me.onClickSendMsgBtn, me));
 		me.$execBtn.click(_.bind(me.startCalculation, me));
 		me.$cancelBtn.click(_.bind(me.viewMap, me));
-		me.scrollToTop();
+	};
+
+	Application.prototype.onStartCalculation = function(task) {
+		var me = this,
+			serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
+
+		window.history.pushState(null, '', '/#!/calc?request=' + serializedCalculation);
 	};
 
 	Application.prototype.viewMap = function() {
@@ -85,18 +181,50 @@ define([
 		me.progressBar.update(percent);
 	};
 
-	Application.prototype.onWarning = function(message) {
+	Application.prototype.onError= function(calcService, message) {
 		var me = this;
 
+		window.alert([
+			me.getMessage('pleaseCheckConditions'),
+			message
+		].join('\r\n'));
+		me.onExitCalculation();
+	};
+
+	Application.prototype.onWarning = function(calcService, message) {
+		var me = this;
+
+		if (me.lastDenialReload
+				&& new Date() - me.lastDenialReload < 60000) {
+			return;
+		}
+
 		if (window.confirm(me.getMessage('askIfReload'))) {
+			calcService.stop();
 			window.location.reload();
+		} else {
+			me.lastDenialReload = new Date();
 		}
 	};
 
-	Application.prototype.onCompleteCalculation = function(vertices) {
-		var me = this;
+	Application.prototype.onCompleteCalculation = function(vertices, task) {
+		var me = this,
+			feature = new google.maps.Data.Feature({
+				geometry: new google.maps.Data.Polygon([
+					_.collect(vertices.getArray(), 'endLocation')
+				]),
+				id: task.taskId,
+				properties: _.defaults({
+					isResult: true,
+					vertices: task.vertices.getArray().slice(0),
+					task: task
+				}, task)
+			}),
+			resultUrl = Walk30mUtils.createSharedURI(feature),
+			newPath = '/' + (resultUrl || '').split('/').slice(3).join('/');
 
 		me.progressBar.update(100);
+		window.history.pushState(null, '', newPath);
 	};
 
 	Application.prototype.onScroll = _.throttle(function() {
@@ -109,31 +237,45 @@ define([
 		}
 	}, 100);
 
+	Application.prototype.moveTo = function(id) {
+		var me = this,
+			$target = id && me.$el.find('#' + id);
+
+		if (id !== 'top' && $target && $target.length > 0) {
+			me.$page.animate({
+				scrollTop: $target.offset().top + 'px'
+			}, undefined, 'swing', function() {
+				window.history.pushState(null, '', '/#!/' + id);
+			});
+		} else {
+			me.scrollToTop(function() {
+				window.history.pushState(null, '', '/#!/');
+			});
+		}
+	};
+
 	Application.prototype.onClickGoToAdvancedSettingsBtn = function(ev) {
 		var me = this;
 
 		ev.preventDefault();
-		me.$page.animate({
-			scrollTop: me.$el.find('#advanced-settings').offset().top + 'px'
-		}, undefined, 'swing');
+		me.moveTo('advanced-settings');
 	};
 
 	Application.prototype.onClickGoToAboutBtn = function(ev) {
 		var me = this;
 
 		ev.preventDefault();
-		me.$page.animate({
-			scrollTop: me.$el.find('#about').offset().top + 'px'
-		}, undefined, 'swing');
+		me.moveTo('about');
 	};
 
 	Application.prototype.onClickSendMsgBtn = function() {
 		var me = this,
-			message = me.$el.find('#message textarea').val();
+			message = me.$el.find('#message textarea').val(),
+			uuid = me.$el.find('#message input[name=uuid]').val();
 
 		if (message) {
 			me.$sendMsgBtn.addClass('disabled');
-			me.sendMessage(message).then(function() {
+			me.sendMessage(message, uuid).then(function() {
 					_.delay(function() {
 						me.$sendMsgBtn.removeClass('disabled');
 					}, 500);
@@ -158,7 +300,7 @@ define([
 		});
 	};
 
-	Application.prototype.sendMessage = function(message) {
+	Application.prototype.sendMessage = function(message, uuid) {
 		var me = this;
 
 		return $.ajax({
@@ -166,18 +308,19 @@ define([
 			url: PUBLIC_API_URL_BASE + '/messages',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify({
-				message: message,
+				message: uuid + ', ' + message,
 				url: window.location.href
 			})
 		}).done(function() {
 			window.alert(me.getMessage('thanks'));
 		}).fail(function() {
+			window.alert(me.getMessage('failedToSendMessage'));
 		});
 	};
 
 	Application.prototype.compareGeocoderResultsByDistance = function(r1, r2) {
 		var me = this,
-			center = me.mapController.map.getCenter();
+			center = me.mapController.map.getCenter(),
 			loc1 = r1.geometry.location,
 			loc2 = r2.geometry.location,
 			r1Dist = Math.pow(loc1.lat() - center.lat(), 2) + Math.pow(loc1.lng() - center.lng(), 2),
@@ -211,7 +354,7 @@ define([
 
 					me.doCalculation(_.defaults({
 						origin: sortedResults[0].geometry.location,
-						address: GeoUtil.trimeGeocoderAddress(sortedResults[0].formatted_address),
+						address: GeoUtil.trimGeocoderAddress(sortedResults[0].formatted_address),
 						keyword: settings.address
 					}, settings));
 				});
@@ -226,7 +369,7 @@ define([
 		var me = this;
 
 		me.inputController.togglePanel(true);
-		me.calcService.stop();
+		window.history.pushState(null, '', '/#!/');
 		me.progressBar.finalize();
 		if (complete) {
 			me.$cancelBtn.show();
@@ -249,17 +392,16 @@ define([
 		me.mapController.startCalculation(me.calcService, _.bind(me.onExitCalculation, me));
 	};
 
-	Application.prototype.startEditMessage = function(message) {
+	Application.prototype.startEditMessage = function(message, relatedResultId) {
 		var me = this;
 
+		me.$el.find('#message input[name=uuid]').val(relatedResultId);
 		me.$message.val(message);
-		me.$page.animate({
-			scrollTop: me.$el.find('#message').offset().top + 'px'
-		}, undefined, 'swing');
 		me.$message.focus();
 		if (message) {
 			me.$message.attr('rows', 10);
 		}
+		me.moveTo('message');
 	};
 
 	Application.prototype.getMessage = function(code) {

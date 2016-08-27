@@ -1,18 +1,40 @@
-define(function() {
+define([
+	'window',
+	'underscore',
+	'google'
+], function(window, _,google) {
 	function Footprint(markerOptions) {
+		var me = this,
+			merged;
+		
+		me.angle = markerOptions && markerOptions.angle;
+		me.__map = markerOptions && markerOptions.map;
+		me.__options = _.omit(markerOptions, 'map', 'angle');
+		merged = _.defaults({
+			icon: me.createIconOption(true)
+		}, me.__options);
+		google.maps.Marker.call(me, merged);
+	}
+
+	Footprint.prototype = new google.maps.Marker();
+
+	Footprint.prototype.startFrom = function(origin) {
 		var me = this;
 		
-		google.maps.Marker.constructor.call(me, markerOptions);
 		me.angle = 90;
 		me.stepCount = 0;
+		me.setOptions({ position: origin });
+		me.setMap(me.__map);
+
+		if (me.timer) {
+			window.clearInterval(me.timer);
+		}
 
 		me.timer = window.setInterval(function() {
 			me.stepCount++;
 			me.setIcon(me.createIconOption());
 		}, 500);
-	}
-
-	Footprint.prototype = new google.maps.Marker();
+	};
 
 	Footprint.prototype.stop = function() {
 		var me = this;
@@ -24,7 +46,7 @@ define(function() {
 	Footprint.prototype.createIconOption = function(stop) {
 		var me = this;
 		
-		return {
+		return _.defaults((me.__options || {}).icon || {}, {
 			path: stop
 				? [
 				'M',
@@ -524,7 +546,7 @@ define(function() {
 			rotation: me.angle,
 			scale: 1,
 			anchor: new google.maps.Point(15, 24)
-		};
+		});
 	};
 
 	Footprint.prototype.setAngle = function(angle) { this.angle = angle; };

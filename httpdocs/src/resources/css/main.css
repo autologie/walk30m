@@ -1,4 +1,5 @@
 body {
+	font-family: Meiryo, sans-serif;
 	color: #222;
 }
 h1,
@@ -11,7 +12,6 @@ h1 {
 }
 #app-header h1 {
 	margin: 0;
-	margin-top: 1em;
 }
 h2 {
 	font-size: 2em;
@@ -86,15 +86,41 @@ input[type=phone] {
 	/* background-image: url(/resources/images/walking4.png); */
 	/* background-repeat: no-repeat; */
 	/* background-size: contain; */
-	/* background-position: calc(50% - 300px); */
+	/* background-position-x: calc(50% - 300px); */
+	/* background-position-y: 0; */
 	/* padding-left: 120px; */
+}
+
+#control.shrink {
+	overflow: hidden;
+	height: 50px;
+	animation-name: toggle-input-panel;
+	animation-duration: .2s;
+	animation-fill-mode: forwards;
+}
+
+#control.shrink .glyphicon[role=cancel] {
+	display: none;
+}
+#control.shrink #app-header {
+	padding: .7em 0 0 60px;
+	background-position: calc(50% - 150px);
+}
+#control.shrink #app-header h1 {
+	margin-top: 0;
+	font-size: 22px;
+	padding-left: 0;
 }
 
 .btn.btn-default,
 .btn.btn-primary {
 	width: 360px;
 }
-@media (max-width: 400px) {
+
+@media
+	(max-width: 414px),
+	(orientation: portrait) {
+
 	h3 {
 		margin-top: 1em;
 		margin-bottom: 1em;
@@ -103,13 +129,24 @@ input[type=phone] {
 		margin: .2em .5em
 	}
 	#app-header {
-		background-size: 120px;
+		padding: 28% 0 0 0;
+		margin-bottom: 1em;
+		background-size: 48%;
 		background-position: center top;
+	}
+	#control.shrink #app-header {
+		padding: 1em 0 0 60px;
+		background-size: contain;
+		background-position: 10px;
+	}
+	#control.shrink #app-header h1 {
+		font-size: 18px;
 	}
 	#app-header h1 {
 		font-size: 1.6em;
 		padding-left: 0;
 	}
+
 	.btn.btn-default,
 	.btn.btn-primary {
 		width: 70%;
@@ -147,20 +184,13 @@ input[type=phone] {
 		display: block;
 	}
 }
-@media (max-height: 600px) {
-	/* iPhone5, portrait */
+@media
+	(max-width: 414px) and (min-width: 500px),
+	(orientation: portrait) and (min-width: 500px) {
+
 	#app-header {
-		padding: 3.6em 0 0 0;
-		margin-bottom: 1em;
-	}
-	#control p {
-		font-size: .9em;
-	}
-	button,
-	select,
-	input {
-		font-size: 1.2em;
-		line-height: 1.3em;
+		padding: 120px 0 0 0;
+		background-size: 200px;
 	}
 }
 
@@ -201,7 +231,6 @@ li {
 	font-size: 120%;
 	padding-right: 1em;
 	padding-left: 1em;
-	overflow: hidden;
 	/* box-sizing: content-box; */
 }
 #control .control-search {
@@ -236,10 +265,10 @@ li {
 	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
 	display: none;
 	margin: 10px 0px 0px 10px;
-	z-index: 1000;
+	z-index: 10000;
 }
 .select li {
-	padding: 1em 2em;
+	padding: 1em 1em;
 	text-align: left;
 	margin: 0px;
 	display: block;
@@ -253,7 +282,7 @@ li {
 	background-color: #f8f8f8;
 }
 .select li .glyphicon {
-	margin-right: 1em;
+	margin-right: .3em;
 	font-size: 130%;
 }
 .glyphicons {
@@ -261,11 +290,12 @@ li {
 	height: 0px;
 }
 .select li.disabled {
-	color: #aaa;
+	opacity: .3;
+	cursor: default;
 }
 #map-wrapper .center-marker {
 	left: 50%;
-	top: 50%;
+	top: calc(50% + 25px);
 	background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi_hdpi.png);
 	background-repeat: no-repeat;
 	margin-top: -40px;
@@ -274,6 +304,7 @@ li {
 	margin-left: -11px;
 	background-size: contain;
 	display: none;
+	pointer-events: none;
 }
 #map-wrapper .btn {
 	display: none;
@@ -313,7 +344,7 @@ li {
 div[role=progressbar] {
 	position: absolute;
 	width: 100%;
-	height: 3px;
+	height: 5px;
 	background-color: rgba(255, 255, 255, 0.5);
 	z-index: 20;
 	display: none;
@@ -351,6 +382,16 @@ div[role=progressbar] .progress .inner {
 	}
 }
 
+@keyframes toggle-input-panel {
+	from {
+	}
+	to {
+		height: 50px;
+	}
+}
+
+
+
 .btn[role=goto-top]:hover {
 	background-color: inherit;
 }
@@ -366,7 +407,7 @@ div[role=progressbar] .progress .inner {
 	z-index: 30000;
 	width: 64px;
 	height: 64px;
-	border-radius: 32px;
+	border-radius: 50%;
 	background-color: #fff;
 	color: #2b8;
 	border: 2px solid #2b8;
@@ -448,6 +489,21 @@ input[type=radio] ~ label {
 	margin-left: auto;
 	margin-right: auto;
 }
+section.glyphicon-bg {
+	overflow: hidden;
+}
+section.glyphicon-bg:before {
+	font-family: 'Glyphicons Halflings';
+	font-size: 20em;
+	color: rgba(200, 200, 200, 0.3);
+	line-height: 0px;
+	margin-left: -1em;
+}
+
+section.glyphicon-bg h2 {
+	display: inline-block;
+	vertical-align: bottom;
+}
 
 #advanced-settings input[type=checkbox] ~ label,
 #advanced-settings input[type=radio] ~ label {
@@ -474,3 +530,13 @@ input[type=radio] ~ label {
 #control .social-buttons > * {
 	vertical-align: bottom;
 }
+.gm-style-iw h4 div.result-identifier-color {
+	display: inline-block;
+	height: 24px;
+	width: 24px;
+	background-color: hsla(60, 50%, 33%, .5);
+	margin: 0 .4em .4em 0;
+	vertical-align: middle;
+	border: 2px solid hsl(60, 50%, 33%);
+}
+

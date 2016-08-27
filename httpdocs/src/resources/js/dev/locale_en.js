@@ -1,6 +1,9 @@
 window.messages = {
-	"resultSummaryBalloonTpl": [
-		'<h4>Area within {{timeExpr}} from {{originAddress}}</h4>',
+	"resultOverviewBalloonTpl": [
+		'<h4>',
+			'<div style="background-color: {{bgColor}}; border-color: {{borderColor}}; " class="result-identifier-color"></div>',
+			'<span>Area within {{timeExpr}} minutes from {{originAddress}}</span>',
+		'</h4>',
 		'<div>',
 			'<a role="show-routes" >Show routes</a>',
 			'<a role="erase-result">Clear this result</a>',
@@ -8,7 +11,17 @@ window.messages = {
 			'<a role="report-problem">Report problems on this result</a>',
 		'</div>'
 	].join(''),
+	"resultSummaryBalloonTpl": [
+		'<h4>',
+			'<div style="background-color: {{bgColor}}; border-color: {{borderColor}}; " class="result-identifier-color"></div>',
+			'<span>Area within {{timeExpr}} minutes from {{originAddress}}</span>',
+		'</h4>',
+		'<div>',
+			'<a role="erase-result">Clear this result</a>',
+		'</div>'
+	].join(''),
 	"routeDetailBalloonTpl": [
+		'<a role="back-to-summary">&lt;&lt; Back to Summary</a>',
 		'<h4>{{summary}}</h4>',
 		'<p>It takes {{time}} to reach to {{dest}}.</p>',
 		'<a href="{{url}}" target="_blank">',
@@ -17,7 +30,7 @@ window.messages = {
 		'<hr>',
 		'<p>{{copyright}}</p>'
 	].join(''),
-	"summaryTpl": "The area within {{timeExpr}} {{travelModeExpr}} from {{originAddress}}",
+	"summaryTpl": "The area within {{timeExpr}} minutes {{travelModeExpr}} from {{originAddress}}",
 	"tweetMessageTpl": "The area within {{timeExpr}} minutes {{travelModeExpr}} from {{originAddress}}:",
 	"contact": "Please input the message body.",
 	"thanks": "Thank you for your cooperation!",
@@ -38,15 +51,18 @@ window.messages = {
 	"geolocationFailure": "The current location could not be detected.",
 	"geolocationError": "An unknown error occured in the GeoLocation API.",
 	"geolocationDetecting": "Detecting the current location...",
-	"timeUnitMinExpr": "min.",
 	"reportMessageTpl": [
-		"I am reporting an problem about the following result:",
-		"ID: {{id}}",
+		"I am reporting a problem about the following result:",
 		"{{summary}}",
 		"------",
 		"(Please describe the problem you found below.)",
 		""
 	].join('\r\n'),
-	"askIfReload": "It seems that the compution is taking long time. This problem may be resolved by reloading the web page. Would you like to reload now?"
+	"askIfReload": "It seems that the compution is taking long time. This problem may be resolved by reloading the web page. Would you like to reload now?",
+	"failedToSendMEssage": "Oops! Something bad happend and your message is not sent.",
+	"brokenResult": "Oops! The result you requested seems to be broken!",
+	"pleaseSpeak": "Please speak...",
+	"cannotRecognizeSpeech": "Sorry, could not recognize.",
+	"pleaseCheckConditions": "An error occured during the calculation. If this happens repeatedly, please check the condition you input. Chances are that there is no route around the specified location."
 };
 
