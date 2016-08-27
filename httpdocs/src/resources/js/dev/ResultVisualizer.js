@@ -2,7 +2,7 @@
 define([
 	'window',
 	'jQuery',
-	'underscore',
+	'lodash',
 	'google',
 	'./GeoUtil.js',
 	'./Walk30mUtils.js',
@@ -243,7 +243,7 @@ define([
 
 	ResultVisualizer.prototype.addResult = function(result) {
 		var me = this,
-			vertices = _.collect(result.vertices.getArray(), 'endLocation'),
+			vertices = _.map(result.vertices.getArray(), 'endLocation'),
 			toSpline = vertices.concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2))),
 			toGeoJsonCoord = function(coord) {
 				return [ coord.lng(), coord.lat() ];

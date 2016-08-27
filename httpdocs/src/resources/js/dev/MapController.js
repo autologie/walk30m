@@ -1,7 +1,7 @@
 'use strict';
 define([
 	'window',
-	'underscore',
+	'lodash',
 	'google',
 	'./GeoUtil.js',
 	'./Footprint.js',

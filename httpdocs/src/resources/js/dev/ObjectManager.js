@@ -1,6 +1,6 @@
 'use strict';
 define([
-	'underscore',
+	'lodash',
 	'google'
 ], function(_, google) {
 

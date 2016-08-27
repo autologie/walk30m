@@ -2,7 +2,7 @@
 
 define([
 	'window',
-	'underscore',
+	'lodash',
 	'google',
 	'./Calculation.js',
 	'./GeoUtil'

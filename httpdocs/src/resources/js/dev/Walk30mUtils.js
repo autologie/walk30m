@@ -1,7 +1,7 @@
 'use strict';
 define([
 	'window',
-	'underscore'
+	'lodash'
 ], function(window, _) {
 	var Walk30mUtils = {};
 
@@ -58,7 +58,7 @@ define([
 	};
 
 	Walk30mUtils.createSharedURI = function(feature) {
-		var path = _.collect(feature.getProperty('vertices'), 'endLocation');
+		var path = _.map(feature.getProperty('vertices'), 'endLocation');
 
 		try {
 			return _.template('https://www.walk30m.com/#!/result?request={{req}}&path={{path}}')({

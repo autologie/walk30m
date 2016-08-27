@@ -1,6 +1,6 @@
 define([
 	'window',
-	'underscore',
+	'lodash',
 	'google'
 ], function(window, _,google) {
 	function Footprint(markerOptions) {

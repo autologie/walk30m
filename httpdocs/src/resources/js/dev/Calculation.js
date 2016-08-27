@@ -1,5 +1,5 @@
 define([
-	'underscore',
+	'lodash',
 	'google',
 	'./GeoUtil'
 ], function(_, google, GeoUtil) {
@@ -25,7 +25,7 @@ define([
 	Calculation.prototype = new google.maps.MVCObject();
 
 	Calculation.prototype.getGoals = function() {
-		return _.collect(this.vertices.getArray(), 'endLocation');
+		return _.map(this.vertices.getArray(), 'endLocation');
 	};
 
 	Calculation.prototype.getProgress = function() {

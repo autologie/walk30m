@@ -3,7 +3,7 @@
 define([
 	'window',
 	'jQuery',
-	'underscore',
+	'lodash',
 	'google',
 	'./CalculationService.js',
 	'./Logger.js',
@@ -78,7 +78,7 @@ define([
 			},
 			splittedHash = window.location.hash.split('?'),
 			path = splittedHash[0].split('/')[1],
-			query = _.object((splittedHash[1] || '').split('&').map(parseQuery));
+			query = _.fromPairs((splittedHash[1] || '').split('&').map(parseQuery));
 
 		if (path === 'calc') {
 			me.startCalcByQuery(query.request);
@@ -211,7 +211,7 @@ define([
 		var me = this,
 			feature = new google.maps.Data.Feature({
 				geometry: new google.maps.Data.Polygon([
-					_.collect(vertices.getArray(), 'endLocation')
+					_.map(vertices.getArray(), 'endLocation')
 				]),
 				id: task.taskId,
 				properties: _.defaults({

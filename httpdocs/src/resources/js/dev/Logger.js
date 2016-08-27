@@ -1,7 +1,7 @@
 'use strict';
 define([
 	'window',
-	'underscore',
+	'lodash',
 	'jQuery'
 ], function(window, _, $) {
 	var endPoint = PUBLIC_API_URL_BASE + '/execution_log/';
@@ -26,8 +26,8 @@ define([
 			dataType: 'json',
 			contentType: 'application/json; charset=utf-8',
 			data: JSON.stringify(_.defaults({
-				completeDatetime: new Date().toISOString(),
-				resultPath: _.map(_.collect(vertices.getArray(), 'endLocation'), function(latLng) {
+				complete_datetime: new Date().toISOString(),
+				result_path: _.map(_.map(vertices.getArray(), 'endLocation'), function(latLng) {
 					return { lat: latLng.lat(), lng: latLng.lng() };
 				})
 			}, me.executions[taskId]))
@@ -48,10 +48,10 @@ define([
 
 	Logger.prototype.onStart = function(task) {
 		var me = this,
-			data = _.defaults({
+			data = _.mapKeys(_.defaults({
 				startDatetime: new Date().toISOString(),
 				isInitial: false
-			}, _.mapObject(_.omit(task.config, 'address'), function(val, key) {
+			}, _.mapValues(_.omit(task.config, 'address'), function(val, key) {
 				return key === 'origin'
 					? {
 						address: task.config.address,
@@ -59,7 +59,9 @@ define([
 						lng: val.lng()
 					}
 					: val;
-			}), me.collectClientInfo());
+			}), me.collectClientInfo()), function(value, key) {
+				return _.snakeCase(key);
+			});
 
 		$.ajax({
 			url: endPoint,

@@ -1,5 +1,5 @@
 define([
-	'underscore'
+	'lodash'
 ], function(_) {
 	function AdvancedSettingsController($el) {
 		var me = this;

@@ -1,5 +1,5 @@
 define([
-	'underscore',
+	'lodash',
 	'google',
 	'numeric'
 ], function(_, google, numeric) {

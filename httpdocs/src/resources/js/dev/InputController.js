@@ -3,7 +3,7 @@
 define([
 	'window',
 	'jQuery',
-	'underscore',
+	'lodash',
 	'google',
 	'./GeoUtil.js',
 	'./ProgressBar.js'
@@ -329,7 +329,7 @@ define([
 		}, function(results, status) {
 				var filteredResults = results && results.filter(function(r) {
 						// exclude road name
-						return !_.contains(r.types, 'route');
+						return !_.includes(r.types, 'route');
 					}),
 					addr;
 

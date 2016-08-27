@@ -1,7 +1,7 @@
 require([
 	'window',
 	'jQuery',
-	'underscore',
+	'lodash',
 	'./dev/Application.js',
 	'./dev/locale_ja.js'
 ], function(window, $, _, Application, locale) {

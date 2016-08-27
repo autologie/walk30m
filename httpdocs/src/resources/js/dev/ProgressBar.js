@@ -1,7 +1,7 @@
 'use strict';
 
 define([
-	'underscore'
+	'lodash'
 ], function(_) {
 	function ProgressBar($el) {
 		var me = this;
