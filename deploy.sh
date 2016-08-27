@@ -9,64 +9,15 @@ echo "  \_/\_/ \__,_|_|_|\_\____/  \___/|_| |_| |_|  \__,_|\___| .__/|_|\___/ \_
 echo "                                                         | |             __/ |"
 echo "                                                         |_|            |___/ "
 
-echo building frontend assets...
-rm -rf ./tmp
-mkdir tmp
-cp -r ./httpdocs/src/* ./tmp/
+echo deploying frontend assets...
 cd ./httpdocs
-webpack > /dev/null
+./deploy.sh
 cd ../
-rm -rf ./tmp/resources/js/*
-cp -r ./httpdocs/target/resources/js/* ./tmp/resources/js/
-cat ./httpdocs/src/index.html \
-	| sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
-	| sed s/%GA_TRACKING_ID%/$GA_TRACKING_ID/g \
-	> ./tmp/index.html
-echo done.
-
-echo uploading static files...
-aws s3 sync --profile=walk30m --quiet ./tmp s3://$S3_PUBLIC_BUCKET_NAME
-rm -rf ./tmp
 echo done.
 
 echo deploying lambda functions...
-echo 1/4 ipInfo...
-cd ./lambda && \
-rm -rf ./target && \
-mkdir target && \
-	cp -r ./ipInfo ./target/ && \
-	cat ./ipInfo/config.js | sed s/%IP_INFO_DB_KEY%/$IP_INFO_DB_KEY/g > ./target/ipInfo/config.js && \
-	cd ./target && \
-	zip -q -r deployment.zip ./ipInfo/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=ipInfo --zip-file=fileb://${cdir}/deployment.zip > /dev/null && > /dev/null \
-	rm deployment.zip && \
-	rm -rf ./target && \
-	cd ../../
-
-echo 2/4 createExecutionLog...
-cd ./lambda/executionLog && \
-	zip -q -r deployment.zip ./create/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=createExecutionLog --zip-file=fileb://${cdir}/deployment.zip > /dev/null && \
-	rm deployment.zip && \
-	cd ../../
-
-echo 3/4 updateExecutionLog...
-cd ./lambda/executionLog && \
-	zip -q -r deployment.zip ./update/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=updateExecutionLog --zip-file=fileb://${cdir}/deployment.zip > /dev/null && \
-	rm deployment.zip && \
-	cd ../../
-
-echo 4/4 createMessage...
-cd ./lambda/messages && \
-	zip -q -r deployment.zip ./create/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=createMessage --zip-file=fileb://${cdir}/deployment.zip > /dev/null && \
-	rm deployment.zip && \
-	cd ../../
-
+cd ./lambda
+./deploy.sh
+cd ../
 echo done.
 
