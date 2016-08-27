@@ -19,7 +19,14 @@ exports.handler = (event, context, callback) => {
 		UpdateExpression: "set complete_datetime = :dt, result_path = :path",
 		ExpressionAttributeValues: {
 			":path": {
-				S: JSON.stringify(event.payload.result_path)
+				L: event.payload.result_path.map((location) => {
+				   return {
+					   M: {
+						 lat: { N: String(location.lat) },
+						 lng: { N: String(location.lng) }
+					  }
+				   };
+			   })
 			},
 			":dt": {
 				N: (+new Date(event.payload.complete_datetime)).toString()
