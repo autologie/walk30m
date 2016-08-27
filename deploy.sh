@@ -32,6 +32,7 @@ echo done.
 echo deploying lambda functions...
 echo 1/4 ipInfo...
 cd ./lambda && \
+rm -rf ./target && \
 mkdir target && \
 	cp -r ./ipInfo ./target/ && \
 	cat ./ipInfo/config.js | sed s/%IP_INFO_DB_KEY%/$IP_INFO_DB_KEY/g > ./target/ipInfo/config.js && \
