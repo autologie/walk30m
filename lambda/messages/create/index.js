@@ -1,22 +1,18 @@
 'use strict';
 console.log('Loading function');
 
-let doc = require('dynamodb-doc');
-let dynamo = new doc.DynamoDB();
-let nodeUuid = require('node-uuid');
+let aws = require('aws-sdk');
+let sns = new aws.SNS();
 
 exports.handler = (event, context, callback) => {
-	let uuid = nodeUuid.unparse(nodeUuid.v4(null, new Array(32), 0));
-
-    dynamo.putItem({
-		TableName: "messages",
-		Item: Object.assign(event.payload, {
-			uuid,
-			datetime: +new Date(),
+    sns.publish({
+        Subject: "New message from walk30m user",
+        Message: JSON.stringify(Object.assign(event.payload, {
 			user_agent: event.userAgent,
 			client_ip: event.sourceIp
-		})
-	}, (e) => {
+        })),
+        TopicArn: "%MESSAGE_TOPIC_ARN%"
+    }, (e) => {
 		console.log(e);
 		callback(null, "");
 	});

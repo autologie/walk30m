@@ -19,3 +19,4 @@ https://www.walk30m.com
 | `IP_INFO_DB_KEY` | Published by IPInfoDB to use its API |
 | `PUBLIC_API_URL_BASE` | An URL of the walk30m public API |
 | `S3_PUBLIC_BUCKET_NAME` | The name of an S3 bucket to host app |
+| `MESSAGE_TOPIC_ARN` | Amazon SNS topic ARN to receive messages from a form on the website
