@@ -1,16 +1,12 @@
-require([
-	'window',
-	'jQuery',
-	'lodash',
-	'./Application.js',
-	'./locale_ja.js'
-], function(window, $, _, Application, locale) {
-	_.templateSettings = {
-		interpolate: /\{\{(.+?)\}\}/g
-	};
+import window from "window";
+import $ from "jQuery";
+import _ from "lodash";
+import Application from "./Application";
+import locale from "./locale_ja";
 
-	$(function() {
-		new Application($(window.document));
-	});
-});
+_.templateSettings = {
+    interpolate: /\{\{(.+?)\}\}/g
+};
+
+$(() => new Application($(window.document)));
 

@@ -7,6 +7,11 @@ module.exports = {
 	resolve: {
 		root: __dirname
 	},
+	resolveLoader: {
+		modulesDirectories: [
+			path.join(__dirname, "node_modules")
+		]
+	},
 	output: {
 		filename: 'app.js',
 		path: path.join(__dirname, '/target/resources/js'),
@@ -16,7 +21,11 @@ module.exports = {
 		'window': 'window',
 		'google': 'google'
 	},
-	module: { loaders: [ ] },
+	module: {
+		loaders: [
+			{ test: /\.js$/, exclude: /node_modules/, loader: "babel" }
+		]
+	},
 	plugins: [
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
