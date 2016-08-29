@@ -14,8 +14,7 @@ module.exports = {
 	},
 	externals: {
 		'window': 'window',
-		'google': 'google',
-		'jQuery': 'jQuery'
+		'google': 'google'
 	},
 	module: { loaders: [ ] },
 	plugins: [
