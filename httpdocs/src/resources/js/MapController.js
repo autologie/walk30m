@@ -55,18 +55,19 @@ class MapController {
   getMap() { return this.map; }
 
   startCalculation(calcService, onExit) {
+    const me = this;
     const calcMsgTpl = _.template(this.application.getMessage('searching'));
     const request = calcService.currentTask.config;
     const listeners = [];
 
     function doExit(isCompleted) {
       if (isCompleted) {
-        this.resultVisualizer.clearResultDetail();
+        me.resultVisualizer.clearResultDetail();
       }
-      this.objectManager.clearObject('inProgress');
-      this.$retryBtn.hide();
-      this.hideMessage();
-      this.footprint.setMap(null);
+      me.objectManager.clearObject('inProgress');
+      me.$retryBtn.hide();
+      me.hideMessage();
+      me.footprint.setMap(null);
       listeners.forEach((listener) => google.maps.event.removeListener(listener));
       onExit(isCompleted);
     }
@@ -76,11 +77,11 @@ class MapController {
         doExit(true);
       } else {
         calcService.pause();
-        if (window.confirm(this.application.getMessage('askIfAbort'))) {
+        if (window.confirm(me.application.getMessage('askIfAbort'))) {
           doExit(false);
         } else {
           calcService.resume();
-          this.$retryBtn.off().one('click', onClickRetryBtn);
+          me.$retryBtn.off().one('click', onClickRetryBtn);
         }
       }
     }
