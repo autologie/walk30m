@@ -1,10 +1,10 @@
-import window from "window";
-import _ from "lodash";
-import google from "google";
-import GeoUtils from "./GeoUtil.js";
-import Footprint from "./Footprint.js";
-import ObjectManager from "./ObjectManager.js";
-import ResultVisualizer from "./ResultVisualizer.js";
+import window from 'window';
+import _ from 'lodash';
+import google from 'google';
+import GeoUtils from './GeoUtil.js';
+import Footprint from './Footprint.js';
+import ObjectManager from './ObjectManager.js';
+import ResultVisualizer from './ResultVisualizer.js';
 
 class MapController {
 
@@ -19,14 +19,14 @@ class MapController {
     this.map = this.initMap(mapOptions);
     this.footprint = new Footprint({
       map: this.map,
-      angle: 90
+      angle: 90,
     });
     this.objectManager = new ObjectManager(this.map);
-    this.resultVisualizer= new ResultVisualizer(application, this.map, this.objectManager);
+    this.resultVisualizer = new ResultVisualizer(application, this.map, this.objectManager);
   }
 
   initMap(options) {
-    var map;
+    let map;
 
     window.console.log('google map: initializing google map...');
 
@@ -34,24 +34,24 @@ class MapController {
       center: new google.maps.LatLng(36, 140),
       zoom: 13,
       zoomControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_CENTER
+        position: google.maps.ControlPosition.RIGHT_CENTER,
       },
       streetViewControlOptions: {
-        position: google.maps.ControlPosition.RIGHT_CENTER
-      }
+        position: google.maps.ControlPosition.RIGHT_CENTER,
+      },
     }));
 
-    map.addListener('tileloaded', function() {
+    map.addListener('tileloaded', function () {
       window.console.log('google map: tile loaded.');
     });
 
     return map;
   }
-  
+
   hideMessage() {
     this.$message.fadeOut();
   }
-  
+
   showMessage(message) {
     this.$message.text(message).fadeIn();
   }
@@ -59,7 +59,7 @@ class MapController {
   getMap() { return this.map; }
 
   startCalculation(calcService, onExit) {
-    var calcMsgTpl = _.template(this.application.getMessage('searching')),
+    let calcMsgTpl = _.template(this.application.getMessage('searching')),
       request = calcService.currentTask.config,
       listeners = [];
 
@@ -92,7 +92,7 @@ class MapController {
     this.resultVisualizer.clearResultDetail();
     this.showMessage(calcMsgTpl(_.defaults({
       min: request.time / 60,
-      travelModeExpr: this.application.getMessage('travelModes')[request.mode]
+      travelModeExpr: this.application.getMessage('travelModes')[request.mode],
     }, request)));
     this.$retryBtn.show();
     this.$retryBtn.off().one('click', onClickRetryBtn);
@@ -110,7 +110,7 @@ class MapController {
     this.objectManager.clearObject('inProgress');
     this.footprint.stop();
     this.showMessage(this.application.getMessage('completed'));
-    _.delay(function() {
+    _.delay(function () {
       this.hideMessage();
       this.footprint.setMap(null);
       this.resultVisualizer.addResult(task);
@@ -123,7 +123,7 @@ class MapController {
   }
 
   onInitialProgress(calcService, percent, added, endLocations) {
-    var center = calcService.currentTask.config.origin,
+    let center = calcService.currentTask.config.origin,
       latDiff, lngDiff;
 
     latDiff = Math.abs(center.lat() - added.endLocation.lat());
@@ -132,26 +132,26 @@ class MapController {
       north: center.lat() + latDiff,
       south: center.lat() - latDiff,
       east: center.lng() + lngDiff,
-      west: center.lng() - lngDiff
+      west: center.lng() - lngDiff,
     });
     this.map.setZoom(this.map.getZoom() - 1);
   }
 
   drawArea(vertices, origin) {
-    var toSpline = vertices
-        .concat([ origin ])
+    let toSpline = vertices
+        .concat([origin])
         .concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2))),
       splined = GeoUtils.spline(toSpline);
-      
+
     this.objectManager.showObject(new google.maps.Polygon({
       path: splined.splice(0, Math.round(splined.length * 2 / 3) - 2),
-      //strokeColor: '#080',
+      // strokeColor: '#080',
       fillColor: '#080',
       clickable: false,
-      //strokeOpacity: 0.7,
+      // strokeOpacity: 0.7,
       strokeWeight: 0,
       fillOpacity: 0.3,
-      zIndex: 100
+      zIndex: 100,
     }), null, 'inProgress');
   }
 
@@ -174,7 +174,7 @@ class MapController {
   }
 
   specifyLocation(callback) {
-    var dragStartListener;
+    let dragStartListener;
 
     this.$centerMarker.show();
     this.$determineBtn.show();

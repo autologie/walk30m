@@ -1,15 +1,14 @@
 'use strict';
 define([
   'lodash',
-  'google'
-], function(_, google) {
-
+  'google',
+], function (_, google) {
   function OM(map) {
-    var me = this;
+    const me = this;
 
     google.maps.MVCArray.constructor.call(me);
     me.map = map;
-    me.addListener('remove_at', function(idx, elem) {
+    me.addListener('remove_at', function (idx, elem) {
       if (elem[0].setMap) {
         elem[0].setMap(null);
       } else if (elem.close) {
@@ -19,8 +18,8 @@ define([
       }
     });
 
-    me.addListener('insert_at', function(idx) {
-      var elem = me.getArray()[idx],
+    me.addListener('insert_at', function (idx) {
+      let elem = me.getArray()[idx],
         obj = elem[0];
 
       if (obj.open) {
@@ -37,14 +36,14 @@ define([
 
   OM.prototype = new google.maps.MVCArray();
 
-  OM.prototype.clearObject = function(id) {
-    var me = this;
+  OM.prototype.clearObject = function (id) {
+    const me = this;
 
     if (!id) {
       return;
     }
 
-    me.forEach(function(elem, idx) {
+    me.forEach(function (elem, idx) {
       if (elem && elem[2] === id) {
         me.removeAt(idx);
         return false;
@@ -52,13 +51,13 @@ define([
     });
   };
 
-  OM.prototype.clearObjects = function(taggedAs) {
-    var me = this;
-    
-    me.forEach(function(elem, idx) {
+  OM.prototype.clearObjects = function (taggedAs) {
+    const me = this;
+
+    me.forEach(function (elem, idx) {
       if (elem && (taggedAs === undefined || elem[1] === taggedAs)) {
         me.removeAt(idx);
-        _.defer(function() {
+        _.defer(function () {
           me.clearObjects(taggedAs);
         });
         return false;
@@ -66,19 +65,19 @@ define([
     });
   };
 
-  OM.prototype.findObject = function(id) {
-    var me = this;
-    
-    return me.getArray().filter(function(elem) {
+  OM.prototype.findObject = function (id) {
+    const me = this;
+
+    return me.getArray().filter(function (elem) {
       return elem[2] === id;
     }).pop();
   };
 
-  OM.prototype.showObject = function(obj, cls, id, options) {
-    var me = this;
-    
+  OM.prototype.showObject = function (obj, cls, id, options) {
+    const me = this;
+
     me.clearObject(id);
-    me.push([ obj, cls, id, options ]);
+    me.push([obj, cls, id, options]);
     return obj;
   };
 

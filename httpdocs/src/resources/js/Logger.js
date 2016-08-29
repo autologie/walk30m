@@ -1,4 +1,4 @@
-import window from "window";
+import window from 'window';
 import _ from 'lodash';
 import $ from 'jQuery';
 import { PUBLIC_API_URL_BASE } from './config';
@@ -27,9 +27,9 @@ class Logger {
         complete_datetime: new Date().toISOString(),
         result_path: _.map(_.map(vertices.getArray(), 'endLocation'), (latLng) => ({
           lat: latLng.lat(),
-          lng: latLng.lng()
-        }))
-      }, this.executions[taskId]))
+          lng: latLng.lng(),
+        })),
+      }, this.executions[taskId])),
     });
   }
 
@@ -40,19 +40,19 @@ class Logger {
       url: window.location.href,
       viewport: {
         width: $win.width(),
-        height: $win.height()
-      }
+        height: $win.height(),
+      },
     };
   }
 
   onStart(task) {
     const data = _.mapKeys(_.defaults({
       startDatetime: new Date().toISOString(),
-      isInitial: false
+      isInitial: false,
     }, _.mapValues(_.omit(task.config, 'address'), (val, key) => (key === 'origin' ? {
       address: task.config.address,
       lat: val.lat(),
-      lng: val.lng()
+      lng: val.lng(),
     } : val)), this.collectClientInfo()), (value, key) => _.snakeCase(key));
 
     $.ajax({
@@ -60,7 +60,7 @@ class Logger {
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(data)
+      data: JSON.stringify(data),
     }).done((res) => {
       this.executions[res.uuid] = data;
 

@@ -1,4 +1,4 @@
-import _ from "lodash";
+import _ from 'lodash';
 
 class AdvancedSettingsController {
 
@@ -13,17 +13,17 @@ class AdvancedSettingsController {
       preference: this.$prefs.filter(':checked').val(),
       tolls: this.$optTolls.is(':checked'),
       highways: this.$optHighways.is(':checked'),
-      ferries: this.$optFerries.is(':checked')
+      ferries: this.$optFerries.is(':checked'),
     };
 
     this.$initializeBtn.click(_.bind(this.initialize, this));
   }
 
   initialize() {
-    var radios = {
+    let radios = {
         '$optTolls': this.defaultSettings.tolls,
         '$optHighways': this.defaultSettings.highways,
-        '$optFerries': this.defaultSettings.ferries
+        '$optFerries': this.defaultSettings.ferries,
       },
       p;
 
@@ -53,7 +53,7 @@ class AdvancedSettingsController {
       avoidFerries: !this.$optFerries.is(':checked'),
       avoidHighways: !this.$optHighways.is(':checked'),
       avoidTolls: !this.$optTolls.is(':checked'),
-      preference: this.$prefs.filter(':checked').val()
+      preference: this.$prefs.filter(':checked').val(),
     };
   }
 }

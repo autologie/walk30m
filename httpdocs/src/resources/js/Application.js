@@ -1,21 +1,21 @@
-import window from "window";
-import $ from "jQuery";
-import _ from "lodash";
-import google from "google";
-import CalculationService from "./CalculationService";
-import Logger from "./Logger";
-import GeoUtil from "./GeoUtil";
-import Walk30mUtils from "./Walk30mUtils";
-import AdvancedSettingsController from "./AdvancedSettingsController";
-import ProgressBar from "./ProgressBar";
-import MapController from "./MapController";
-import InputController from "./InputController";
+import window from 'window';
+import $ from 'jQuery';
+import _ from 'lodash';
+import google from 'google';
+import CalculationService from './CalculationService';
+import Logger from './Logger';
+import GeoUtil from './GeoUtil';
+import Walk30mUtils from './Walk30mUtils';
+import AdvancedSettingsController from './AdvancedSettingsController';
+import ProgressBar from './ProgressBar';
+import MapController from './MapController';
+import InputController from './InputController';
 
 class Application {
 
   constructor($el) {
-    var startDate = new Date();
-    
+    const startDate = new Date();
+
     this.messages = window.messages;
     this.$el = $el;
     this.$page = $('html,body');
@@ -35,7 +35,7 @@ class Application {
 
     $.get(PUBLIC_API_URL_BASE + '/client_location').done((data) => {
       this.mapController = new MapController(this, $el.find('#map-wrapper'), {
-        center: new google.maps.LatLng(data.lat, data.lng)
+        center: new google.maps.LatLng(data.lat, data.lng),
       });
       this.inputController = new InputController(
         this,
@@ -46,17 +46,16 @@ class Application {
       console.log('Application: initialized', new Date() - startDate);
 
       this.route();
-
     }).fail((err) => window.alert(err));
   }
 
   route() {
-    var parseQuery = (s) => {
-        var ret = s.split('=');
-        
+    let parseQuery = (s) => {
+        const ret = s.split('=');
+
         return [
           ret[0],
-          window.decodeURIComponent(ret[1])
+          window.decodeURIComponent(ret[1]),
         ];
       },
       splittedHash = window.location.hash.split('?'),
@@ -73,14 +72,14 @@ class Application {
   }
 
   startViewResult(path, request) {
-    var decoded;
+    let decoded;
 
     try {
       request = JSON.parse(request);
       decoded = Walk30mUtils.decodeResult(path);
 
       this.inputController.applyValues(_.defaults({
-        origin: new google.maps.LatLng(request.origin.lat, request.origin.lng)
+        origin: new google.maps.LatLng(request.origin.lat, request.origin.lng),
       }, request)).then(() => {
         this.advancedSettingsController.applyValues(request);
 
@@ -89,13 +88,12 @@ class Application {
           taskId: 'viewonly',
           vertices: new google.maps.MVCArray(decoded.map((latLng) => {
             return {
-              endLocation: new google.maps.LatLng(latLng.lat, latLng.lng)
+              endLocation: new google.maps.LatLng(latLng.lat, latLng.lng),
             };
           })),
-          config: request
+          config: request,
         });
         this.viewMap();
-
       });
     } catch (ex) {
       window.alert(this.getMessage('brokenResult'));
@@ -109,7 +107,7 @@ class Application {
 
       if (req && req.origin) {
         this.inputController.applyValues(_.defaults({
-          origin: new google.maps.LatLng(req.origin.lat, req.origin.lng)
+          origin: new google.maps.LatLng(req.origin.lat, req.origin.lng),
         }, req)).then(() => {
           this.advancedSettingsController.applyValues(req);
           this.startCalculation();
@@ -117,7 +115,7 @@ class Application {
       } else {
         throw new Error('Not sufficient parameters provided.');
       }
-    } catch(ex) {
+    } catch (ex) {
       window.history.pushState(null, '', '/#!/');
     }
   }
@@ -139,7 +137,7 @@ class Application {
   }
 
   onStartCalculation(task) {
-    var serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
+    const serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
 
     window.history.pushState(null, '', '/#!/calc?request=' + serializedCalculation);
   }
@@ -158,7 +156,7 @@ class Application {
   onError(calcService, message) {
     window.alert([
       this.getMessage('pleaseCheckConditions'),
-      message
+      message,
     ].join('\r\n'));
     this.onExitCalculation();
   }
@@ -178,16 +176,16 @@ class Application {
   }
 
   onCompleteCalculation(vertices, task) {
-    var feature = new google.maps.Data.Feature({
+    let feature = new google.maps.Data.Feature({
         geometry: new google.maps.Data.Polygon([
-          _.map(vertices.getArray(), 'endLocation')
+          _.map(vertices.getArray(), 'endLocation'),
         ]),
         id: task.taskId,
         properties: _.defaults({
           isResult: true,
           vertices: task.vertices.getArray().slice(0),
-          task: task
-        }, task)
+          task,
+        }, task),
       }),
       resultUrl = Walk30mUtils.createSharedURI(feature),
       newPath = '/' + (resultUrl || '').split('/').slice(3).join('/');
@@ -197,11 +195,11 @@ class Application {
   }
 
   moveTo(id) {
-    var $target = id && this.$el.find('#' + id);
+    const $target = id && this.$el.find('#' + id);
 
     if (id !== 'top' && $target && $target.length > 0) {
       this.$page.animate({
-        scrollTop: $target.offset().top + 'px'
+        scrollTop: $target.offset().top + 'px',
       }, undefined, 'swing', () => {
         window.history.pushState(null, '', '/#!/' + id);
       });
@@ -223,13 +221,13 @@ class Application {
   }
 
   onClickSendMsgBtn() {
-    var message = this.$el.find('#message textarea').val(),
+    let message = this.$el.find('#message textarea').val(),
       uuid = this.$el.find('#message input[name=uuid]').val();
 
     if (message) {
       this.$sendMsgBtn.addClass('disabled');
       this.sendMessage(message, uuid).then(() => {
-          _.delay(() => this.$sendMsgBtn.removeClass('disabled'), 500);
+        _.delay(() => this.$sendMsgBtn.removeClass('disabled'), 500);
       });
     } else {
       window.alert(this.getMessage('contact'));
@@ -237,7 +235,7 @@ class Application {
   }
 
   scrollToTop(callback) {
-    var fired = false;
+    let fired = false;
 
     this.$gotoTopBtn.blur();
     this.$page.animate({ scrollTop: '0px' }, undefined, () => {
@@ -257,37 +255,36 @@ class Application {
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify({
         message: uuid + ', ' + message,
-        url: window.location.href
-      })
+        url: window.location.href,
+      }),
     })
     .done(() => window.alert(this.getMessage('thanks')))
     .fail(() => window.alert(this.getMessage('failedToSendMessage')));
   }
 
   compareGeocoderResultsByDistance(r1, r2) {
-    var center = this.mapController.map.getCenter(),
+    let center = this.mapController.map.getCenter(),
       loc1 = r1.geometry.location,
       loc2 = r2.geometry.location,
       r1Dist = Math.pow(loc1.lat() - center.lat(), 2) + Math.pow(loc1.lng() - center.lng(), 2),
       r2Dist = Math.pow(loc2.lat() - center.lat(), 2) + Math.pow(loc2.lng() - center.lng(), 2);
 
-    return r1Dist > r2Dist? 1: -1;
+    return r1Dist > r2Dist ? 1 : -1;
   }
 
   startCalculation() {
-    var settings = _.defaults(
+    const settings = _.defaults(
         this.inputController.getValues(),
         this.advancedSettingsController.getValues());
 
     this.scrollToTop(() => {
       if (settings.origin) {
         this.doCalculation(settings);
-
       } else if (settings.address) {
         new google.maps.Geocoder().geocode({
-          address: settings.address
+          address: settings.address,
         }, (results, status) => {
-          var sortedResults = results.sort(_.bind(this.compareGeocoderResultsByDistance, this));
+          const sortedResults = results.sort(_.bind(this.compareGeocoderResultsByDistance, this));
 
           if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
             window.alert(this.getMessage('geocoderResultNotFound'));
@@ -300,7 +297,7 @@ class Application {
           this.doCalculation(_.defaults({
             origin: sortedResults[0].geometry.location,
             address: GeoUtil.trimGeocoderAddress(sortedResults[0].formatted_address),
-            keyword: settings.address
+            keyword: settings.address,
           }, settings));
         });
       } else {
@@ -327,8 +324,8 @@ class Application {
       anglePerStep: ({
         SPEED: 20,
         BALANCE: 10,
-        PRECISION: 5
-      })[settings.preference]
+        PRECISION: 5,
+      })[settings.preference],
     }));
 
     this.mapController.startCalculation(this.calcService, _.bind(this.onExitCalculation, this));
@@ -351,7 +348,7 @@ class Application {
 }
 
 
-Application.prototype.onScroll = _.throttle(function() {
+Application.prototype.onScroll = _.throttle(function () {
   if (this.$el.scrollTop() > 0) {
     this.$gotoTopBtn.fadeIn();
   } else {

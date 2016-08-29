@@ -6,11 +6,10 @@ define([
   'google',
   './GeoUtil.js',
   './Walk30mUtils.js',
-  './Footprint.js'
-], function(window, $, _, google, GeoUtil, Walk30mUtils, Footprint) {
-
+  './Footprint.js',
+], function (window, $, _, google, GeoUtil, Walk30mUtils, Footprint) {
   function ResultVisualizer(application, map, objectManager) {
-    var me = this,
+    let me = this,
       defaultStyler = map.data.getStyle();
 
     me.colors = [
@@ -19,7 +18,7 @@ define([
       'hsl(0, 50%, 33%)',
       'hsl(240, 50%, 33%)',
       'hsl(300, 50%, 33%)',
-      'hsl(60, 50%, 33%)'
+      'hsl(60, 50%, 33%)',
     ];
     me.application = application;
     me.map = map;
@@ -32,8 +31,8 @@ define([
 
     me.map.data.addListener('click', _.bind(me.onClickResult, me));
 
-    me.map.data.setStyle(function(feature) {
-      var color;
+    me.map.data.setStyle(function (feature) {
+      let color;
 
       if (feature.getProperty('isResult') === true) {
         color = feature.getProperty('color');
@@ -42,7 +41,7 @@ define([
           fillColor: color,
           strokeOpacity: 1,
           strokeWeight: 2,
-          fillOpacity: 0.3
+          fillOpacity: 0.3,
         };
       } else {
         return _.isObject(defaultStyler)
@@ -54,8 +53,8 @@ define([
     });
   }
 
-  ResultVisualizer.prototype.createRouteLink = function(route) { 
-    var me = this,
+  ResultVisualizer.prototype.createRouteLink = function (route) {
+    let me = this,
       path = route.overview_path;
 
     return me.routeLinkTpl({
@@ -66,85 +65,85 @@ define([
     });
   };
 
-  ResultVisualizer.prototype.createDetailedBalloonContent = function(directionResult) {
-    var me = this,
+  ResultVisualizer.prototype.createDetailedBalloonContent = function (directionResult) {
+    let me = this,
       route = directionResult.routes[0],
       content = me.balloonTpl({
         dest: GeoUtil.trimGeocoderAddress(route.legs[0].end_address),
         time: route.legs[0].duration.text,
         url: me.createRouteLink(route),
         summary: route.summary,
-        copyright: route.copyrights
+        copyright: route.copyrights,
       });
 
     return content;
   };
 
-  ResultVisualizer.prototype.clearResultDetail = function() {
-    var me = this;
+  ResultVisualizer.prototype.clearResultDetail = function () {
+    const me = this;
 
     me.objectManager.clearObjects('routeHilight');
     me.objectManager.clearObjects('route');
     me.objectManager.clearObject('summaryBalloon');
   };
 
-  ResultVisualizer.prototype.onClickRoute = function(feature, route, directionResult, event) {
-    var me = this,
+  ResultVisualizer.prototype.onClickRoute = function (feature, route, directionResult, event) {
+    let me = this,
       iw = new google.maps.InfoWindow({
-        position: _.max(route.slice(route.length / 4), function(latLng) { return latLng.lat(); }),
+        position: _.max(route.slice(route.length / 4), function (latLng) { return latLng.lat(); }),
         content: me.createDetailedBalloonContent(directionResult),
-        maxWidth: Math.min(0.6 * $(window).width(), 320)
+        maxWidth: Math.min(0.6 * $(window).width(), 320),
       }),
       cls = 'routeHilight',
       color = (feature.getProperty('color') || '').replace('50%, 33%', '60%, 50%');
 
     me.objectManager.clearObjects(cls);
-    iw.addListener('domready', function() {
+    iw.addListener('domready', function () {
       $(me.map.getDiv()).find('a[role=back-to-summary]').click(_.bind(me.onClickResult, me, {
-        feature: feature
+        feature,
       }));
     });
 
-    _.delay(function() {
+    _.delay(function () {
       me.objectManager.showObject(iw, cls, 'routeBalloon');
       me.objectManager.showObject(me.createCircle({
-          icon: {
-            strokeColor: color,
-            scale: 8,
-            strokeWeight: 4
-          },
-          position: route[route.length - 1],
-          zIndex: 40
-        }), cls);
+        icon: {
+          strokeColor: color,
+          scale: 8,
+          strokeWeight: 4,
+        },
+        position: route[route.length - 1],
+        zIndex: 40,
+      }), cls);
       me.objectManager.showObject(new google.maps.Polyline({
         path: route,
         clickable: false,
         strokeColor: color,
         strokeWeight: 4,
         strokeOpacity: 1,
-        zIndex: 25
+        zIndex: 25,
       }), cls);
-      iw.addListener('closeclick', function() {
+      iw.addListener('closeclick', function () {
         me.objectManager.clearObjects(cls);
       });
     }, 200);
   };
 
-  ResultVisualizer.prototype.createCircle = function(options) {
+  ResultVisualizer.prototype.createCircle = function (options) {
     return new google.maps.Marker(_.defaults(options, {
       icon: _.defaults(options.icon || {}, {
         path: google.maps.SymbolPath.CIRCLE,
         scale: 4,
         strokeWeight: 2,
         fillColor: '#fff',
-        fillOpacity: 1
+        fillOpacity: 1,
       }),
-      zIndex: 30
+      zIndex: 30,
     }));
   };
 
-  ResultVisualizer.prototype.drawRoute = function(feature, route, directionResult) {
-    var me = this,
+  ResultVisualizer.prototype.drawRoute = function (feature, route, directionResult) {
+    let me = this,
       cls = 'route',
       routePolygon = me.objectManager.showObject(new google.maps.Polyline({
         path: route,
@@ -152,77 +151,77 @@ define([
         strokeColor: feature.getProperty('color'),
         strokeWeight: 2,
         strokeOpacity: 1,
-        zIndex: 20
+        zIndex: 20,
       }), cls),
       endPoint = me.objectManager.showObject(me.createCircle({
         icon: { strokeColor: feature.getProperty('color') },
-        position: route[route.length - 1]
+        position: route[route.length - 1],
       }), cls);
 
     routePolygon.addListener('click', _.bind(me.onClickRoute, me, feature, route, directionResult));
     endPoint.addListener('click', _.bind(me.onClickRoute, me, feature, route, directionResult));
   };
 
-  ResultVisualizer.prototype.showResultDetail = function(feature) {
-    var me = this;
-    
-    feature.getProperty('vertices').forEach(function(vertex) {
+  ResultVisualizer.prototype.showResultDetail = function (feature) {
+    const me = this;
+
+    feature.getProperty('vertices').forEach(function (vertex) {
       me.drawRoute(feature, vertex.directionResult.routes[0].overview_path, vertex.directionResult);
     });
   };
 
-  ResultVisualizer.prototype.createSummary = function(feature) {
-    var me = this,
+  ResultVisualizer.prototype.createSummary = function (feature) {
+    let me = this,
       options = feature.getProperty('config'),
       color = feature.getProperty('color'),
       tpl = feature.getId() !== 'viewonly'
         ? me.overviewBalloonTpl
-        : me.summaryBalloonTpl
+        : me.summaryBalloonTpl;
 
     return tpl(_.defaults({
       borderColor: color,
-      bgColor: (color || '').replace('hsl', 'hsla').replace(')', ', .5)')
+      bgColor: (color || '').replace('hsl', 'hsla').replace(')', ', .5)'),
     }, Walk30mUtils.createSummary(options)));
   };
 
-  ResultVisualizer.prototype.bindSummaryBalloonEvents = function(feature) {
-    var me = this,
+  ResultVisualizer.prototype.bindSummaryBalloonEvents = function (feature) {
+    let me = this,
       __ = _.bind(me.application.getMessage, me.application),
       options = feature.getProperty('config'),
       summary = Walk30mUtils.createSummary(_.defaults({
-        travelModeExpr: __('travelModes')[options.mode]
+        travelModeExpr: __('travelModes')[options.mode],
       }, options)),
       $balloon = $(me.map.getDiv()).find('.gm-style-iw');
 
-    $balloon.find('a[role=tweet-result]').click(function() {
-      var url = me.twitterURITpl({
+    $balloon.find('a[role=tweet-result]').click(function () {
+      const url = me.twitterURITpl({
         url: window.encodeURIComponent(Walk30mUtils.createSharedURI(feature)),
-        message: window.encodeURIComponent(_.template(__('tweetMessageTpl'))(summary))
+        message: window.encodeURIComponent(_.template(__('tweetMessageTpl'))(summary)),
       });
 
       window.open(url, '_blank');
     });
-    $balloon.find('a[role=report-problem]').click(function() {
+    $balloon.find('a[role=report-problem]').click(function () {
       me.application.startEditMessage(_.template(__('reportMessageTpl'))({
-        summary: _.template(__('summaryTpl'))(summary)
+        summary: _.template(__('summaryTpl'))(summary),
       }), feature.getId());
     });
-    $balloon.find('a[role=erase-result]').click(function() {
+    $balloon.find('a[role=erase-result]').click(function () {
       me.map.data.remove(feature);
       me.objectManager.clearObject('summaryBalloon');
       me.objectManager.clearObject('origin-' + feature.getId());
     });
-    $balloon.find('a[role=show-routes]').click(function() {
+    $balloon.find('a[role=show-routes]').click(function () {
       me.objectManager.clearObject('summaryBalloon');
       feature.setProperty('detailed', true);
       me.showResultDetail(feature);
     });
   };
 
-  ResultVisualizer.prototype.showSummaryBalloon = function(feature) {
-    var me = this,
+  ResultVisualizer.prototype.showSummaryBalloon = function (feature) {
+    let me = this,
       iw = new google.maps.InfoWindow({
-        maxWidth: Math.min(0.6 * $(window).width(), 320)
+        maxWidth: Math.min(0.6 * $(window).width(), 320),
       });
 
     iw.setContent(me.createSummary(feature));
@@ -230,9 +229,9 @@ define([
     me.objectManager.showObject(iw, null, 'summaryBalloon', (me.objectManager.findObject('origin-' + feature.getId()) || {})[0]);
   };
 
-  ResultVisualizer.prototype.onClickResult = function(event) {
-    var me = this;
-    
+  ResultVisualizer.prototype.onClickResult = function (event) {
+    const me = this;
+
     me.clearResultDetail();
 
     if (event.feature.getProperty('detailed')) {
@@ -241,16 +240,16 @@ define([
     me.showSummaryBalloon(event.feature);
   };
 
-  ResultVisualizer.prototype.addResult = function(result) {
-    var me = this,
+  ResultVisualizer.prototype.addResult = function (result) {
+    let me = this,
       vertices = _.map(result.vertices.getArray(), 'endLocation'),
       toSpline = vertices.concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2))),
-      toGeoJsonCoord = function(coord) {
-        return [ coord.lng(), coord.lat() ];
+      toGeoJsonCoord = function (coord) {
+        return [coord.lng(), coord.lat()];
       },
       splined = GeoUtil.spline(toSpline),
       delta = 0.01,
-      bounds = _.reduce(vertices, function(passed, latLng) {
+      bounds = _.reduce(vertices, function (passed, latLng) {
         return passed.extend(latLng);
       }, new google.maps.LatLngBounds(
         new google.maps.LatLng(vertices[0].lat() - delta, vertices[0].lng() - delta),
@@ -260,9 +259,9 @@ define([
       added,
       count = 0,
       myColor;
-    
+
     me.map.fitBounds(bounds);
-    me.map.data.forEach(function() { count++; });
+    me.map.data.forEach(function () { count++; });
     myColor = me.colors[count % me.colors.length];
     splined = splined.slice(0, Math.round(splined.length * 2 / 3) - 2);
 
@@ -272,15 +271,15 @@ define([
       geometry: {
         type: 'Polygon',
         coordinates: [
-          splined.concat([ splined[0] ]).map(toGeoJsonCoord)
-        ]
+          splined.concat([splined[0]]).map(toGeoJsonCoord),
+        ],
       },
       properties: _.defaults({
         isResult: true,
         vertices: result.vertices.getArray().slice(0),
         color: myColor,
-        task: result
-      }, result)
+        task: result,
+      }, result),
     });
 
     originMarker = me.objectManager.showObject(new Footprint({
@@ -288,8 +287,8 @@ define([
       zIndex: 50,
       icon: {
         fillColor: myColor,
-        anchor: new google.maps.Point(20, 30)
-      }
+        anchor: new google.maps.Point(20, 30),
+      },
     }), null, 'origin-' + result.taskId);
 
     originMarker.addListener('click', _.bind(me.onClickResult, me, { feature: added[0] }));
