@@ -1,74 +1,57 @@
-'use strict';
+import window from "window";
+import $ from "jQuery";
+import _ from "lodash";
+import google from "google";
+import CalculationService from "./CalculationService";
+import Logger from "./Logger";
+import GeoUtil from "./GeoUtil";
+import Walk30mUtils from "./Walk30mUtils";
+import AdvancedSettingsController from "./AdvancedSettingsController";
+import ProgressBar from "./ProgressBar";
+import MapController from "./MapController";
+import InputController from "./InputController";
 
-define([
-	'window',
-	'jQuery',
-	'lodash',
-	'google',
-	'./CalculationService.js',
-	'./Logger.js',
-	'./GeoUtil.js',
-	'./Walk30mUtils.js',
-	'./AdvancedSettingsController.js',
-	'./ProgressBar.js',
-	'./MapController.js',
-	'./InputController.js'
-], function(
-	window,
-	$,
-	_,
-	google,
-	CalculationService,
-	Logger,
-	GeoUtil,
-	Walk30mUtils,
-	AdvancedSettingsController,
-	ProgressBar,
-	MapController,
-	InputController) {
-	
-	function Application($el) {
-		var me = this,
-			startDate = new Date();
+class Application {
+
+	constructor($el) {
+		var startDate = new Date();
 		
-		me.messages = window.messages;
-		me.$el = $el;
-		me.$page = $('html,body');
-		me.$gotoTopBtn = $el.find('.btn[role=goto-top]');
-		me.$execBtn = $el.find('.btn[role=execute]');
-		me.$cancelBtn = $el.find('#control span[role=cancel]');
-		me.$sendMsgBtn = $el.find('.btn[role=send-message]');
-		me.$goToAboutLink = $el.find('a[href=#about]');
-		me.$message = $el.find('#message textarea');
-		me.$goToAdvancedSettingsLink = $el.find('a[href=#advanced-settings]');
-		me.calcService = new CalculationService();
-		me.logger = new Logger(me.calcService);
-		me.advancedSettingsController = new AdvancedSettingsController($el.find('#advanced-settings'));
-	
-		$el.find('#extra').css({ top: Math.min($(window).height(), 700) + 'px' });
-		me.initEvents();
+		this.messages = window.messages;
+		this.$el = $el;
+		this.$page = $('html,body');
+		this.$gotoTopBtn = $el.find('.btn[role=goto-top]');
+		this.$execBtn = $el.find('.btn[role=execute]');
+		this.$cancelBtn = $el.find('#control span[role=cancel]');
+		this.$sendMsgBtn = $el.find('.btn[role=send-message]');
+		this.$goToAboutLink = $el.find('a[href=#about]');
+		this.$message = $el.find('#message textarea');
+		this.$goToAdvancedSettingsLink = $el.find('a[href=#advanced-settings]');
+		this.calcService = new CalculationService();
+		this.logger = new Logger(this.calcService);
+		this.advancedSettingsController = new AdvancedSettingsController($el.find('#advanced-settings'));
 
-		$.get(PUBLIC_API_URL_BASE + '/client_location').done(function(data) {
-			me.mapController = new MapController(me, $el.find('#map-wrapper'), {
+		$el.find('#extra').css({ top: Math.min($(window).height(), 700) + 'px' });
+		this.initEvents();
+
+		$.get(PUBLIC_API_URL_BASE + '/client_location').done((data) => {
+			this.mapController = new MapController(this, $el.find('#map-wrapper'), {
 				center: new google.maps.LatLng(data.lat, data.lng)
 			});
-			me.inputController = new InputController(
-				me,
+			this.inputController = new InputController(
+				this,
 				$el.find('#control'),
-				me.mapController
+				this.mapController
 			);
-			me.progressBar = new ProgressBar($el.find('#progressbar'));
+			this.progressBar = new ProgressBar($el.find('#progressbar'));
 			console.log('Application: initialized', new Date() - startDate);
 
-			me.route();
-		}).fail(function(err) {
-			window.alert(err);
-		});
+			this.route();
+
+		}).fail((err) => window.alert(err));
 	}
-	
-	Application.prototype.route = function() {
-		var me = this,
-			parseQuery = function(s) {
+
+	route() {
+		var parseQuery = (s) => {
 				var ret = s.split('=');
 				
 				return [
@@ -81,57 +64,55 @@ define([
 			query = _.fromPairs((splittedHash[1] || '').split('&').map(parseQuery));
 
 		if (path === 'calc') {
-			me.startCalcByQuery(query.request);
+			this.startCalcByQuery(query.request);
 		} else if (path === 'result') {
-			me.startViewResult(query.path, query.request);
+			this.startViewResult(query.path, query.request);
 		} else {
-			me.moveTo(path);
+			this.moveTo(path);
 		}
-	};
+	}
 
-	Application.prototype.startViewResult = function(path, request) {
-		var me = this,
-			decoded;
+	startViewResult(path, request) {
+		var decoded;
 
 		try {
 			request = JSON.parse(request);
 			decoded = Walk30mUtils.decodeResult(path);
 
-			me.inputController.applyValues(_.defaults({
+			this.inputController.applyValues(_.defaults({
 				origin: new google.maps.LatLng(request.origin.lat, request.origin.lng)
-			}, request)).then(function() {
-				me.advancedSettingsController.applyValues(request);
+			}, request)).then(() => {
+				this.advancedSettingsController.applyValues(request);
 
-				me.$cancelBtn.show();
-				me.mapController.resultVisualizer.addResult({
+				this.$cancelBtn.show();
+				this.mapController.resultVisualizer.addResult({
 					taskId: 'viewonly',
-					vertices: new google.maps.MVCArray(decoded.map(function(latLng) {
+					vertices: new google.maps.MVCArray(decoded.map((latLng) => {
 						return {
 							endLocation: new google.maps.LatLng(latLng.lat, latLng.lng)
 						};
 					})),
 					config: request
 				});
-				me.viewMap();
+				this.viewMap();
 
 			});
 		} catch (ex) {
-			window.alert(me.getMessage('brokenResult'));
+			window.alert(this.getMessage('brokenResult'));
 			window.history.pushState(null, '', '/#!/');
 		}
-	};
+	}
 
-	Application.prototype.startCalcByQuery = function(req) {
-		var me = this;
-
+	startCalcByQuery(req) {
 		try {
 			req = JSON.parse(req);
+
 			if (req && req.origin) {
-				me.inputController.applyValues(_.defaults({
+				this.inputController.applyValues(_.defaults({
 					origin: new google.maps.LatLng(req.origin.lat, req.origin.lng)
-				}, req)).then(function() {
-					me.advancedSettingsController.applyValues(req);
-					me.startCalculation();
+				}, req)).then(() => {
+					this.advancedSettingsController.applyValues(req);
+					this.startCalculation();
 				});
 			} else {
 				throw new Error('Not sufficient parameters provided.');
@@ -139,77 +120,65 @@ define([
 		} catch(ex) {
 			window.history.pushState(null, '', '/#!/');
 		}
-	};
+	}
 
-	Application.prototype.initEvents = function() {
-		var me = this;
+	initEvents() {
+		this.calcService.addListener('start', _.bind(this.onStartCalculation, this));
+		this.calcService.addListener('complete', _.bind(this.onCompleteCalculation, this));
+		this.calcService.addListener('progress', _.bind(this.onProgressCalculation, this));
+		this.calcService.addListener('warn', _.bind(this.onWarning, this, this.calcService));
+		this.calcService.addListener('error', _.bind(this.onError, this, this.calcService));
 
-		me.calcService.addListener('start', _.bind(me.onStartCalculation, me));
-		me.calcService.addListener('complete', _.bind(me.onCompleteCalculation, me));
-		me.calcService.addListener('progress', _.bind(me.onProgressCalculation, me));
-		me.calcService.addListener('warn', _.bind(me.onWarning, me, me.calcService));
-		me.calcService.addListener('error', _.bind(me.onError, me, me.calcService));
+		this.$goToAboutLink.click(_.bind(this.onClickGoToAboutBtn, this));
+		this.$goToAdvancedSettingsLink.click(_.bind(this.onClickGoToAdvancedSettingsBtn, this));
+		this.$el.scroll(_.bind(this.onScroll, this));
+		this.$gotoTopBtn.click(_.bind(this.moveTo, this, 'top'));
+		this.$sendMsgBtn.click(_.bind(this.onClickSendMsgBtn, this));
+		this.$execBtn.click(_.bind(this.startCalculation, this));
+		this.$cancelBtn.click(_.bind(this.viewMap, this));
+	}
 
-		me.$goToAboutLink.click(_.bind(me.onClickGoToAboutBtn, me));
-		me.$goToAdvancedSettingsLink.click(_.bind(me.onClickGoToAdvancedSettingsBtn, me));
-		me.$el.scroll(_.bind(me.onScroll, me));
-		me.$gotoTopBtn.click(_.bind(me.moveTo, me, 'top'));
-		me.$sendMsgBtn.click(_.bind(me.onClickSendMsgBtn, me));
-		me.$execBtn.click(_.bind(me.startCalculation, me));
-		me.$cancelBtn.click(_.bind(me.viewMap, me));
-	};
-
-	Application.prototype.onStartCalculation = function(task) {
-		var me = this,
-			serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
+	onStartCalculation(task) {
+		var serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
 
 		window.history.pushState(null, '', '/#!/calc?request=' + serializedCalculation);
-	};
+	}
 
-	Application.prototype.viewMap = function() {
-		var me = this;
-
-		me.inputController.togglePanel(false);
-		me.mapController.startView(function() {
-			me.inputController.togglePanel(true);
+	viewMap() {
+		this.inputController.togglePanel(false);
+		this.mapController.startView(() => {
+			this.inputController.togglePanel(true);
 		});
-	};
+	}
 
-	Application.prototype.onProgressCalculation = function(percent, vertices) {
-		var me = this;
+	onProgressCalculation(percent, vertices) {
+		this.progressBar.update(percent);
+	}
 
-		me.progressBar.update(percent);
-	};
-
-	Application.prototype.onError= function(calcService, message) {
-		var me = this;
-
+	onError(calcService, message) {
 		window.alert([
-			me.getMessage('pleaseCheckConditions'),
+			this.getMessage('pleaseCheckConditions'),
 			message
 		].join('\r\n'));
-		me.onExitCalculation();
-	};
+		this.onExitCalculation();
+	}
 
-	Application.prototype.onWarning = function(calcService, message) {
-		var me = this;
-
-		if (me.lastDenialReload
-				&& new Date() - me.lastDenialReload < 60000) {
+	onWarning(calcService, message) {
+		if (this.lastDenialReload
+				&& new Date() - this.lastDenialReload < 60000) {
 			return;
 		}
 
-		if (window.confirm(me.getMessage('askIfReload'))) {
+		if (window.confirm(this.getMessage('askIfReload'))) {
 			calcService.stop();
 			window.location.reload();
 		} else {
-			me.lastDenialReload = new Date();
+			this.lastDenialReload = new Date();
 		}
-	};
+	}
 
-	Application.prototype.onCompleteCalculation = function(vertices, task) {
-		var me = this,
-			feature = new google.maps.Data.Feature({
+	onCompleteCalculation(vertices, task) {
+		var feature = new google.maps.Data.Feature({
 				geometry: new google.maps.Data.Polygon([
 					_.map(vertices.getArray(), 'endLocation')
 				]),
@@ -223,74 +192,55 @@ define([
 			resultUrl = Walk30mUtils.createSharedURI(feature),
 			newPath = '/' + (resultUrl || '').split('/').slice(3).join('/');
 
-		me.progressBar.update(100);
+		this.progressBar.update(100);
 		window.history.pushState(null, '', newPath);
-	};
+	}
 
-	Application.prototype.onScroll = _.throttle(function() {
-		var me = this;
-
-		if (me.$el.scrollTop() > 0) {
-			me.$gotoTopBtn.fadeIn();
-		} else {
-			me.$gotoTopBtn.fadeOut();
-		}
-	}, 100);
-
-	Application.prototype.moveTo = function(id) {
-		var me = this,
-			$target = id && me.$el.find('#' + id);
+	moveTo(id) {
+		var $target = id && this.$el.find('#' + id);
 
 		if (id !== 'top' && $target && $target.length > 0) {
-			me.$page.animate({
+			this.$page.animate({
 				scrollTop: $target.offset().top + 'px'
-			}, undefined, 'swing', function() {
+			}, undefined, 'swing', () => {
 				window.history.pushState(null, '', '/#!/' + id);
 			});
 		} else {
-			me.scrollToTop(function() {
+			this.scrollToTop(() => {
 				window.history.pushState(null, '', '/#!/');
 			});
 		}
-	};
+	}
 
-	Application.prototype.onClickGoToAdvancedSettingsBtn = function(ev) {
-		var me = this;
-
+	onClickGoToAdvancedSettingsBtn(ev) {
 		ev.preventDefault();
-		me.moveTo('advanced-settings');
-	};
+		this.moveTo('advanced-settings');
+	}
 
-	Application.prototype.onClickGoToAboutBtn = function(ev) {
-		var me = this;
-
+	onClickGoToAboutBtn(ev) {
 		ev.preventDefault();
-		me.moveTo('about');
-	};
+		this.moveTo('about');
+	}
 
-	Application.prototype.onClickSendMsgBtn = function() {
-		var me = this,
-			message = me.$el.find('#message textarea').val(),
-			uuid = me.$el.find('#message input[name=uuid]').val();
+	onClickSendMsgBtn() {
+		var message = this.$el.find('#message textarea').val(),
+			uuid = this.$el.find('#message input[name=uuid]').val();
 
 		if (message) {
-			me.$sendMsgBtn.addClass('disabled');
-			me.sendMessage(message, uuid).then(function() {
-					_.delay(function() {
-						me.$sendMsgBtn.removeClass('disabled');
-					}, 500);
+			this.$sendMsgBtn.addClass('disabled');
+			this.sendMessage(message, uuid).then(() => {
+					_.delay(() => this.$sendMsgBtn.removeClass('disabled'), 500);
 			});
 		} else {
-			window.alert(me.getMessage('contact'));
+			window.alert(this.getMessage('contact'));
 		}
-	};
+	}
 
-	Application.prototype.scrollToTop = function(callback) {
-		var me = this,
-			fired = false;
+	scrollToTop(callback) {
+		var fired = false;
 
-		me.$gotoTopBtn.blur();
-		me.$page.animate({ scrollTop: '0px' }, undefined, function() {
+		this.$gotoTopBtn.blur();
+		this.$page.animate({ scrollTop: '0px' }, undefined, () => {
 			// this event fires twice, for the fact that
 			// the selector for me.$page matches two elements: html and body.
 			if (!fired && _.isFunction(callback)) {
@@ -298,11 +248,9 @@ define([
 				callback();
 			}
 		});
-	};
+	}
 
-	Application.prototype.sendMessage = function(message, uuid) {
-		var me = this;
-
+	sendMessage(message, uuid) {
 		return $.ajax({
 			type: 'POST',
 			url: PUBLIC_API_URL_BASE + '/messages',
@@ -311,77 +259,71 @@ define([
 				message: uuid + ', ' + message,
 				url: window.location.href
 			})
-		}).done(function() {
-			window.alert(me.getMessage('thanks'));
-		}).fail(function() {
-			window.alert(me.getMessage('failedToSendMessage'));
-		});
-	};
+		})
+		.done(() => window.alert(this.getMessage('thanks')))
+		.fail(() => window.alert(this.getMessage('failedToSendMessage')));
+	}
 
-	Application.prototype.compareGeocoderResultsByDistance = function(r1, r2) {
-		var me = this,
-			center = me.mapController.map.getCenter(),
+	compareGeocoderResultsByDistance(r1, r2) {
+		var center = this.mapController.map.getCenter(),
 			loc1 = r1.geometry.location,
 			loc2 = r2.geometry.location,
 			r1Dist = Math.pow(loc1.lat() - center.lat(), 2) + Math.pow(loc1.lng() - center.lng(), 2),
 			r2Dist = Math.pow(loc2.lat() - center.lat(), 2) + Math.pow(loc2.lng() - center.lng(), 2);
 
-			return r1Dist > r2Dist? 1: -1;
-	};
+		return r1Dist > r2Dist? 1: -1;
+	}
 
-	Application.prototype.startCalculation = function() {
-		var me = this,
-			settings = _.defaults(
-				me.inputController.getValues(),
-				me.advancedSettingsController.getValues());
+	startCalculation() {
+		var settings = _.defaults(
+				this.inputController.getValues(),
+				this.advancedSettingsController.getValues());
 
-		me.scrollToTop(function() {
+		this.scrollToTop(() => {
 			if (settings.origin) {
-				me.doCalculation(settings);
+				this.doCalculation(settings);
+
 			} else if (settings.address) {
 				new google.maps.Geocoder().geocode({
 					address: settings.address
-				}, function(results, status) {
-					var sortedResults = results.sort(_.bind(me.compareGeocoderResultsByDistance, me));
+				}, (results, status) => {
+					var sortedResults = results.sort(_.bind(this.compareGeocoderResultsByDistance, this));
 
 					if (status === google.maps.GeocoderStatus.ZERO_RESULTS) {
-						window.alert(me.getMessage('geocoderResultNotFound'));
+						window.alert(this.getMessage('geocoderResultNotFound'));
 						return;
 					} else if (status !== google.maps.GeocoderStatus.OK) {
 						window.alert(status);
 						return;
 					}
 
-					me.doCalculation(_.defaults({
+					this.doCalculation(_.defaults({
 						origin: sortedResults[0].geometry.location,
 						address: GeoUtil.trimGeocoderAddress(sortedResults[0].formatted_address),
 						keyword: settings.address
 					}, settings));
 				});
 			} else {
-				window.alert(me.getMessage('originLocationIsRequired'));
-				me.inputController.$location.focus();
+				window.alert(this.getMessage('originLocationIsRequired'));
+				this.inputController.$location.focus();
 			}
 		});
-	};
+	}
 
-	Application.prototype.onExitCalculation = function(complete) {
-		var me = this;
-
-		me.inputController.togglePanel(true);
+	onExitCalculation(complete) {
+		this.inputController.togglePanel(true);
 		window.history.pushState(null, '', '/#!/');
-		me.progressBar.finalize();
+		this.progressBar.finalize();
+
 		if (complete) {
-			me.$cancelBtn.show();
+			this.$cancelBtn.show();
 		}
-	};
+	}
 
-	Application.prototype.doCalculation = function(settings) {
-		var me = this;
-
-		me.inputController.togglePanel(false);
-		me.progressBar.update(0);
-		me.calcService.start(_.defaults(settings, {
+	doCalculation(settings) {
+		this.inputController.togglePanel(false);
+		this.progressBar.update(0);
+		this.calcService.start(_.defaults(settings, {
 			anglePerStep: ({
 				SPEED: 20,
 				BALANCE: 10,
@@ -389,27 +331,34 @@ define([
 			})[settings.preference]
 		}));
 
-		me.mapController.startCalculation(me.calcService, _.bind(me.onExitCalculation, me));
-	};
+		this.mapController.startCalculation(this.calcService, _.bind(this.onExitCalculation, this));
+	}
 
-	Application.prototype.startEditMessage = function(message, relatedResultId) {
-		var me = this;
+	startEditMessage(message, relatedResultId) {
+		this.$el.find('#message input[name=uuid]').val(relatedResultId);
+		this.$message.val(message);
+		this.$message.focus();
 
-		me.$el.find('#message input[name=uuid]').val(relatedResultId);
-		me.$message.val(message);
-		me.$message.focus();
 		if (message) {
-			me.$message.attr('rows', 10);
+			this.$message.attr('rows', 10);
 		}
-		me.moveTo('message');
-	};
+		this.moveTo('message');
+	}
 
-	Application.prototype.getMessage = function(code) {
-		var me = this;
+	getMessage(code) {
+		return this.messages[code];
+	}
+}
 
-		return me.messages[code];
-	};
 
-	return Application;
-});
+Application.prototype.onScroll = _.throttle(function() {
+	if (this.$el.scrollTop() > 0) {
+		this.$gotoTopBtn.fadeIn();
+	} else {
+		this.$gotoTopBtn.fadeOut();
+	}
+}, 100);
+
+
+module.exports = Application;
 

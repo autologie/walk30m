@@ -1,34 +1,31 @@
-'use strict';
-define([
-	'window',
-	'lodash',
-	'google',
-	'./GeoUtil.js',
-	'./Footprint.js',
-	'./ObjectManager.js',
-	'./ResultVisualizer.js'
-], function(window, _, google, GeoUtils, Footprint, ObjectManager, ResultVisualizer) {
+import window from "window";
+import _ from "lodash";
+import google from "google";
+import GeoUtils from "./GeoUtil.js";
+import Footprint from "./Footprint.js";
+import ObjectManager from "./ObjectManager.js";
+import ResultVisualizer from "./ResultVisualizer.js";
 
-	function MapController(application, $el, mapOptions) {
-		var me = this;
+class MapController {
 
-		me.$el = $el;
-		me.application = application;
-		me.$centerMarker = $el.find('.center-marker');
-		me.$message = $el.find('.message');
-		me.$determineBtn = $el.find('.btn[role=determine-location]');
-		me.$retryBtn = $el.find('.btn[role=retry]');
-		me.$cancelBtn = $el.find('.btn[role=cancel]');
-		me.map = me.initMap(mapOptions);
-		me.footprint = new Footprint({
-			map: me.map,
+	constructor(application, $el, mapOptions) {
+		this.$el = $el;
+		this.application = application;
+		this.$centerMarker = $el.find('.center-marker');
+		this.$message = $el.find('.message');
+		this.$determineBtn = $el.find('.btn[role=determine-location]');
+		this.$retryBtn = $el.find('.btn[role=retry]');
+		this.$cancelBtn = $el.find('.btn[role=cancel]');
+		this.map = this.initMap(mapOptions);
+		this.footprint = new Footprint({
+			map: this.map,
 			angle: 90
 		});
-		me.objectManager = new ObjectManager(me.map);
-		me.resultVisualizer= new ResultVisualizer(application, me.map, me.objectManager);
+		this.objectManager = new ObjectManager(this.map);
+		this.resultVisualizer= new ResultVisualizer(application, this.map, this.objectManager);
 	}
 
-	MapController.prototype.initMap = function(options) {
+	initMap(options) {
 		var map;
 
 		window.console.log('google map: initializing google map...');
@@ -49,35 +46,32 @@ define([
 		});
 
 		return map;
-	};
+	}
 	
-	MapController.prototype.hideMessage = function() {
+	hideMessage() {
 		this.$message.fadeOut();
-	};
+	}
 	
-	MapController.prototype.showMessage = function(message) {
+	showMessage(message) {
 		this.$message.text(message).fadeIn();
-	};
+	}
 
-	MapController.prototype.getMap = function() { return this.map; };
+	getMap() { return this.map; }
 
-	MapController.prototype.startCalculation = function(calcService, onExit) {
-		var me = this,
-			calcMsgTpl = _.template(me.application.getMessage('searching')),
+	startCalculation(calcService, onExit) {
+		var calcMsgTpl = _.template(this.application.getMessage('searching')),
 			request = calcService.currentTask.config,
 			listeners = [];
 
 		function doExit(isCompleted) {
 			if (isCompleted) {
-				me.resultVisualizer.clearResultDetail();
+				this.resultVisualizer.clearResultDetail();
 			}
-			me.objectManager.clearObject('inProgress');
-			me.$retryBtn.hide();
-			me.hideMessage();
-			me.footprint.setMap(null);
-			listeners.forEach(function(listener) {
-				google.maps.event.removeListener(listener);
-			});
+			this.objectManager.clearObject('inProgress');
+			this.$retryBtn.hide();
+			this.hideMessage();
+			this.footprint.setMap(null);
+			listeners.forEach((listener) => google.maps.event.removeListener(listener));
 			onExit(isCompleted);
 		}
 
@@ -86,76 +80,70 @@ define([
 				doExit(true);
 			} else {
 				calcService.pause();
-				if (window.confirm(me.application.getMessage('askIfAbort'))) {
+				if (window.confirm(this.application.getMessage('askIfAbort'))) {
 					doExit(false);
 				} else {
 					calcService.resume();
-					me.$retryBtn.off().one('click', onClickRetryBtn);
+					this.$retryBtn.off().one('click', onClickRetryBtn);
 				}
 			}
 		}
 
-		me.resultVisualizer.clearResultDetail();
-		me.showMessage(calcMsgTpl(_.defaults({
+		this.resultVisualizer.clearResultDetail();
+		this.showMessage(calcMsgTpl(_.defaults({
 			min: request.time / 60,
-			travelModeExpr: me.application.getMessage('travelModes')[request.mode]
+			travelModeExpr: this.application.getMessage('travelModes')[request.mode]
 		}, request)));
-		me.$retryBtn.show();
-		me.$retryBtn.off().one('click', onClickRetryBtn);
+		this.$retryBtn.show();
+		this.$retryBtn.off().one('click', onClickRetryBtn);
 
-		me.footprint.startFrom(request.origin);
+		this.footprint.startFrom(request.origin);
 
-		listeners.push(calcService.addListener('progress', _.once(_.bind(me.onInitialProgress, me, calcService))));
-		listeners.push(calcService.addListener('progress', _.bind(me.onProgress, me, calcService)));
-		listeners.push(calcService.addListener('complete', _.bind(me.onComplete, me, calcService)));
+		listeners.push(calcService.addListener('progress', _.once(_.bind(this.onInitialProgress, this, calcService))));
+		listeners.push(calcService.addListener('progress', _.bind(this.onProgress, this, calcService)));
+		listeners.push(calcService.addListener('complete', _.bind(this.onComplete, this, calcService)));
 
-		me.map.panTo(request.origin);
-	};
+		this.map.panTo(request.origin);
+	}
 
-	MapController.prototype.onComplete = function(calcService, vertices, task) {
-		var me = this;
-		
-		me.objectManager.clearObject('inProgress');
-		me.footprint.stop();
-		me.showMessage(me.application.getMessage('completed'));
+	onComplete(calcService, vertices, task) {
+		this.objectManager.clearObject('inProgress');
+		this.footprint.stop();
+		this.showMessage(this.application.getMessage('completed'));
 		_.delay(function() {
-			me.hideMessage();
-			me.footprint.setMap(null);
-			me.resultVisualizer.addResult(task);
+			this.hideMessage();
+			this.footprint.setMap(null);
+			this.resultVisualizer.addResult(task);
 		}, 1000);
-	};
+	}
 
-	MapController.prototype.onProgress = function(calcService, percent, added, endLocations) {
-		var me = this;
+	onProgress(calcService, percent, added, endLocations) {
+		this.footprint.setAngle(90 - (percent * 360 / 100) - 30);
+		this.drawArea(endLocations, calcService.currentTask.config.origin);
+	}
 
-		me.footprint.setAngle(90 - (percent * 360 / 100) - 30);
-		me.drawArea(endLocations, calcService.currentTask.config.origin);
-	};
-
-	MapController.prototype.onInitialProgress = function(calcService, percent, added, endLocations) {
-		var me = this,
-			center = calcService.currentTask.config.origin,
+	onInitialProgress(calcService, percent, added, endLocations) {
+		var center = calcService.currentTask.config.origin,
 			latDiff, lngDiff;
 
 		latDiff = Math.abs(center.lat() - added.endLocation.lat());
 		lngDiff = Math.abs(center.lng() - added.endLocation.lng());
-		me.map.fitBounds({
+		this.map.fitBounds({
 			north: center.lat() + latDiff,
 			south: center.lat() - latDiff,
 			east: center.lng() + lngDiff,
 			west: center.lng() - lngDiff
 		});
-		me.map.setZoom(me.map.getZoom() - 1);
-	};
+		this.map.setZoom(this.map.getZoom() - 1);
+	}
 
-	MapController.prototype.drawArea = function(vertices, origin) {
-		var me = this,
-			toSpline = vertices
+	drawArea(vertices, origin) {
+		var toSpline = vertices
 				.concat([ origin ])
 				.concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2))),
 			splined = GeoUtils.spline(toSpline);
 			
-		me.objectManager.showObject(new google.maps.Polygon({
+		this.objectManager.showObject(new google.maps.Polygon({
 			path: splined.splice(0, Math.round(splined.length * 2 / 3) - 2),
 			//strokeColor: '#080',
 			fillColor: '#080',
@@ -165,51 +153,40 @@ define([
 			fillOpacity: 0.3,
 			zIndex: 100
 		}), null, 'inProgress');
-	};
+	}
 
-	MapController.prototype.startView = function(callback) {
-		var me = this;
-
-		me.$retryBtn.show();
-		me.$retryBtn.off().one('click', function() {
-			me.resultVisualizer.clearResultDetail();
-			me.$retryBtn.hide();
+	startView(callback) {
+		this.$retryBtn.show();
+		this.$retryBtn.off().one('click', () => {
+			this.resultVisualizer.clearResultDetail();
+			this.$retryBtn.hide();
 			callback();
 		});
-	};
+	}
 
-	MapController.prototype.specifyLocation = function(callback) {
-		var me = this,
-			dragStartListener;
+	finalize(dragStartListener, callback = _.noop) {
+		this.$centerMarker.hide();
+		this.$determineBtn.hide();
+		this.$cancelBtn.hide();
+		google.maps.event.removeListener(dragStartListener);
+		this.hideMessage();
+		callback();
+	}
 
-		function hideMessage() {
-			me.hideMessage();
-		}
+	specifyLocation(callback) {
+		var dragStartListener;
 
-		function finalize(latLng) {
-			me.$centerMarker.hide();
-			me.$determineBtn.hide();
-			me.$cancelBtn.hide();
-			google.maps.event.removeListener(dragStartListener);
-			hideMessage();
-			callback(latLng);
-		}
+		this.$centerMarker.show();
+		this.$determineBtn.show();
+		this.$cancelBtn.show();
+		this.showMessage(this.application.getMessage('dragMapToSpecifyLocation'));
 
-		me.$centerMarker.show();
-		me.$determineBtn.show();
-		me.$cancelBtn.show();
-		me.showMessage(me.application.getMessage('dragMapToSpecifyLocation'));
+		dragStartListener = google.maps.event.addListenerOnce(this.map, 'dragstart', () => this.hideMessage());
 
-		dragStartListener = google.maps.event.addListenerOnce(me.map, 'dragstart', hideMessage);
+		this.$cancelBtn.off().one('click', () => this.finalize(dragStartListener));
+		this.$determineBtn.off().one('click', () => this.finalize(dragStartListener, () => callback(this.map.getCenter())));
+	}
+}
 
-		me.$cancelBtn.off().one('click', function() {
-			finalize();
-		});
-		me.$determineBtn.off().one('click', function() {
-			finalize(me.map.getCenter());
-		});
-	};
-
-	return MapController;
-});
+module.exports = MapController;
 
