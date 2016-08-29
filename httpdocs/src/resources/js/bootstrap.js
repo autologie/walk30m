@@ -5,7 +5,7 @@ import Application from "./Application";
 import locale from "./locale_ja";
 
 _.templateSettings = {
-    interpolate: /\{\{(.+?)\}\}/g
+  interpolate: /\{\{(.+?)\}\}/g
 };
 
 $(() => new Application($(window.document)));
