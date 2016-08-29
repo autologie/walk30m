@@ -26,11 +26,9 @@ class MapController {
   }
 
   initMap(options) {
-    let map;
-
     window.console.log('google map: initializing google map...');
 
-    map = new google.maps.Map(this.$el.find('#map-canvas').get(0), _.defaults(options || {}, {
+    const map = new google.maps.Map(this.$el.find('#map-canvas').get(0), _.defaults(options || {}, {
       center: new google.maps.LatLng(36, 140),
       zoom: 13,
       zoomControlOptions: {
@@ -41,9 +39,7 @@ class MapController {
       },
     }));
 
-    map.addListener('tileloaded', function () {
-      window.console.log('google map: tile loaded.');
-    });
+    map.addListener('tileloaded', () => window.console.log('google map: tile loaded.'));
 
     return map;
   }
@@ -59,9 +55,9 @@ class MapController {
   getMap() { return this.map; }
 
   startCalculation(calcService, onExit) {
-    let calcMsgTpl = _.template(this.application.getMessage('searching')),
-      request = calcService.currentTask.config,
-      listeners = [];
+    const calcMsgTpl = _.template(this.application.getMessage('searching'));
+    const request = calcService.currentTask.config;
+    const listeners = [];
 
     function doExit(isCompleted) {
       if (isCompleted) {
@@ -99,9 +95,12 @@ class MapController {
 
     this.footprint.startFrom(request.origin);
 
-    listeners.push(calcService.addListener('progress', _.once(_.bind(this.onInitialProgress, this, calcService))));
-    listeners.push(calcService.addListener('progress', _.bind(this.onProgress, this, calcService)));
-    listeners.push(calcService.addListener('complete', _.bind(this.onComplete, this, calcService)));
+    listeners.push(calcService.addListener('progress',
+      _.once(_.bind(this.onInitialProgress, this, calcService))));
+    listeners.push(calcService.addListener('progress',
+      _.bind(this.onProgress, this, calcService)));
+    listeners.push(calcService.addListener('complete',
+      _.bind(this.onComplete, this, calcService)));
 
     this.map.panTo(request.origin);
   }
@@ -110,7 +109,7 @@ class MapController {
     this.objectManager.clearObject('inProgress');
     this.footprint.stop();
     this.showMessage(this.application.getMessage('completed'));
-    _.delay(function () {
+    _.delay(() => {
       this.hideMessage();
       this.footprint.setMap(null);
       this.resultVisualizer.addResult(task);
@@ -118,16 +117,15 @@ class MapController {
   }
 
   onProgress(calcService, percent, added, endLocations) {
-    this.footprint.setAngle(90 - (percent * 360 / 100) - 30);
+    this.footprint.setAngle(90 - ((percent * 360) / 100) - 30);
     this.drawArea(endLocations, calcService.currentTask.config.origin);
   }
 
-  onInitialProgress(calcService, percent, added, endLocations) {
-    let center = calcService.currentTask.config.origin,
-      latDiff, lngDiff;
+  onInitialProgress(calcService, percent, added) {
+    const center = calcService.currentTask.config.origin;
+    const latDiff = Math.abs(center.lat() - added.endLocation.lat());
+    const lngDiff = Math.abs(center.lng() - added.endLocation.lng());
 
-    latDiff = Math.abs(center.lat() - added.endLocation.lat());
-    lngDiff = Math.abs(center.lng() - added.endLocation.lng());
     this.map.fitBounds({
       north: center.lat() + latDiff,
       south: center.lat() - latDiff,
@@ -138,13 +136,13 @@ class MapController {
   }
 
   drawArea(vertices, origin) {
-    let toSpline = vertices
+    const toSpline = vertices
         .concat([origin])
-        .concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2))),
-      splined = GeoUtils.spline(toSpline);
+        .concat(vertices.slice(0).splice(0, Math.round(vertices.length / 2)));
+    const splined = GeoUtils.spline(toSpline);
 
     this.objectManager.showObject(new google.maps.Polygon({
-      path: splined.splice(0, Math.round(splined.length * 2 / 3) - 2),
+      path: splined.splice(0, Math.round((splined.length * 2) / 3) - 2),
       // strokeColor: '#080',
       fillColor: '#080',
       clickable: false,
@@ -174,17 +172,24 @@ class MapController {
   }
 
   specifyLocation(callback) {
-    let dragStartListener;
-
     this.$centerMarker.show();
     this.$determineBtn.show();
     this.$cancelBtn.show();
     this.showMessage(this.application.getMessage('dragMapToSpecifyLocation'));
 
-    dragStartListener = google.maps.event.addListenerOnce(this.map, 'dragstart', () => this.hideMessage());
+    const dragStartListener = google.maps.event.addListenerOnce(
+      this.map,
+      'dragstart',
+      () => this.hideMessage()
+    );
 
-    this.$cancelBtn.off().one('click', () => this.finalize(dragStartListener));
-    this.$determineBtn.off().one('click', () => this.finalize(dragStartListener, () => callback(this.map.getCenter())));
+    this.$cancelBtn.off().one('click',
+      () => this.finalize(dragStartListener)
+    );
+    this.$determineBtn.off().one('click',
+      () => this.finalize(dragStartListener,
+      () => callback(this.map.getCenter()))
+    );
   }
 }
 

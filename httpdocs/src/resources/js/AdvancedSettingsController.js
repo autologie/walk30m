@@ -20,24 +20,22 @@ class AdvancedSettingsController {
   }
 
   initialize() {
-    let radios = {
-        '$optTolls': this.defaultSettings.tolls,
-        '$optHighways': this.defaultSettings.highways,
-        '$optFerries': this.defaultSettings.ferries,
-      },
-      p;
+    const radios = {
+      $optTolls: this.defaultSettings.tolls,
+      $optHighways: this.defaultSettings.highways,
+      $optFerries: this.defaultSettings.ferries,
+    };
 
     this.$prefs.removeProp('checked');
-    this.$prefs.filter('[value=' + this.defaultSettings.preference + ']').prop('checked', 'checked');
-    for (p in radios) {
-      if (radios.hasOwnProperty(p)) {
-        if (radios[p]) {
-          this[p].prop('checked', 'checked');
-        } else {
-          this[p].removeAttr('checked');
-        }
+    this.$prefs.filter(`[value=${this.defaultSettings.preference}]`).prop('checked', 'checked');
+
+    _.keys(radios).forEach((p) => {
+      if (radios[p]) {
+        this[p].prop('checked', 'checked');
+      } else {
+        this[p].removeAttr('checked');
       }
-    }
+    });
   }
 
   applyValues(values) {
@@ -45,7 +43,7 @@ class AdvancedSettingsController {
     this.$optHighways.prop('checked', !values.avoidHighways);
     this.$optTolls.prop('checked', !values.avoidTolls);
     this.$prefs.prop('checked', false);
-    this.$prefs.filter('[value=' + values.preference + ']').prop('checked', true);
+    this.$prefs.filter(`[value=${values.preference}]`).prop('checked', true);
   }
 
   getValues() {

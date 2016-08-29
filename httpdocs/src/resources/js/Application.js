@@ -1,15 +1,16 @@
 import window from 'window';
-import $ from 'jQuery';
+import $ from 'jquery';
 import _ from 'lodash';
 import google from 'google';
 import CalculationService from './CalculationService';
 import Logger from './Logger';
 import GeoUtil from './GeoUtil';
 import Walk30mUtils from './Walk30mUtils';
-import AdvancedSettingsController from './AdvancedSettingsController';
+import SettingsCtrl from './AdvancedSettingsController';
 import ProgressBar from './ProgressBar';
-import MapController from './MapController';
-import InputController from './InputController';
+import MapCtrl from './MapController';
+import InputCtrl from './InputController';
+import { PUBLIC_API_URL_BASE } from './config';
 
 class Application {
 
@@ -28,21 +29,23 @@ class Application {
     this.$goToAdvancedSettingsLink = $el.find('a[href=#advanced-settings]');
     this.calcService = new CalculationService();
     this.logger = new Logger(this.calcService);
-    this.advancedSettingsController = new AdvancedSettingsController($el.find('#advanced-settings'));
+    this.advancedSettingsController = new SettingsCtrl($el.find('#advanced-settings'));
 
-    $el.find('#extra').css({ top: Math.min($(window).height(), 700) + 'px' });
+    $el.find('#extra').css({ top: `${Math.min($(window).height(), 700)}px` });
     this.initEvents();
 
-    $.get(PUBLIC_API_URL_BASE + '/client_location').done((data) => {
-      this.mapController = new MapController(this, $el.find('#map-wrapper'), {
+    $.get(`${PUBLIC_API_URL_BASE}/client_location`).done((data) => {
+      this.mapController = new MapCtrl(this, $el.find('#map-wrapper'), {
         center: new google.maps.LatLng(data.lat, data.lng),
       });
-      this.inputController = new InputController(
+      this.inputController = new InputCtrl(
         this,
         $el.find('#control'),
         this.mapController
       );
       this.progressBar = new ProgressBar($el.find('#progressbar'));
+
+      // eslint-disable-next-line no-console
       console.log('Application: initialized', new Date() - startDate);
 
       this.route();
@@ -50,17 +53,17 @@ class Application {
   }
 
   route() {
-    let parseQuery = (s) => {
-        const ret = s.split('=');
+    function parseQuery(s) {
+      const ret = s.split('=');
 
-        return [
-          ret[0],
-          window.decodeURIComponent(ret[1]),
-        ];
-      },
-      splittedHash = window.location.hash.split('?'),
-      path = splittedHash[0].split('/')[1],
-      query = _.fromPairs((splittedHash[1] || '').split('&').map(parseQuery));
+      return [
+        ret[0],
+        window.decodeURIComponent(ret[1]),
+      ];
+    }
+    const splittedHash = window.location.hash.split('?');
+    const path = splittedHash[0].split('/')[1];
+    const query = _.fromPairs((splittedHash[1] || '').split('&').map(parseQuery));
 
     if (path === 'calc') {
       this.startCalcByQuery(query.request);
@@ -71,12 +74,10 @@ class Application {
     }
   }
 
-  startViewResult(path, request) {
-    let decoded;
-
+  startViewResult(path, rawRequest) {
     try {
-      request = JSON.parse(request);
-      decoded = Walk30mUtils.decodeResult(path);
+      const request = JSON.parse(rawRequest);
+      const decoded = Walk30mUtils.decodeResult(path);
 
       this.inputController.applyValues(_.defaults({
         origin: new google.maps.LatLng(request.origin.lat, request.origin.lng),
@@ -86,11 +87,9 @@ class Application {
         this.$cancelBtn.show();
         this.mapController.resultVisualizer.addResult({
           taskId: 'viewonly',
-          vertices: new google.maps.MVCArray(decoded.map((latLng) => {
-            return {
-              endLocation: new google.maps.LatLng(latLng.lat, latLng.lng),
-            };
-          })),
+          vertices: new google.maps.MVCArray(decoded.map((latLng) => ({
+            endLocation: new google.maps.LatLng(latLng.lat, latLng.lng),
+          }))),
           config: request,
         });
         this.viewMap();
@@ -101,9 +100,9 @@ class Application {
     }
   }
 
-  startCalcByQuery(req) {
+  startCalcByQuery(rawReq) {
     try {
-      req = JSON.parse(req);
+      const req = JSON.parse(rawReq);
 
       if (req && req.origin) {
         this.inputController.applyValues(_.defaults({
@@ -137,9 +136,10 @@ class Application {
   }
 
   onStartCalculation(task) {
-    const serializedCalculation = window.encodeURIComponent(JSON.stringify(task.serialize().config));
+    const serialized = JSON.stringify(task.serialize().config);
+    const encoded = window.encodeURIComponent(serialized);
 
-    window.history.pushState(null, '', '/#!/calc?request=' + serializedCalculation);
+    window.history.pushState(null, '', `/#!/calc?request=${encoded}`);
   }
 
   viewMap() {
@@ -149,7 +149,7 @@ class Application {
     });
   }
 
-  onProgressCalculation(percent, vertices) {
+  onProgressCalculation(percent) {
     this.progressBar.update(percent);
   }
 
@@ -161,7 +161,7 @@ class Application {
     this.onExitCalculation();
   }
 
-  onWarning(calcService, message) {
+  onWarning(calcService) {
     if (this.lastDenialReload
         && new Date() - this.lastDenialReload < 60000) {
       return;
@@ -176,32 +176,32 @@ class Application {
   }
 
   onCompleteCalculation(vertices, task) {
-    let feature = new google.maps.Data.Feature({
-        geometry: new google.maps.Data.Polygon([
-          _.map(vertices.getArray(), 'endLocation'),
-        ]),
-        id: task.taskId,
-        properties: _.defaults({
-          isResult: true,
-          vertices: task.vertices.getArray().slice(0),
-          task,
-        }, task),
-      }),
-      resultUrl = Walk30mUtils.createSharedURI(feature),
-      newPath = '/' + (resultUrl || '').split('/').slice(3).join('/');
+    const feature = new google.maps.Data.Feature({
+      geometry: new google.maps.Data.Polygon([
+        _.map(vertices.getArray(), 'endLocation'),
+      ]),
+      id: task.taskId,
+      properties: _.defaults({
+        isResult: true,
+        vertices: task.vertices.getArray().slice(0),
+        task,
+      }, task),
+    });
+    const resultUrl = Walk30mUtils.createSharedURI(feature);
+    const newPath = `/${(resultUrl || '').split('/').slice(3).join('/')}`;
 
     this.progressBar.update(100);
     window.history.pushState(null, '', newPath);
   }
 
   moveTo(id) {
-    const $target = id && this.$el.find('#' + id);
+    const $target = id && this.$el.find(`#${id}`);
 
     if (id !== 'top' && $target && $target.length > 0) {
       this.$page.animate({
-        scrollTop: $target.offset().top + 'px',
+        scrollTop: `${$target.offset().top}px`,
       }, undefined, 'swing', () => {
-        window.history.pushState(null, '', '/#!/' + id);
+        window.history.pushState(null, '', `/#!/${id}`);
       });
     } else {
       this.scrollToTop(() => {
@@ -221,8 +221,8 @@ class Application {
   }
 
   onClickSendMsgBtn() {
-    let message = this.$el.find('#message textarea').val(),
-      uuid = this.$el.find('#message input[name=uuid]').val();
+    const message = this.$el.find('#message textarea').val();
+    const uuid = this.$el.find('#message input[name=uuid]').val();
 
     if (message) {
       this.$sendMsgBtn.addClass('disabled');
@@ -251,10 +251,10 @@ class Application {
   sendMessage(message, uuid) {
     return $.ajax({
       type: 'POST',
-      url: PUBLIC_API_URL_BASE + '/messages',
+      url: `${PUBLIC_API_URL_BASE}/messages`,
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify({
-        message: uuid + ', ' + message,
+        message: `${uuid}, ${message}`,
         url: window.location.href,
       }),
     })
@@ -263,11 +263,11 @@ class Application {
   }
 
   compareGeocoderResultsByDistance(r1, r2) {
-    let center = this.mapController.map.getCenter(),
-      loc1 = r1.geometry.location,
-      loc2 = r2.geometry.location,
-      r1Dist = Math.pow(loc1.lat() - center.lat(), 2) + Math.pow(loc1.lng() - center.lng(), 2),
-      r2Dist = Math.pow(loc2.lat() - center.lat(), 2) + Math.pow(loc2.lng() - center.lng(), 2);
+    const center = this.mapController.map.getCenter();
+    const loc1 = r1.geometry.location;
+    const loc2 = r2.geometry.location;
+    const r1Dist = Math.pow(loc1.lat() - center.lat(), 2) + Math.pow(loc1.lng() - center.lng(), 2);
+    const r2Dist = Math.pow(loc2.lat() - center.lat(), 2) + Math.pow(loc2.lng() - center.lng(), 2);
 
     return r1Dist > r2Dist ? 1 : -1;
   }
@@ -348,7 +348,7 @@ class Application {
 }
 
 
-Application.prototype.onScroll = _.throttle(function () {
+Application.prototype.onScroll = _.throttle(function onScrollImpl() {
   if (this.$el.scrollTop() > 0) {
     this.$gotoTopBtn.fadeIn();
   } else {

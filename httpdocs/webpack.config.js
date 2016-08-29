@@ -1,5 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
+var InlineEnviromentVariablesPlugin = require('inline-environment-variables-webpack-plugin');
 
 module.exports = {
 	context: path.join(__dirname, 'src/'),
@@ -32,9 +33,7 @@ module.exports = {
 				drop_debugger: false
 			}
 		}),
-		new webpack.DefinePlugin({
-			PUBLIC_API_URL_BASE: JSON.stringify(process.env.PUBLIC_API_URL_BASE)
-		})
+    new InlineEnviromentVariablesPlugin()
 	],
 	devtool: 'source-map'
 };

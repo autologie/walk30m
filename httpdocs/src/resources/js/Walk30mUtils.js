@@ -1,78 +1,69 @@
-'use strict';
-define([
-  'window',
-  'lodash',
-], function (window, _) {
-  const Walk30mUtils = {};
+import window from 'window';
+import _ from 'lodash';
 
-  Walk30mUtils.createSummary = function (options) {
+class Walk30mUtils {
+
+  static createSummary(options) {
     return _.defaults({
       originAddress: options.address,
       timeExpr: (options.time / 60),
     }, options);
-  };
+  }
 
-  Walk30mUtils.encodeResult = function (coords) {
-    const diffSequence = coords.reduce(function (passed, elem) {
-      return [
-        elem,
-        passed[1].concat([[
-          Math.round(1000000 * (elem.lng - (passed[0] === null ? 0 : passed[0].lng))),
-          Math.round(1000000 * (elem.lat - (passed[0] === null ? 0 : passed[0].lat))),
-        ]]),
-      ];
-    }, [null, []])[1];
+  static encodeResult(coords) {
+    const diffSequence = coords.reduce((passed, elem) => [
+      elem,
+      passed[1].concat([[
+        Math.round(1000000 * (elem.lng - (passed[0] === null ? 0 : passed[0].lng))),
+        Math.round(1000000 * (elem.lat - (passed[0] === null ? 0 : passed[0].lat))),
+      ]]),
+    ], [null, []])[1];
 
-    return diffSequence.map(function (s) {
-      return [
-        s[0].toString(36),
-        s[1].toString(36),
-      ].join(' ');
-    }).join(',')
+    return diffSequence.map((s) => [
+      s[0].toString(36),
+      s[1].toString(36),
+    ].join(' ')).join(',')
       .replace(/,/g, ' ')
       .replace(/\s/g, '+')
       .replace(/\+\-/g, '-');
-  };
+  }
 
-  Walk30mUtils.decodeResult = function (str) {
+  static decodeResult(str) {
     const charSeq = str
       .replace(/\+/g, ' ')
       .replace(/\-/g, ' -')
       .split(' ')
-      .reduce(function (passed, elem) {
-        return [
-          passed[0] === null ? elem : null,
-          passed[0] === null ? passed[1] : passed[1].concat([[passed[0], elem]]),
-        ];
-      }, [null, []])[1];
+      .reduce((passed, elem) => [
+        passed[0] === null ? elem : null,
+        passed[0] === null ? passed[1] : passed[1].concat([[passed[0], elem]]),
+      ], [null, []])[1];
 
-    return charSeq.reduce(function (passed, elem) {
-      let x = parseInt(elem[0], 36) / 1000000,
-        y = parseInt(elem[1], 36) / 1000000,
-        last = passed ? passed[passed.length - 1] : null;
+    return charSeq.reduce((passed, elem) => {
+      const x = parseInt(elem[0], 36) / 1000000;
+      const y = parseInt(elem[1], 36) / 1000000;
+      const last = passed ? passed[passed.length - 1] : null;
 
       return passed
         ? passed.concat([{ lat: last.lat + y, lng: last.lng + x }])
         : [{ lat: y, lng: x }];
     }, null);
-  };
+  }
 
-  Walk30mUtils.createSharedURI = function (feature) {
-    const path = _.map(feature.getProperty('vertices'), 'endLocation');
-
+  static createSharedURI(feature) {
     try {
+      const path = _.map(feature.getProperty('vertices'), 'endLocation');
+      const encoded = JSON.stringify(feature.getProperty('task').serialize().config);
+
       return _.template('https://www.walk30m.com/#!/result?request={{req}}&path={{path}}')({
-        req: window.encodeURIComponent(JSON.stringify(feature.getProperty('task').serialize().config)),
-        path: Walk30mUtils.encodeResult(path.map(function (latLng) {
-          return { lat: latLng.lat(), lng: latLng.lng() };
-        })),
+        req: window.encodeURIComponent(encoded),
+        path: Walk30mUtils.encodeResult(path.map((latLng) => latLng.toJSON())),
       });
     } catch (ex) {
       // fallback
       return 'https://www.walk30m.com/';
     }
-  };
+  }
+}
 
-  return Walk30mUtils;
-});
+module.exports = Walk30mUtils;
 
