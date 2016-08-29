@@ -2,8 +2,8 @@ require([
 	'window',
 	'jQuery',
 	'lodash',
-	'./dev/Application.js',
-	'./dev/locale_ja.js'
+	'./Application.js',
+	'./locale_ja.js'
 ], function(window, $, _, Application, locale) {
 	_.templateSettings = {
 		interpolate: /\{\{(.+?)\}\}/g
