@@ -1,5 +1,6 @@
 import window from 'window';
 import _ from 'lodash';
+import { APP_URL } from './config';
 
 class Walk30mUtils {
 
@@ -54,13 +55,13 @@ class Walk30mUtils {
       const path = _.map(feature.getProperty('vertices'), 'endLocation');
       const encoded = JSON.stringify(feature.getProperty('task').serialize().config);
 
-      return _.template('https://www.walk30m.com/#!/result?request={{req}}&path={{path}}')({
+      return _.template(`${APP_URL}/#!/result?request={{req}}&path={{path}}`)({
         req: window.encodeURIComponent(encoded),
         path: Walk30mUtils.encodeResult(path.map((latLng) => latLng.toJSON())),
       });
     } catch (ex) {
       // fallback
-      return 'https://www.walk30m.com/';
+      return APP_URL;
     }
   }
 }
