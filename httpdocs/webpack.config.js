@@ -5,7 +5,7 @@ var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
 	context: path.join(__dirname, 'src/'),
-	entry: './resources/js/bootstrap.js',
+	entry: './js/bootstrap.js',
 	resolve: {
 		root: __dirname
 	},
@@ -16,8 +16,8 @@ module.exports = {
 	},
 	output: {
 		filename: 'app.js',
-		path: path.join(__dirname, '/target/resources/js'),
-		publicPath: '/resources/js/'
+		path: path.join(__dirname, '/target/js'),
+		publicPath: '/js/'
 	},
 	externals: {
 		'window': 'window',

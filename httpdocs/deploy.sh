@@ -4,7 +4,7 @@ echo start building...
 rm -rf ./target
 mkdir target
 cp -r ./src/* ./target/
-rm -rf ./target/resources/js/*
+rm -rf ./target/js/*
 webpack > /dev/null
 cat ./src/index.html \
 	| sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
