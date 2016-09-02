@@ -1,27 +1,34 @@
-'use strict';
+import window from 'window';
+import $ from 'jquery';
+import _ from 'lodash';
+import google from 'google';
+import GeoUtil from './GeoUtil';
+import ProgressBar from './ProgressBar';
 
-define([
-  'window',
-  'jQuery',
-  'lodash',
-  'google',
-  './GeoUtil.js',
-  './ProgressBar.js',
-], function (window, $, _, google, GeoUtil, ProgressBar) {
-  const minuteArray = _.range(1, 61).concat(_.map(_.range(1, 19), function (n) {
-    return 60 + n * 10;
-  })).concat(_.map(_.range(1, 7), function (n) {
-    return 240 + n * 60;
-  }));
+const minuteArray = _.range(1, 61).concat(_.map(_.range(1, 19), function (n) {
+  return 60 + n * 10;
+})).concat(_.map(_.range(1, 7), function (n) {
+  return 240 + n * 60;
+}));
 
-  function initializeScroll() {
-    // correct unnecessary scroll offset caused by software keyboard of iPhone.
-    window.scrollTo(0, 0);
-  }
+function initializeScroll() {
+  // correct unnecessary scroll offset caused by software keyboard of iPhone.
+  window.scrollTo(0, 0);
+}
 
-  function InputController(application, $el, mapController) {
+class InputController {
+
+  constructor(application, $el, mapController) {
     const me = this;
     const optionTpl = _.template('<option value="{{num}}" {{selected}}>{{num}}</option>');
+
+    this.selMode = {
+      TEXT: 'selmode-text',
+      MAP: 'selmode-map',
+      CURRENT: 'selmode-current',
+      GEOCODE: 'selmode-geocode',
+      SPEECH: 'selmode-voice',
+    };
 
     me.isSpeechAvailable = undefined !== window.webkitSpeechRecognition;
     me.mapController = mapController;
@@ -39,6 +46,7 @@ define([
     }).join(''));
 
     me.defaultPlaceholder = me.$location.attr('placeholder');
+    this.updateLocationCombo = _.debounce(() => this.doUpdateLocationCombo(), 200);
 
     if (!me.isSpeechAvailable) {
       me.$selModeList.find('[data-selmode=' + me.selMode.SPEECH + ']').addClass('disabled');
@@ -50,7 +58,7 @@ define([
     me.initEvents();
   }
 
-  InputController.prototype.initEvents = function () {
+  initEvents() {
     const me = this;
 
     me.$selModeList.find('li[data-selmode]:not(.disabled)').click(function (ev) {
@@ -79,16 +87,16 @@ define([
     me.$location.keydown(_.bind(me.onKeydown, me));
     me.$location.change(_.bind(me.resetLatLng, me));
     me.$time.blur(initializeScroll);
-  };
+  }
 
-  InputController.prototype.resetLatLng = function () {
+  resetLatLng() {
     const me = this;
 
     me.$location.removeAttr('data-latitude');
     me.$location.removeAttr('data-longitude');
-  };
+  }
 
-  InputController.prototype.onBlurSelModeListItem = function () {
+  onBlurSelModeListItem() {
     const me = this;
 
     _.defer(function () {
@@ -97,9 +105,9 @@ define([
         me.toggleSelModeList(false);
       }
     });
-  };
+  }
 
-  InputController.prototype.onKeydown = function (ev) {
+  onKeydown(ev) {
     let me = this,
       $items;
 
@@ -116,9 +124,9 @@ define([
     } else {
       me.updateLocationCombo();
     }
-  };
+  }
 
-  InputController.prototype.onKeyDownSelModeListItem = function (ev) {
+  onKeyDownSelModeListItem(ev) {
     let me = this,
       $target = $(ev.target),
       $items,
@@ -133,9 +141,9 @@ define([
       $items.eq(($li.index() + (ev.keyCode === 38 ? -1 : 1)) % $items.length).focus();
       ev.preventDefault();
     }
-  };
+  }
 
-  InputController.prototype.extractSelModeListItemData = function ($item) {
+  extractSelModeListItemData($item) {
     return {
       position: {
         lat: +$item.attr('data-latitude'),
@@ -143,9 +151,9 @@ define([
       },
       address: $item.text(),
     };
-  };
+  }
 
-  InputController.prototype.updateLocationCombo = _.debounce(function () {
+  doUpdateLocationCombo() {
     let me = this,
       val = me.$location.val(),
       selector = 'li[data-selmode=selmode-geocode]',
@@ -177,17 +185,9 @@ define([
           .blur(_.bind(me.onBlurSelModeListItem, me));
       }
     });
-  }, 200);
+  }
 
-  InputController.prototype.selMode = {
-    TEXT: 'selmode-text',
-    MAP: 'selmode-map',
-    CURRENT: 'selmode-current',
-    GEOCODE: 'selmode-geocode',
-    SPEECH: 'selmode-voice',
-  };
-
-  InputController.prototype.appendElementToLocationInput = function ($el, fix) {
+  appendElementToLocationInput($el, fix) {
     let me = this,
       $loc = me.$location;
 
@@ -198,9 +198,9 @@ define([
       left: (fix.left + Math.round($loc.offset().left - ($loc.outerWidth() - $loc.width()) / 2)) + 'px',
       width: (fix.width + $loc.outerWidth()) + 'px',
     });
-  };
+  }
 
-  InputController.prototype.toggleSelModeList = function (show) {
+  toggleSelModeList(show) {
     let me = this,
       isVisible = me.$selModeList.is(':visible'),
       doShow = !isVisible && (show !== false || show === true),
@@ -224,9 +224,9 @@ define([
     }
 
     return deferred.promise();
-  };
+  }
 
-  InputController.prototype.selectLocationOnMap = function () {
+  selectLocationOnMap() {
     const me = this;
 
     me.togglePanel(false);
@@ -237,9 +237,9 @@ define([
         me.$execBtn.focus();
       }
     });
-  };
+  }
 
-  InputController.prototype.selectLocationByText = function (data) {
+  selectLocationByText(data) {
     const me = this;
 
     me.$location.focus();
@@ -248,9 +248,9 @@ define([
       me.$location.val(data);
       me.updateLocationCombo();
     }
-  };
+  }
 
-  InputController.prototype.applyGeoLocationResult = function () {
+  applyGeoLocationResult() {
     let me = this,
       crd,
       latLng,
@@ -272,9 +272,9 @@ define([
     } else {
       window.alert(__('geolocationError'));
     }
-  };
+  }
 
-  InputController.prototype.initGeoLocationAPI = function (progressBar) {
+  initGeoLocationAPI(progressBar) {
     const me = this;
 
     me.geoLocationWatchId = window.navigator.geolocation.watchPosition(function (pos) {
@@ -292,9 +292,9 @@ define([
     });
 
     me.selectLocationByGeoLocation();
-  };
+  }
 
-  InputController.prototype.selectLocationByGeoLocation = function () {
+  selectLocationByGeoLocation() {
     let me = this,
       bar, $bar;
 
@@ -311,9 +311,9 @@ define([
 
       _.delay(_.bind(me.initGeoLocationAPI, me, bar), 1000);
     }
-  };
+  }
 
-  InputController.prototype.setLatLng = function (loc) {
+  setLatLng(loc) {
     let me = this,
       deferred = new $.Deferred();
 
@@ -343,9 +343,9 @@ define([
     });
 
     return deferred.promise();
-  };
+  }
 
-  InputController.prototype.onSelModeChoosed = function (mode, data) {
+  onSelModeChoosed(mode, data) {
     const me = this;
 
     window.console.log('InputController: onSelModeChoosed', mode, data);
@@ -362,9 +362,9 @@ define([
     } else if (mode === me.selMode.CURRENT) {
       me.selectLocationByGeoLocation();
     }
-  };
+  }
 
-  InputController.prototype.selectLocationBySpeech = function () {
+  selectLocationBySpeech() {
     let me = this,
       recognizer = new window.webkitSpeechRecognition(),
       accepted,
@@ -391,9 +391,9 @@ define([
     me.$location.attr('placeholder', __('pleaseSpeak'));
     recognizer.lang = window.navigator.language;
     recognizer.start();
-  };
+  }
 
-  InputController.prototype.selectLocationByGeocodeResult = function (data) {
+  selectLocationByGeocodeResult(data) {
     const me = this;
 
     me.$location.val(data.address);
@@ -401,9 +401,9 @@ define([
     me.$location.attr('data-longitude', data.position.lng);
     me.$execBtn.focus();
     me.application.mapController.map.setCenter(new google.maps.LatLng(data.position.lat, data.position.lng));
-  };
+  }
 
-  InputController.prototype.togglePanel = function (show) {
+  togglePanel(show) {
     let me = this,
       $header = me.$el.find('#app-header'),
       // isVisible = me.$el.is(':visible'),
@@ -418,9 +418,9 @@ define([
       // me.$el.fadeOut();
       me.$el.addClass('shrink');
     }
-  };
+  }
 
-  InputController.prototype.isCancellable = function () {
+  isCancellable() {
     let me = this,
       retVal = false;
 
@@ -432,9 +432,9 @@ define([
     });
 
     return retVal;
-  };
+  }
 
-  InputController.prototype.applyValues = function (values) {
+  applyValues(values) {
     let me = this,
       $modes = me.$el.find('input[name=travelMode]'),
       deferred = new $.Deferred();
@@ -448,9 +448,9 @@ define([
     $modes.filter('[value=' + values.mode + ']').prop('checked', true);
 
     return deferred.promise();
-  };
+  }
 
-  InputController.prototype.getValues = function () {
+  getValues() {
     let me = this,
       latVal = +me.$location.attr('data-latitude'),
       lngVal = +me.$location.attr('data-longitude');
@@ -463,7 +463,7 @@ define([
       time: +me.$time.val() * 60,
       mode: me.$el.find('input[name=travelMode]:checked').val(),
     };
-  };
+  }
+}
 
-  return InputController;
-});
+export default InputController;
