@@ -29,12 +29,17 @@ module.exports = {
 		]
 	},
 	plugins: [
-    new LodashModuleReplacementPlugin,
+    new LodashModuleReplacementPlugin({
+      collections: true,
+      shorthands: true
+    }),
+    /*
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				drop_debugger: false
 			}
 		}),
+    */
     new InlineEnviromentVariablesPlugin
 	],
 	devtool: 'source-map'
