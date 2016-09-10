@@ -110,9 +110,9 @@ export default class CalculationService extends google.maps.MVCObject {
       google.maps.event.trigger(this, 'progress', progress, added, goals);
     });
 
+    this.currentTask = task;
     this.startMonitorVelocity(30000, 1000);
 
-    this.currentTask = task;
     this.isPausing = false;
     this.isRunning = true;
     this.calcNext(new google.maps.LatLng(
