@@ -16,22 +16,22 @@ class Logger {
   }
 
   createGaValue(data) {
-      return [
-        data.mode,
-        data.time,
-        data.preference
-      ].join(',');
+    return [
+      data.mode,
+      data.time,
+      data.preference,
+    ].join(',');
   }
 
   sendGA(action, data, value) {
-    if(!window.ga) return;
+    if (!window.ga) return;
 
     window.ga('send', {
       hitType: 'event',
       eventCategory: 'calculation',
       eventAction: action,
       eventLabel: this.createGaValue(data),
-      eventValue: value
+      eventValue: value,
     });
   }
 

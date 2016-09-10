@@ -20,7 +20,7 @@ class InputController {
 
   constructor(application, $el, mapController) {
     const me = this;
-    const optionTpl = _.template('<option value="{{num}}" {{selected}}>{{num}}</option>');
+    const optionTpl = _.template('<option value="<%= num %>" <%= selected %>><%= num %></option>');
 
     this.selMode = {
       TEXT: 'selmode-text',
@@ -157,7 +157,7 @@ class InputController {
     let me = this,
       val = me.$location.val(),
       selector = 'li[data-selmode=selmode-geocode]',
-      tpl = _.template('<li tabindex="-1" data-selmode="selmode-geocode" data-latitude="{{lat}}" data-longitude="{{lng}}">{{address}}</li>');
+      tpl = _.template('<li tabindex="-1" data-selmode="selmode-geocode" data-latitude="<%= lat %>" data-longitude="<%= lng %>"><%= address %></li>');
 
     me.$selModeList.find(selector).remove();
 

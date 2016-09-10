@@ -23,8 +23,8 @@ define([
     me.application = application;
     me.map = map;
     me.objectManager = objectManager;
-    me.twitterURITpl = _.template('https://twitter.com/intent/tweet?text={{message}}&url={{url}}&hashtags=walk30m');
-    me.routeLinkTpl = _.template('https://www.google.co.jp/maps/dir/{{originLat}},{{originLng}}/{{destLat}},{{destLng}}');
+    me.twitterURITpl = _.template('https://twitter.com/intent/tweet?text=<%= message %>&url=<%= url %>&hashtags=walk30m');
+    me.routeLinkTpl = _.template('https://www.google.co.jp/maps/dir/<%= originLat %>,<%= originLng %>/<%= destLat %>,<%= destLng %>');
     me.balloonTpl = _.template(application.getMessage('routeDetailBalloonTpl'));
     me.overviewBalloonTpl = _.template(application.getMessage('resultOverviewBalloonTpl'));
     me.summaryBalloonTpl = _.template(application.getMessage('resultSummaryBalloonTpl'));

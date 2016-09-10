@@ -54,11 +54,10 @@ class Walk30mUtils {
     try {
       const path = _.map(feature.getProperty('vertices'), 'endLocation');
       const encoded = JSON.stringify(feature.getProperty('task').serialize().config);
+      const reqExpr = window.encodeURIComponent(encoded);
+      const pathExpr = Walk30mUtils.encodeResult(path.map((latLng) => latLng.toJSON()));
 
-      return _.template(`${APP_URL}/#!/result?request={{req}}&path={{path}}`)({
-        req: window.encodeURIComponent(encoded),
-        path: Walk30mUtils.encodeResult(path.map((latLng) => latLng.toJSON())),
-      });
+      return `${APP_URL}/#!/result?request=${reqExpr}&path=${pathExpr}`;
     } catch (ex) {
       // fallback
       return APP_URL;
