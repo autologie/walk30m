@@ -27,10 +27,10 @@ build:
     - npm-test:
       cwd: httpdocs/
     - script:
-      name: webpack
+      name: webpack-build
       cwd: httpdocs/
       code: |
-        webpack > /dev/null
+        npm run build
     - script:
       name: apply-envvars
       cwd: httpdocs/

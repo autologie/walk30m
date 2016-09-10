@@ -6,7 +6,8 @@
   "scripts": {
     "test": "echo \"Pass.\" && exit 0",
     "lint": "eslint ./src/js/",
-    "preview": "http-server ./target"
+    "preview": "http-server ./target",
+    "build": "webpack > /dev/null"
   },
   "author": "",
   "license": "ISC",
