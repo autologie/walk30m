@@ -185,7 +185,8 @@ class MapController {
     );
 
     this.$cancelBtn.off().one('click',
-      () => this.finalize(dragStartListener)
+      () => this.finalize(dragStartListener),
+      callback
     );
     this.$determineBtn.off().one('click',
       () => this.finalize(dragStartListener,

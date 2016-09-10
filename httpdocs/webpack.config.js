@@ -33,13 +33,11 @@ module.exports = {
       collections: true,
       shorthands: true
     }),
-    /*
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				drop_debugger: false
 			}
 		}),
-    */
     new InlineEnviromentVariablesPlugin
 	],
 	devtool: 'source-map'
