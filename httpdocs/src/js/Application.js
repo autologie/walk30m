@@ -12,13 +12,14 @@ import ProgressBar from './ProgressBar';
 import MapCtrl from './MapController';
 import InputCtrl from './InputController';
 import { PUBLIC_API_URL_BASE } from './config';
+import messages from './locale_ja';
 
 class Application {
 
   constructor($el) {
     const startDate = new Date();
 
-    this.messages = window.messages;
+    this.messages = messages;
     this.$el = $el;
     this.$page = $('html,body');
     this.$gotoTopBtn = $el.find('.btn[role=goto-top]');
