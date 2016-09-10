@@ -6,7 +6,7 @@ export default class ProgressBar {
     this.currentProgress = 0;
     $el.append('<div class="progress"><div class="inner"></div></div>');
 
-    this.finalize = _.debounce(() => this.doFinazlie(), 1000);
+    this.finalize = _.debounce(() => this.doFinalize(), 1000);
     this.update = _.throttle((percent) => this.doUpdate(percent), 1000);
   }
 
