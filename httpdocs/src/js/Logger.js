@@ -39,19 +39,20 @@ class Logger {
     const taskId = task.taskId;
     const now = new Date();
     const took = +now - +new Date(this.executions[taskId].start_datetime);
+    const data = _.defaults({
+      complete_datetime: now.toISOString(),
+      result_path: _.map(_.map(vertices.getArray(), 'endLocation'), (latLng) => ({
+        lat: latLng.lat(),
+        lng: latLng.lng(),
+      })),
+    }, this.executions[taskId]);
 
     $.ajax({
       url: endPoint + taskId,
       type: 'PUT',
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(_.defaults({
-        complete_datetime: now.toISOString(),
-        result_path: _.map(_.map(vertices.getArray(), 'endLocation'), (latLng) => ({
-          lat: latLng.lat(),
-          lng: latLng.lng(),
-        })),
-      }, this.executions[taskId])),
+      data: JSON.stringify(data),
     });
     this.sendGA('complete', data, took);
   }
