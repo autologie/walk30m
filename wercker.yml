@@ -42,7 +42,7 @@ build:
           > ./target/index.html
 deploy:
   steps:
-    - s3sync
+    - s3sync:
       key_id: $AWS_ACCESS_KEY_ID
       key_secret: $AWS_SECRET_ACCESS_KEY
       bucket_url: s3://$S3_PUBLIC_BUCKET_NAME
