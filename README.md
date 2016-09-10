@@ -1,5 +1,7 @@
 # walk30m
 
+[![wercker status](https://app.wercker.com/status/a37daacd68f6c6707e8f77790e3cf9bc/s/master "wercker status")](https://app.wercker.com/project/byKey/a37daacd68f6c6707e8f77790e3cf9bc)
+
 https://www.walk30m.com
 
 ## Development
