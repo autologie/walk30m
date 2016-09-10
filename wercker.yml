@@ -22,17 +22,28 @@ build:
   # Read more about steps on our dev center:
   # http://devcenter.wercker.com/docs/steps/index.html
   steps:
-    # A step that executes `npm install` command
     - npm-install:
       cwd: httpdocs/
-    # A step that executes `npm test` command
     - npm-test:
       cwd: httpdocs/
-
-    # A custom script step, name value is used in the UI
-    # and the code value contains the command that get executed
     - script:
-      name: echo nodejs information
+      name: webpack
+      cwd: httpdocs/
       code: |
-        echo "node version $(node -v) running"
-        echo "npm version $(npm -v) running"
+        webpack > /dev/null
+    - script:
+      name: apply-envvars
+      cwd: httpdocs/
+      code: |
+        cat ./src/index.html \
+          | sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
+          | sed s/%GA_TRACKING_ID%/$GA_TRACKING_ID/g \
+          | sed s@%APP_URL%@$APP_URL@g \
+          > ./target/index.html
+deploy:
+  steps:
+    - s3sync
+      key_id: $AWS_ACCESS_KEY_ID
+      key_secret: $AWS_SECRET_ACCESS_KEY
+      bucket_url: s3://$S3_PUBLIC_BUCKET_NAME
+      source_dir: httpdocs/target/
