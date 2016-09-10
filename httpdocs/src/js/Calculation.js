@@ -1,85 +1,72 @@
-define([
-  'lodash',
-  'google',
-  './GeoUtil',
-], function (_, google, GeoUtil) {
-  'use strict';
-  let twicePI = 2 * Math.PI,
-    halfPI = Math.PI / 2;
+/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
+import _ from 'lodash';
+import google from 'google';
+import * as GeoUtil from './GeoUtil';
 
-  function Calculation(request) {
-    const me = this;
+const twicePI = 2 * Math.PI;
 
-    me.config = request;
-    me.startTime = new Date();
-    me.pauseTime = 0;
-    me.vertices = new google.maps.MVCArray();
+export default class Calculation extends google.maps.MVCObject {
+  constructor(request) {
+    super();
 
-    me.vertices.addListener('insert_at', function (n) {
-      const added = me.vertices.getAt(n);
+    this.config = request;
+    this.startTime = new Date();
+    this.pauseTime = 0;
+    this.vertices = new google.maps.MVCArray();
 
-      google.maps.event.trigger(me, 'progress', me.getProgress(), added, me.getGoals());
+    this.vertices.addListener('insert_at', n => {
+      const added = this.vertices.getAt(n);
+
+      google.maps.event.trigger(this, 'progress', this.getProgress(), added, this.getGoals());
     });
   }
 
-  Calculation.prototype = new google.maps.MVCObject();
-
-  Calculation.prototype.getGoals = function () {
+  getGoals() {
     return _.map(this.vertices.getArray(), 'endLocation');
-  };
+  }
 
-  Calculation.prototype.getProgress = function () {
-    const me = this;
+  getProgress() {
+    return Math.round((100 * this.accumulateAngles(this.getGoals())) / twicePI);
+  }
 
-    return Math.round(100 * me.accumulateAngles(me.getGoals()) / twicePI);
-  };
+  getVelocity() {
+    const progress = this.getProgress();
+    const consumedTime = new Date() - this.startTime - this.pauseTime;
 
-  Calculation.prototype.getVelocity = function () {
-    let me = this,
-      progress = me.getProgress(),
-      consumedTime = new Date() - me.startTime - me.pauseTime;
+    return progress === 0 ? 0 : (1000 * progress) / consumedTime;
+  }
 
-    return progress === 0 ? 0 : 1000 * progress / consumedTime;
-  };
+  isComplete(vertices) {
+    return this.accumulateAngles(vertices || this.getGoals()) >= twicePI;
+  }
 
-  Calculation.prototype.isComplete = function (vertices) {
-    const me = this;
+  hasVisited(location) {
+    const sameLocation = v => GeoUtil.distance(v.endLocation, location) < 0.0005;
 
-    return me.accumulateAngles(vertices || me.getGoals()) >= twicePI;
-  };
+    return _.some(this.vertices.getArray(), sameLocation);
+  }
 
-  Calculation.prototype.hasVisited = function (location) {
-    let me = this,
-      sameLocation = function (v) {
-        return GeoUtil.distance(v.endLocation, location) < 0.0005;
-      };
+  accumulateAngles(vertices) {
+    const angles = _.map(vertices, v => GeoUtil.calcAngle(this.config.origin, v));
 
-    return _.some(me.vertices.getArray(), sameLocation);
-  };
+    return _.reduce(angles, ({ accum, diff, prev }, angle) => {
+      let angleToAdd = 0;
 
-  Calculation.prototype.accumulateAngles = function (vertices) {
-    let me = this,
-      checked = 0,
-      diff,
-      angles = _.map(vertices, function (v) {
-        return GeoUtil.calcAngle(me.config.origin, v);
-      });
+      if (prev === undefined) {
+        angleToAdd = 0;
+      } else {
+        angleToAdd = prev - angle > Math.PI ? (diff + twicePI) : diff;
+      }
 
-    return _.reduce(angles, function (passed, angle, idx, arr) {
-      return passed + (idx > 0 ? ((diff = angle - arr[idx - 1]) < -1 * Math.PI ? (diff + twicePI) : diff) : 0);
-    }, 0);
-  };
+      return { accum: accum + angleToAdd, diff: angleToAdd, prev: angle };
+    }, { accum: 0, diff: 0, prev: undefined }).accum;
+  }
 
-  Calculation.prototype.serialize = function () {
-    const me = this;
-
+  serialize() {
     return {
       config: _.defaults({
-        origin: GeoUtil.latLngToLiteral(me.config.origin),
-      }, me.config),
+        origin: GeoUtil.latLngToLiteral(this.config.origin),
+      }, this.config),
     };
-  };
-
-  return Calculation;
-});
-
+  }
+}

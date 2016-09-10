@@ -1,14 +1,13 @@
-'use strict';
-define([
-  'lodash',
-  'google',
-], function (_, google) {
-  function OM(map) {
-    const me = this;
+/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
+import _ from 'lodash';
+import google from 'google';
 
-    google.maps.MVCArray.constructor.call(me);
-    me.map = map;
-    me.addListener('remove_at', function (idx, elem) {
+export default class OM extends google.maps.MVCArray {
+  constructor(map) {
+    super();
+
+    this.map = map;
+    this.addListener('remove_at', (idx, elem) => {
       if (elem[0].setMap) {
         elem[0].setMap(null);
       } else if (elem.close) {
@@ -18,69 +17,55 @@ define([
       }
     });
 
-    me.addListener('insert_at', function (idx) {
-      let elem = me.getArray()[idx],
-        obj = elem[0];
+    this.addListener('insert_at', (idx) => {
+      const elem = this.getArray()[idx];
+      const obj = elem[0];
 
       if (obj.open) {
         if (elem[3] instanceof google.maps.MVCObject) {
-          obj.open(me.map, elem[3]);
+          obj.open(map, elem[3]);
         } else {
-          obj.open(me.map);
+          obj.open(map);
         }
       } else {
-        obj.setMap(me.map);
+        obj.setMap(map);
       }
     });
   }
 
-  OM.prototype = new google.maps.MVCArray();
-
-  OM.prototype.clearObject = function (id) {
-    const me = this;
-
+  clearObject(id) {
     if (!id) {
       return;
     }
 
-    me.forEach(function (elem, idx) {
+    this.forEach((elem, idx) => {
       if (elem && elem[2] === id) {
-        me.removeAt(idx);
+        this.removeAt(idx);
         return false;
       }
+      return true;
     });
-  };
+  }
 
-  OM.prototype.clearObjects = function (taggedAs) {
-    const me = this;
-
-    me.forEach(function (elem, idx) {
+  clearObjects(taggedAs) {
+    this.forEach((elem, idx) => {
       if (elem && (taggedAs === undefined || elem[1] === taggedAs)) {
-        me.removeAt(idx);
-        _.defer(function () {
-          me.clearObjects(taggedAs);
-        });
+        this.removeAt(idx);
+        _.defer(() => this.clearObjects(taggedAs));
         return false;
       }
+      return true;
     });
-  };
+  }
 
-  OM.prototype.findObject = function (id) {
-    const me = this;
+  findObject(id) {
+    return this.getArray().filter(elem => elem[2] === id).pop();
+  }
 
-    return me.getArray().filter(function (elem) {
-      return elem[2] === id;
-    }).pop();
-  };
-
-  OM.prototype.showObject = function (obj, cls, id, options) {
-    const me = this;
-
-    me.clearObject(id);
-    me.push([obj, cls, id, options]);
+  showObject(obj, cls, id, options) {
+    this.clearObject(id);
+    this.push([obj, cls, id, options]);
     return obj;
-  };
-
-  return OM;
-});
+  }
+}
 

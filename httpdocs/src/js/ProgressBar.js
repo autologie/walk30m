@@ -1,45 +1,37 @@
-'use strict';
+import _ from 'lodash';
 
-define([
-  'lodash',
-], function (_) {
-  function ProgressBar($el) {
-    const me = this;
-
-    me.$el = $el;
-    me.currentProgress = 0;
+export default class ProgressBar {
+  constructor($el) {
+    this.$el = $el;
+    this.currentProgress = 0;
     $el.append('<div class="progress"><div class="inner"></div></div>');
+
+    this.finalize = _.debounce(() => this.doFinazlie(), 1000);
+    this.update = _.throttle((percent) => this.doUpdate(percent), 1000);
   }
 
-  ProgressBar.prototype.finalize = _.debounce(function () {
-    const me = this;
+  doFinalize() {
+    this.currentProgress = 0;
+    this.$el.fadeOut(undefined, () => this.$el.find('.progress').css({ width: 0 }));
+  }
 
-    me.currentProgress = 0;
-    me.$el.fadeOut(undefined, function () {
-      me.$el.find('.progress').css({ width: 0 });
-    });
-  }, 1000);
-
-  ProgressBar.prototype.update = _.throttle(function (percent) {
-    let $el = this.$el,
-      me = this;
+  doUpdate(percent) {
+    const $el = this.$el;
 
     if ($el.is(':visible')) {
-      if (percent < me.currentProgress) {
+      if (percent < this.currentProgress) {
         return;
       }
 
-      $el.find('.progress').animate({ width: percent + '%' }, 1000, function () {
+      $el.find('.progress').animate({ width: `${percent}%` }, 1000, () => {
         if (percent === 100) {
-          me.finalize();
+          this.finalize();
         }
       });
-      me.currentProgress = percent;
+      this.currentProgress = percent;
     } else {
-      $el.fadeIn(undefined, function () { me.update(percent); });
+      $el.fadeIn(undefined, () => this.update(percent));
     }
-  }, 1000);
-
-  return ProgressBar;
-});
+  }
+}
 
