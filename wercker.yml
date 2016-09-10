@@ -27,6 +27,14 @@ build:
     - npm-test:
       cwd: httpdocs/
     - script:
+      name: copy
+      cwd: httpdocs/
+      code: |
+        rm -rf ./target && \
+          mkdir target && \
+          cp -r ./src/* ./target/ && \
+          rm -rf ./target/js/*
+    - script:
       name: webpack-build
       cwd: httpdocs/
       code: |
