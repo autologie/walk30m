@@ -26,7 +26,7 @@ build:
     - npm-install:
       cwd: httpdocs/
     # A step that executes `npm test` command
-    - npm-test
+    - npm-test:
       cwd: httpdocs/
 
     # A custom script step, name value is used in the UI
