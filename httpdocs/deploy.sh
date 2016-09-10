@@ -9,6 +9,7 @@ webpack > /dev/null
 cat ./src/index.html \
 	| sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
 	| sed s/%GA_TRACKING_ID%/$GA_TRACKING_ID/g \
+	| sed s@%APP_URL%@$APP_URL@g \
 	> ./target/index.html
 echo done.
 

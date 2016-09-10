@@ -15,8 +15,30 @@ class Logger {
     calcService.addListener('complete', _.bind(this.onComplete, this));
   }
 
+  createGaValue(data) {
+      return [
+        data.mode,
+        data.time,
+        data.preference
+      ].join(',');
+  }
+
+  sendGA(action, data, value) {
+    if(!window.ga) return;
+
+    window.ga('send', {
+      hitType: 'event',
+      eventCategory: 'calculation',
+      eventAction: action,
+      eventLabel: this.createGaValue(data),
+      eventValue: value
+    });
+  }
+
   onComplete(vertices, task) {
     const taskId = task.taskId;
+    const now = new Date();
+    const took = +now - +new Date(this.executions[taskId].start_datetime);
 
     $.ajax({
       url: endPoint + taskId,
@@ -24,13 +46,14 @@ class Logger {
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify(_.defaults({
-        complete_datetime: new Date().toISOString(),
+        complete_datetime: now.toISOString(),
         result_path: _.map(_.map(vertices.getArray(), 'endLocation'), (latLng) => ({
           lat: latLng.lat(),
           lng: latLng.lng(),
         })),
       }, this.executions[taskId])),
     });
+    this.sendGA('complete', data, took);
   }
 
   collectClientInfo() {
@@ -66,6 +89,7 @@ class Logger {
 
       task.taskId = res.uuid;
     });
+    this.sendGA('start', data);
   }
 }
 
