@@ -4,6 +4,12 @@ var https = require("https");
 
 _.templateSettings = { interpolate: /\{\{(.+?)\}\}/ };
 
+function getFallback() {
+	var responses = config.ipInfoDB.fallbackResponses;
+
+	return responses[Math.floor(Math.random() * responses.length)];
+}
+
 function handleRequest(req, context, callback) {
 	var rpcReq,
 		cfg = config.ipInfoDB,
@@ -13,12 +19,12 @@ function handleRequest(req, context, callback) {
 		}));
 
 	function sendResponse(body) {
-		callback(null, body);
+		callback(null, body || getFallback());
 	}
 
 	if (!clientIp) {
 		console.log('no client ip provided, sending fallback response...');
-		sendResponse(cfg.fallbackResponse);
+		sendResponse();
 
 	} else {
 		rpcReq = https.get(serviceUrl, function(rpcRes) {
@@ -43,7 +49,7 @@ function handleRequest(req, context, callback) {
 
 		rpcReq.on('error', function(err) {
 			console.log(err);
-			sendResponse(cfg.fallbackResponse);
+			sendResponse();
 		});
 	}
 }
