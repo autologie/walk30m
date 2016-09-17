@@ -38,7 +38,7 @@ function handleRequest(req, context, callback) {
 
 		rpcReq.setTimeout(cfg.timeout, function() {
 			console.log('no response in ' + cfg.timeout + ' milliseconds.');
-			sendResponse(cfg.fallbackResponse);
+			rpcReq.abort();
 		});
 
 		rpcReq.on('error', function(err) {
