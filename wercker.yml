@@ -1,53 +1,15 @@
-# This references the default nodejs container from
-# the Docker Hub: https://registry.hub.docker.com/_/node/
-# If you want Nodesource's container you would reference nodesource/node
-# Read more about containers on our dev center
-# http://devcenter.wercker.com/docs/containers/index.html
 box: node
-  # This is the build pipeline. Pipelines are the core of wercker
-  # Read more about pipelines on our dev center
-  # http://devcenter.wercker.com/docs/pipelines/index.html
-
-  # You can also use services such as databases. Read more on our dev center:
-  # http://devcenter.wercker.com/docs/services/index.html
-  # services:
-  # - postgres
-  # http://devcenter.wercker.com/docs/services/postgresql.html
-
-  # - mongo
-  # http://devcenter.wercker.com/docs/services/mongodb.html
 build:
-  # The steps that will be executed on build
-  # Steps make up the actions in your pipeline
-  # Read more about steps on our dev center:
-  # http://devcenter.wercker.com/docs/steps/index.html
   steps:
     - npm-install:
       cwd: httpdocs/
     - npm-test:
       cwd: httpdocs/
     - script:
-      name: copy
-      cwd: httpdocs/
-      code: |
-        rm -rf ./target && \
-          mkdir target && \
-          cp -r ./src/* ./target/ && \
-          rm -rf ./target/js/*
-    - script:
       name: webpack-build
       cwd: httpdocs/
       code: |
         npm run build
-    - script:
-      name: apply-envvars
-      cwd: httpdocs/
-      code: |
-        cat ./src/index.html \
-          | sed s/%GOOGLE_MAPS_API_KEY%/$GOOGLE_MAPS_API_KEY/g \
-          | sed s/%GA_TRACKING_ID%/$GA_TRACKING_ID/g \
-          | sed s@%APP_URL%@$APP_URL@g \
-          > ./target/index.html
 deploy:
   steps:
     - s3sync:
