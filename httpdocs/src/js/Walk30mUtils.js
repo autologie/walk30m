@@ -1,4 +1,3 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
 import window from 'window';
 import _ from 'lodash';
 import { APP_URL } from './config';

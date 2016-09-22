@@ -1,11 +1,10 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
 import window from 'window';
 import $ from 'jquery';
 import _ from 'lodash';
 import google from 'google';
 import CalculationService from './CalculationService';
 import Logger from './Logger';
-import * as GeoUtil from './GeoUtil';
+import GeoUtil from './GeoUtil';
 import Walk30mUtils from './Walk30mUtils';
 import SettingsCtrl from './AdvancedSettingsController';
 import ProgressBar from './ProgressBar';

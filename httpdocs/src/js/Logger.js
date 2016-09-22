@@ -1,7 +1,6 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
 import window from 'window';
 import _ from 'lodash';
-import $ from 'jquery';
+import $ from 'jQuery';
 import { PUBLIC_API_URL_BASE } from './config';
 
 const endPoint = `${PUBLIC_API_URL_BASE}/execution_log/`;
@@ -89,7 +88,6 @@ class Logger {
     }).done((res) => {
       this.executions[res.uuid] = data;
 
-      /* eslint-disable no-param-reassign */
       task.taskId = res.uuid;
     });
     this.sendGA('start', data);

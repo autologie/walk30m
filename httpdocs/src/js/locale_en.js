@@ -1,5 +1,4 @@
-/* eslint-disable quote-props, max-len */
-export default {
+window.messages = {
   'resultOverviewBalloonTpl': [
     '<h4>',
     '<div style="background-color: <%= bgColor %>; border-color: <%= borderColor %>; " class="result-identifier-color"></div>',

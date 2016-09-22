@@ -1,265 +1,267 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
-import window from 'window';
-import _ from 'lodash';
-import google from 'google';
-import * as GeoUtil from './GeoUtil';
-import Calculation from './Calculation';
+'use strict';
 
-export default class CalculationService extends google.maps.MVCObject {
-  constructor() {
-    super();
+define([
+  'window',
+  'lodash',
+  'google',
+  './Calculation.js',
+  './GeoUtil',
+], function (window, _, google, Calculation, GeoUtil) {
+  function CalculationService() {
+    const me = this;
 
-    this.directionsService = new google.maps.DirectionsService();
-    this.isRunning = false;
+    me.directionsService = new google.maps.DirectionsService();
+    me.isRunning = false;
 
-    this.addListener('error', () => this.stop());
+    me.addListener('error', _.bind(me.stop, me));
   }
 
-  calcRoute(destination, callback, successiveRateLimitCount) {
-    const task = this.currentTask;
-    const config = task && task.config;
-    const options = config && _.pick(config,
-      'origin', 'avoidFerries', 'avoidTolls', 'avoidHighways');
+  CalculationService.prototype = new google.maps.MVCObject();
 
-    if (!task) return;
+  CalculationService.prototype.calcRoute = function (dest, callback, successiveRateLimitCount) {
+    let me = this,
+      task = me.currentTask,
+      config, options;
 
-    google.maps.event.trigger(this, 'request', destination);
+    if (!task) {
+      return;
+    }
 
-    /* eslint-disable no-console */
-    console.log('CalculationService: do directions request',
-      options.origin.toString(), destination.toString());
+    config = task.config;
+    options = _.pick(config, 'origin', 'avoidFerries', 'avoidTolls', 'avoidHighways');
 
-    this.directionsService.route(_.defaults({
-      destination,
+    google.maps.event.trigger(me, 'request', dest);
+    console.log('CalculationService: do directions request', options.origin.toString(), dest.toString());
+
+    me.directionsService.route(_.defaults({
+      destination: dest,
       travelMode: google.maps.TravelMode[config.mode],
-    }, options), (res, status) => {
+    }, options), function (res, status) {
       if (status !== google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
         callback(res, status);
       } else if (successiveRateLimitCount < 3) {
-        _.delay(() => {
-          this.calcRoute(destination, callback, successiveRateLimitCount + 1);
+        _.delay(function () {
+          me.calcRoute(dest, callback, ++successiveRateLimitCount);
         }, successiveRateLimitCount * 2000);
       } else {
-        google.maps.event.trigger(this, 'warn', 'FREQUENT_OVER_QUERY_LIMIT');
-        this.calcRoute(destination, callback, 0);
+        google.maps.event.trigger(me, 'warn', 'FREQUENT_OVER_QUERY_LIMIT');
+        me.calcRoute(dest, callback, 0);
       }
     });
-  }
+  };
 
-  calcNext(destination, isNarrowing) {
-    const tryDispatch = (res, status) => {
-      if (this.isPausing) {
-        _.delay(() => tryDispatch(res, status), 100);
+  CalculationService.prototype.calcNext = function (dest, isNarrowing) {
+    const me = this;
+
+    function tryDispatch(res, status) {
+      if (me.isPausing) {
+        _.delay(function () { tryDispatch(res, status); }, 100);
       } else {
-        this.dispatch(res, status, { destination, isNarrowing });
+        me.dispatch(res, status, {
+          destination: dest,
+          isNarrowing,
+        });
       }
-    };
-
-    if (!destination || _.isNaN(destination.lat()) || _.isNaN(destination.lng())) {
-      google.maps.event.trigger(this, 'error', 'NO_DESTINATION');
     }
 
-    this.calcRoute(destination, (res, status) => {
-      if (this.isRunning) tryDispatch(res, status);
+    if (!dest || _.isNaN(dest.lat()) || _.isNaN(dest.lng())) {
+      google.maps.event.trigger(me, 'error', 'NO_DESTINATION');
+    }
+
+    me.calcRoute(dest, function (res, status) {
+      if (me.isRunning) {
+        tryDispatch(res, status);
+      }
     }, 0);
-  }
+  };
 
-  stopMonitorVelocity() {
-    const task = this.currentTask;
-
+  CalculationService.prototype.stopMonitorVelocity = function (task) {
     if (task.timeout) {
       window.clearInterval(task.timeout);
       delete task.timeout;
     }
-  }
+  };
 
-  startMonitorVelocity(initialDelay, interval) {
-    const task = this.currentTask;
+  CalculationService.prototype.startMonitorVelocity = function (task, initialDelay, interval) {
+    const me = this;
 
     if (task.timeout) {
-      /* eslint-disable no-console */
       console.log('CalculationService: already monitoring', task);
       return;
     }
 
     task.timeConsumed = 0;
-    _.delay(() => {
-      task.timeout = window.setInterval(() => {
-        if (!this.isRunning) {
-          this.stopMonitorVelocity();
+    _.delay(function () {
+      task.timeout = window.setInterval(function () {
+        if (!me.isRunning) {
+          me.stopMonitorVelocity(task);
           return;
         }
 
         const velocity = task.getVelocity();
 
-        /* eslint-disable no-console */
         console.log('CalculationService: current velocity: ', velocity);
 
         if (velocity < 1) {
-          google.maps.event.trigger(this, 'warn', 'CALCULATION_IS_GETTING_SLOWER');
+          google.maps.event.trigger(me, 'warn', 'CALCULATION_IS_GETTING_SLOWER');
         }
       }, interval);
     }, initialDelay);
-  }
+  };
 
-  start(request) {
-    const task = new Calculation(request);
-    const origin = request.origin;
+  CalculationService.prototype.start = function (request) {
+    let me = this,
+      task = new Calculation(request),
+      origin = request.origin;
 
-    task.addListener('progress', (progress, added, goals) => {
-      google.maps.event.trigger(this, 'progress', progress, added, goals);
+    task.addListener('progress', function (progress, added, goals) {
+      google.maps.event.trigger(me, 'progress', progress, added, goals);
     });
 
-    this.currentTask = task;
-    this.startMonitorVelocity(30000, 1000);
+    me.startMonitorVelocity(task, 30000, 1000);
 
-    this.isPausing = false;
-    this.isRunning = true;
-    this.calcNext(new google.maps.LatLng(
+    me.currentTask = task;
+    me.isPausing = false;
+    me.isRunning = true;
+    me.calcNext(new google.maps.LatLng(
       origin.lat(),
       origin.lng() + GeoUtil.meterToLng(100, origin.lat())
     ));
 
-    google.maps.event.trigger(this, 'start', task);
+    google.maps.event.trigger(me, 'start', task);
     return task;
-  }
+  };
 
-  walkToFillSecondsAlong(sec, wayPoints) {
+  CalculationService.prototype.walkToFillSecondsAlong = function (sec, wayPoints) {
     function getPartial(step, ratio) {
-      const limitedLength = _.reduce(step.lat_lngs, (passed, v, idx, arr) => {
-        const isLast = idx === arr.length - 1;
+      let len = 0, lat_lngs = [],
+        limited_length = _.reduce(step.lat_lngs, function (passed, v, idx, arr) {
+          return idx === arr.length - 1 ? passed : passed + GeoUtil.distance(v, arr[idx + 1]);
+        }, 0) * ratio;
 
-        return passed + (isLast ? 0 : GeoUtil.distance(v, arr[idx + 1]));
-      }, 0) * ratio;
-      const latLngs = [];
-      let len = 0;
-
-      _.each(step.lat_lngs, (pos, idx, arr) => {
-        if (idx > 0) {
-          len += GeoUtil.distance(pos, arr[idx - 1]);
+      _.each(step.lat_lngs, function (pos, idx, arr) {
+        if (idx === 0 || (len += GeoUtil.distance(pos, arr[idx - 1])) <= limited_length) {
+          lat_lngs.push(pos);
+        } else {
+          return false;
         }
-        if (len <= limitedLength) {
-          latLngs.push(pos);
-          return true;
-        }
-        return false;
       });
-
-      return latLngs;
+      return lat_lngs;
     }
 
-    return _.reduce(wayPoints, (passed, step) => {
-      if (passed && passed.endFlag) return passed;
+    return _.reduce(wayPoints, function (passed, step) {
+      let next_accum;
 
-      const nextAccum = (passed ? passed.accum : 0) + step.duration.value;
+      if (passed && passed.end_flag) {
+        return passed;
+      } else {
+        next_accum = (passed ? passed.accum : 0) + step.duration.value;
+        if (next_accum > sec) {
+          step.lat_lngs = getPartial(step, 1 - (next_accum - sec) / step.duration.value);
+        }
 
-      return {
-        accum: nextAccum,
-        endFlag: nextAccum > sec,
-        concat_path: ((passed && passed.concat_path) || []).concat(step.lat_lngs),
-        lat_lngs: nextAccum > sec
-          ? getPartial(step, 1 - ((nextAccum - sec) / step.duration.value))
-          : step.lat_lngs,
-      };
+        step.accum = next_accum;
+        step.end_flag = next_accum > sec;
+        step.concat_path = ((passed && passed.concat_path) || []).concat(step.lat_lngs);
+        return step;
+      }
     }, null);
-  }
+  };
 
-  stop() {
-    if (this.isRunning) {
-      this.isRunning = false;
-      this.stopMonitorVelocity();
-      delete this.currentTask;
+  CalculationService.prototype.stop = function () {
+    const me = this;
+
+    if (me.isRunning) {
+      me.isRunning = false;
+      me.stopMonitorVelocity(me.currentTask);
+      delete me.currentTask;
     }
-  }
+  };
 
-  pause() {
+  CalculationService.prototype.pause = function () {
     const me = this;
 
     me.isPausing = true;
     me.currentTask.pauseStarted = new Date();
-  }
+  };
 
-  resume() {
-    const task = this.currentTask;
+  CalculationService.prototype.resume = function () {
+    let me = this,
+      task = me.currentTask;
 
-    this.isPausing = false;
-
+    me.isPausing = false;
     if (task && task.pauseStarted) {
       task.pauseTime = task.pauseTime || 0;
       task.pauseTime += (new Date() - task.pauseStarted);
     }
-  }
+  };
 
-  willBeCompletedWith(wayPoint) {
+  CalculationService.prototype.willBeCompletedWith = function (wayPoint) {
     const me = this;
 
     return me.currentTask.isComplete(me.currentTask.getGoals().concat(wayPoint));
-  }
+  };
 
-  getAdvancedOne(task, p1, p2) {
+  CalculationService.prototype.getAdvancedOne = function (task, p1, p2) {
     const origin = task.config.origin;
 
     return GeoUtil.calcAngle(origin, p1) <= GeoUtil.calcAngle(origin, p2)
       ? p2
       : p1;
-  }
+  };
 
-  dispatch(response, status, request) {
-    const dest = request.destination;
-    const task = this.currentTask;
-    const sec = task.config.time;
-    const center = task.config.origin;
-    const anglePerStep = task.config.anglePerStep;
-    let leg = null;
-    let lastWayPoint = null;
-    let step = null;
-    let nextDest = null;
+  CalculationService.prototype.dispatch = function (response, status, request) {
+    let leg, lastWayPoint, step,
+      me = this,
+      dest = request.destination,
+      task = me.currentTask,
+      sec = task.config.time,
+      center = task.config.origin,
+      anglePerStep = task.config.anglePerStep,
+      nextDest;
 
     if (status === google.maps.DirectionsStatus.ZERO_RESULTS) {
       nextDest = GeoUtil.divide(center, dest, 0.8);
-      this.calcNext(nextDest, true);
+      me.calcNext(nextDest, true);
     } else if (status !== google.maps.DirectionsStatus.OK) {
-      google.maps.event.trigger(this, 'error', status);
+      google.maps.event.trigger(me, 'error', status);
     } else {
       leg = response.routes[0].legs[0];
 
       if (leg.duration.value > sec * 1.2) {
         nextDest = GeoUtil.divide(center, dest, 0.8);
-        this.calcNext(nextDest, true);
+        me.calcNext(nextDest, true);
       } else if (!request.isNarrowing && leg.duration.value < sec) {
         nextDest = GeoUtil.divide(center, dest, Math.max(1.1, sec / leg.duration.value));
 
-        if (this.getAdvancedOne(task, dest, nextDest) === dest) {
+        if (me.getAdvancedOne(task, dest, nextDest) === dest) {
           nextDest = GeoUtil.rotate(center, nextDest, anglePerStep);
         }
-        this.calcNext(nextDest);
-      } else {
-        step = this.walkToFillSecondsAlong(sec, leg.steps);
+        me.calcNext(nextDest);
+      } else if (step = me.walkToFillSecondsAlong(sec, leg.steps)) {
+        lastWayPoint = step.lat_lngs[step.lat_lngs.length - 1];
 
-        if (!step) {
-          google.maps.event.trigger(this, 'error');
+        if (task.hasVisited(lastWayPoint)) {
+          nextDest = GeoUtil.divide(center, GeoUtil.rotate(center, dest, 3), 0.8);
+          me.calcNext(nextDest, true);
+        } else if (me.willBeCompletedWith(lastWayPoint)) {
+          me.isRunning = false;
+          google.maps.event.trigger(me, 'complete', task.vertices, task);
         } else {
-          lastWayPoint = step.lat_lngs[step.lat_lngs.length - 1];
-
-          if (task.hasVisited(lastWayPoint)) {
-            nextDest = GeoUtil.divide(center, GeoUtil.rotate(center, dest, 3), 0.8);
-            this.calcNext(nextDest, true);
-          } else if (this.willBeCompletedWith(lastWayPoint)) {
-            this.isRunning = false;
-            google.maps.event.trigger(this, 'complete', task.vertices, task);
-          } else {
-            const advanced = this.getAdvancedOne(task, lastWayPoint, dest);
-
-            task.vertices.push({
-              endLocation: lastWayPoint,
-              step,
-              directionResult: response,
-            });
-            nextDest = GeoUtil.rotate(center, advanced, anglePerStep);
-            this.calcNext(nextDest);
-          }
+          task.vertices.push({
+            endLocation: lastWayPoint,
+            step,
+            directionResult: response,
+          });
+          nextDest = GeoUtil.rotate(center, me.getAdvancedOne(task, lastWayPoint, dest), anglePerStep);
+          me.calcNext(nextDest);
         }
+      } else {
+        google.maps.event.trigger(me, 'error');
       }
     }
-  }
-}
+  };
+
+  return CalculationService;
+});
+

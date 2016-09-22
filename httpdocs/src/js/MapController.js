@@ -1,8 +1,7 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
 import window from 'window';
 import _ from 'lodash';
 import google from 'google';
-import * as GeoUtils from './GeoUtil.js';
+import GeoUtils from './GeoUtil.js';
 import Footprint from './Footprint.js';
 import ObjectManager from './ObjectManager.js';
 import ResultVisualizer from './ResultVisualizer.js';

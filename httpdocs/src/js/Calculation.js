@@ -1,72 +1,85 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
-import _ from 'lodash';
-import google from 'google';
-import * as GeoUtil from './GeoUtil';
+define([
+  'lodash',
+  'google',
+  './GeoUtil',
+], function (_, google, GeoUtil) {
+  'use strict';
+  let twicePI = 2 * Math.PI,
+    halfPI = Math.PI / 2;
 
-const twicePI = 2 * Math.PI;
+  function Calculation(request) {
+    const me = this;
 
-export default class Calculation extends google.maps.MVCObject {
-  constructor(request) {
-    super();
+    me.config = request;
+    me.startTime = new Date();
+    me.pauseTime = 0;
+    me.vertices = new google.maps.MVCArray();
 
-    this.config = request;
-    this.startTime = new Date();
-    this.pauseTime = 0;
-    this.vertices = new google.maps.MVCArray();
+    me.vertices.addListener('insert_at', function (n) {
+      const added = me.vertices.getAt(n);
 
-    this.vertices.addListener('insert_at', n => {
-      const added = this.vertices.getAt(n);
-
-      google.maps.event.trigger(this, 'progress', this.getProgress(), added, this.getGoals());
+      google.maps.event.trigger(me, 'progress', me.getProgress(), added, me.getGoals());
     });
   }
 
-  getGoals() {
+  Calculation.prototype = new google.maps.MVCObject();
+
+  Calculation.prototype.getGoals = function () {
     return _.map(this.vertices.getArray(), 'endLocation');
-  }
+  };
 
-  getProgress() {
-    return Math.round((100 * this.accumulateAngles(this.getGoals())) / twicePI);
-  }
+  Calculation.prototype.getProgress = function () {
+    const me = this;
 
-  getVelocity() {
-    const progress = this.getProgress();
-    const consumedTime = new Date() - this.startTime - this.pauseTime;
+    return Math.round(100 * me.accumulateAngles(me.getGoals()) / twicePI);
+  };
 
-    return progress === 0 ? 0 : (1000 * progress) / consumedTime;
-  }
+  Calculation.prototype.getVelocity = function () {
+    let me = this,
+      progress = me.getProgress(),
+      consumedTime = new Date() - me.startTime - me.pauseTime;
 
-  isComplete(vertices) {
-    return this.accumulateAngles(vertices || this.getGoals()) >= twicePI;
-  }
+    return progress === 0 ? 0 : 1000 * progress / consumedTime;
+  };
 
-  hasVisited(location) {
-    const sameLocation = v => GeoUtil.distance(v.endLocation, location) < 0.0005;
+  Calculation.prototype.isComplete = function (vertices) {
+    const me = this;
 
-    return _.some(this.vertices.getArray(), sameLocation);
-  }
+    return me.accumulateAngles(vertices || me.getGoals()) >= twicePI;
+  };
 
-  accumulateAngles(vertices) {
-    const angles = _.map(vertices, v => GeoUtil.calcAngle(this.config.origin, v));
+  Calculation.prototype.hasVisited = function (location) {
+    let me = this,
+      sameLocation = function (v) {
+        return GeoUtil.distance(v.endLocation, location) < 0.0005;
+      };
 
-    return _.reduce(angles, ({ accum, diff, prev }, angle) => {
-      let angleToAdd = 0;
+    return _.some(me.vertices.getArray(), sameLocation);
+  };
 
-      if (prev === undefined) {
-        angleToAdd = 0;
-      } else {
-        angleToAdd = prev - angle > Math.PI ? (diff + twicePI) : diff;
-      }
+  Calculation.prototype.accumulateAngles = function (vertices) {
+    let me = this,
+      checked = 0,
+      diff,
+      angles = _.map(vertices, function (v) {
+        return GeoUtil.calcAngle(me.config.origin, v);
+      });
 
-      return { accum: accum + angleToAdd, diff: angleToAdd, prev: angle };
-    }, { accum: 0, diff: 0, prev: undefined }).accum;
-  }
+    return _.reduce(angles, function (passed, angle, idx, arr) {
+      return passed + (idx > 0 ? ((diff = angle - arr[idx - 1]) < -1 * Math.PI ? (diff + twicePI) : diff) : 0);
+    }, 0);
+  };
 
-  serialize() {
+  Calculation.prototype.serialize = function () {
+    const me = this;
+
     return {
       config: _.defaults({
-        origin: GeoUtil.latLngToLiteral(this.config.origin),
-      }, this.config),
+        origin: GeoUtil.latLngToLiteral(me.config.origin),
+      }, me.config),
     };
-  }
-}
+  };
+
+  return Calculation;
+});
+
