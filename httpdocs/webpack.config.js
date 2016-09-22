@@ -29,7 +29,7 @@ module.exports = {
 		]
 	},
 	plugins: [
-		// new webpack.optimize.UglifyJsPlugin,
+		new webpack.optimize.UglifyJsPlugin,
     new InlineEnviromentVariablesPlugin,
     new HtmlWebpackPlugin({
       inject: 'head',
