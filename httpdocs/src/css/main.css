@@ -285,10 +285,6 @@ li {
 	margin-right: .3em;
 	font-size: 130%;
 }
-.glyphicons {
-	color: transparent;
-	height: 0px;
-}
 .select li.disabled {
 	opacity: .3;
 	cursor: default;
