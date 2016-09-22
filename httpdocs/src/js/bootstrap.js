@@ -2,7 +2,7 @@
 import './ga';
 import './fb';
 import window from 'window';
-import $ from 'jQuery';
+import $ from 'jquery';
 import Application from './Application';
 
 $(() => new Application($(window.document)));

@@ -1,7 +1,7 @@
 'use strict';
 define([
   'window',
-  'jQuery',
+  'jquery',
   'lodash',
   'google',
   './GeoUtil.js',

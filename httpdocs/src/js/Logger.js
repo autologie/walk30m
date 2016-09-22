@@ -1,6 +1,6 @@
 import window from 'window';
 import _ from 'lodash';
-import $ from 'jQuery';
+import $ from 'jquery';
 import { PUBLIC_API_URL_BASE } from './config';
 
 const endPoint = `${PUBLIC_API_URL_BASE}/execution_log/`;
