@@ -1,4 +1,4 @@
-window.messages = {
+export default {
   'resultOverviewBalloonTpl': [
     '<h4>',
     '<div style="background-color: <%= bgColor %>; border-color: <%= borderColor %>; " class="result-identifier-color"></div>',
@@ -65,4 +65,3 @@ window.messages = {
   'cannotRecognizeSpeech': 'すみません、聞き取れませんでした。',
   'pleaseCheckConditions': '計算途中でエラーが発生しました。繰り返し同じエラーが発生する場合、検索条件を見直してください。経路がまったく存在しない場所で実行すると必ずエラーが発生します。',
 };
-
