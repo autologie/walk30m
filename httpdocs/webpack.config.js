@@ -1,7 +1,6 @@
 var webpack = require('webpack');
 var path = require('path');
 var InlineEnviromentVariablesPlugin = require('inline-environment-variables-webpack-plugin');
-var LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
 
 module.exports = {
 	context: path.join(__dirname, 'src/'),
@@ -15,7 +14,7 @@ module.exports = {
 		]
 	},
 	output: {
-		filename: 'app.js',
+		filename: 'app-wo-lodash-plugin.js',
 		path: path.join(__dirname, '/target/js'),
 		publicPath: '/js/'
 	},
@@ -29,10 +28,6 @@ module.exports = {
 		]
 	},
 	plugins: [
-    new LodashModuleReplacementPlugin({
-      collections: true,
-      shorthands: true
-    }),
 		new webpack.optimize.UglifyJsPlugin({
 			compress: {
 				drop_debugger: false
