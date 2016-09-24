@@ -316,13 +316,31 @@ define([
 
     return new Promise(resolve => {
       feature.toGeoJson(json => {
-        const geoJSON = _.defaults({
-          properties: {
-            name,
-            description,
-            timestamp: +new Date(),
-          }
-        }, _.omit(json, 'id'));
+        const geoJSON = {
+          type: 'FeatureCollection',
+          features: [
+            {
+              type: 'Feature',
+              geometry: {
+                type: 'Point',
+                coordinates: [
+                  readable.origin.lng,
+                  readable.origin.lat,
+                ]
+              },
+              properties: {
+                name: readable.originAddress,
+              },
+            },
+            _.defaults({
+              properties: {
+                name,
+                description,
+                timestamp: +new Date(),
+              },
+            }, _.omit(json, 'id')),
+          ]
+        };
 
         resolve({
           kml: `data:text/xml;charset=UTF-8,${encodeURIComponent(toKML(geoJSON))}`,
