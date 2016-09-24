@@ -547,5 +547,4 @@ class Footprint extends google.maps.Marker {
   }
 }
 
-module.exports = Footprint;
-
+export default Footprint;

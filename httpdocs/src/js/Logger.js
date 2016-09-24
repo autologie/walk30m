@@ -5,7 +5,7 @@ import { PUBLIC_API_URL_BASE } from './config';
 
 const endPoint = `${PUBLIC_API_URL_BASE}/execution_log/`;
 
-class Logger {
+export default class Logger {
 
   constructor(calcService) {
     this.calcService = calcService;
@@ -93,6 +93,3 @@ class Logger {
     this.sendGA('start', data);
   }
 }
-
-module.exports = Logger;
-

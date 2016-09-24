@@ -194,5 +194,4 @@ class MapController {
   }
 }
 
-module.exports = MapController;
-
+export default MapController;

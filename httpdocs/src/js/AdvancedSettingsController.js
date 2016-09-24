@@ -56,5 +56,4 @@ class AdvancedSettingsController {
   }
 }
 
-module.exports = AdvancedSettingsController;
-
+export default AdvancedSettingsController;

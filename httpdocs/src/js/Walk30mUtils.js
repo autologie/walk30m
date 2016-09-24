@@ -65,5 +65,4 @@ class Walk30mUtils {
   }
 }
 
-module.exports = Walk30mUtils;
-
+export default Walk30mUtils;
