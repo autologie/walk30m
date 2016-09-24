@@ -1,3 +1,5 @@
+import toKML from 'tokml';
+
 'use strict';
 define([
   'window',
@@ -181,16 +183,14 @@ define([
     return tpl(_.defaults({
       borderColor: color,
       bgColor: (color || '').replace('hsl', 'hsla').replace(')', ', .5)'),
-    }, Walk30mUtils.createSummary(options)));
+    }, me.toReadable(options)));
   };
 
   ResultVisualizer.prototype.bindSummaryBalloonEvents = function (feature) {
     let me = this,
       __ = _.bind(me.application.getMessage, me.application),
       options = feature.getProperty('config'),
-      summary = Walk30mUtils.createSummary(_.defaults({
-        travelModeExpr: __('travelModes')[options.mode],
-      }, options)),
+      summary = me.toReadable(options),
       $balloon = $(me.map.getDiv()).find('.gm-style-iw');
 
     $balloon.find('a[role=tweet-result]').click(function () {
@@ -215,6 +215,18 @@ define([
       me.objectManager.clearObject('summaryBalloon');
       feature.setProperty('detailed', true);
       me.showResultDetail(feature);
+    });
+    me.createDataURI(feature).then(dataURI => {
+      $balloon.find('a[role=download-geojson]').attr({
+        download: `feature-${+new Date()}.geojson`,
+        href: dataURI.geoJSON,
+        target: '_blank',
+      });
+      $balloon.find('a[role=download-kml]').attr({
+        download: `feature-${+new Date()}.kml`,
+        href: dataURI.kml,
+        target: '_blank',
+      });
     });
   };
 
@@ -293,6 +305,49 @@ define([
 
     originMarker.addListener('click', _.bind(me.onClickResult, me, { feature: added[0] }));
     me.onClickResult({ feature: added[0] });
+  };
+
+  ResultVisualizer.prototype.createDataURI = function (feature) {
+    const readable = this.toReadable(feature.getProperty('config'));
+    const nameTpl = _.template(this.application.getMessage('summaryTpl'));
+    const name = nameTpl(readable);
+    const descriptionTpl = _.template(this.application.getMessage('descriptionTpl'));
+    const description = descriptionTpl(readable);
+
+    return new Promise(resolve => {
+      feature.toGeoJson(json => {
+        const geoJSON = _.defaults({
+          properties: {
+            name,
+            description,
+            timestamp: +new Date(),
+          }
+        }, _.omit(json, 'id'));
+
+        resolve({
+          kml: `data:text/xml;charset=UTF-8,${encodeURIComponent(toKML(geoJSON))}`,
+          geoJSON: `data:application/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(geoJSON))}`
+        });
+      });
+    });
+  };
+
+  ResultVisualizer.prototype.toReadable = function(options) {
+    const __ = this.application.getMessage.bind(this.application);
+    const travelModes = __('travelModes');
+    const useExpr = __('use');
+    const noUseExpr = __('noUse');
+    const readable = _.defaults({
+      executionDateExpr: new Date().toLocaleString(),
+      origin: options.origin.toJSON ? options.origin.toJSON() : options.origin,
+      travelModeExpr: travelModes[options.mode],
+      preferenceExpr: __('preferences')[options.preference],
+      avoidTollsExpr: options.avoidTolls ? noUseExpr: useExpr,
+      avoidHighwaysExpr: options.avoidHighways ? noUseExpr: useExpr,
+      avoidFerriesExpr: options.avoidFerries ? noUseExpr: useExpr,
+    }, options);
+
+    return Walk30mUtils.createSummary(readable);
   };
 
   return ResultVisualizer;
