@@ -8,7 +8,8 @@ module.exports = {
 	context: path.join(__dirname, 'src/'),
 	entry: './js/bootstrap.js',
 	resolve: {
-		root: __dirname
+		root: __dirname,
+		extensions: ['.js', '.jsx', '']
 	},
 	resolveLoader: {
 		modulesDirectories: [
@@ -25,7 +26,8 @@ module.exports = {
 	},
 	module: {
 		loaders: [
-			{ test: /\.js$/, exclude: /node_modules/, loader: 'babel' }
+			{ test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel' },
+			{ test: /\.yml?$/, exclude: /node_modules/, loader: 'yaml' }
 		]
 	},
 	plugins: [
