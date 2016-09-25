@@ -1,0 +1,35 @@
+.recommends {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+}
+.recommends ul {
+  list-style-type: none;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: flex-end;
+}
+.recommends li {
+  width: 300px;
+  border-radius: 2px;
+  box-shadow: 0 0 6px rgba(0, 0, 0, .5);
+  margin: 8px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 320px;
+  max-height: 20vh;
+  display: inline-block;
+  pointer: cursor;
+  text-shadow: 0 0 .5em rgba(0, 0, 0, .7);
+  transition: all 500ms ease;
+  cursor: pointer;
+  zoom: .9;
+}
+.recommends li:hover {
+  opacity: 0.7;
+  zoom: 1;
+}

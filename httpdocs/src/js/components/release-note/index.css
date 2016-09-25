@@ -1,0 +1,11 @@
+
+.releaseNote dt {
+  font-size: 2em;
+  color: #aaa;
+}
+.releaseNote dd {
+  margin: 1em 0;
+}
+.releaseNote dl {
+  margin-bottom: 2em;
+}

@@ -1,0 +1,23 @@
+.app {
+  position: relative;
+  width: 100vw;
+}
+.app.fixedHeight {
+  overflow: hidden;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app button:focus,
+.app input:focus {
+  outline: none;
+}
+
+.app a,
+.app a:visited {
+  color: #4ca;
+}
+.main {
+  flex: 1;
+}

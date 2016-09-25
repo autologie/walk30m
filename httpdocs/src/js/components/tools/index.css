@@ -1,0 +1,35 @@
+.entrance .tools .basic {
+  padding: 2em 1em;
+}
+
+.tools {
+  background: #ddd;
+  text-align: center;
+  position: relative;
+  z-index: 100;
+}
+
+.tools .basic {
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+.tools .basic .toolItem {
+  font-size: 1.3em;
+  margin-right: .5em;
+}
+.tools .basic .toolItem.travelMode label {
+  display: block;
+  text-align: left;
+}
+.tools .basic .methods {
+  display: none;
+}
+.tools .basic input[type=text] {
+  padding: .5em 1em;
+  border: none;
+  background: transparent;
+  border-bottom: 3px solid #4ca;
+}

@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import { releases } from 'json!yaml!../../../releases.yml';
+import styles from './index.css';
+import commonStyles from '../common.css';
 
 export default () => {
   const releaseNotes = releases
@@ -12,9 +14,9 @@ export default () => {
     ));
 
   return (
-    <div>
-      <h3>リリース履歴</h3>
+    <section className={`${commonStyles.staticContent} ${styles.releaseNote}`}>
+      <h2>リリース履歴</h2>
       {releaseNotes}
-    </div>
+    </section>
   );
 }

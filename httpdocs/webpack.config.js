@@ -6,7 +6,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
 	context: path.join(__dirname, 'src/'),
-	entry: './js/bootstrap.js',
+	entry: './js/index.js',
 	resolve: {
 		root: __dirname,
 		extensions: ['.js', '.jsx', '']
@@ -27,6 +27,7 @@ module.exports = {
 	module: {
 		loaders: [
 			{ test: /\.jsx?$/, exclude: /node_modules/, loader: 'babel' },
+			{ test: /\.css$/, exclude: /node_modules/, loaders: ['style', 'css?modules'] },
 			{ test: /\.yml?$/, exclude: /node_modules/, loader: 'yaml' }
 		]
 	},
@@ -48,7 +49,8 @@ module.exports = {
   devServer: {
     contentBase: 'target/',
     inline: true,
-    port: 8080
+    port: 8080,
+    historyApiFallback: true
   }
 };
 

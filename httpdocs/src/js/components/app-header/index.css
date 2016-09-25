@@ -1,0 +1,68 @@
+.appHeader {
+  background: #7ae;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: .5em;
+}
+.appHeader p,
+.appHeader h1 {
+  margin: 0;
+}
+.menu {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  position: absolute;
+  flex-direction: column;
+  bottom: auto;
+  top: 100%;
+  right: 0;
+}
+.menu li {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  justify-content: center;
+}
+.menu a {
+  padding: 0 1em;
+  background: #333;
+  color: #fff;
+  vertical-align: middle;
+  padding: .8em 1em;
+  width: 200px;
+  margin-right: 3px;
+  text-decoration: none;
+  transition: all 500ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menu a:hover {
+  background: #555;
+}
+
+.entrance.appHeader {
+  height: 40vh;
+}
+.entrance .menu {
+  flex-direction: row;
+  bottom: 8px;
+  top: auto;
+  right: auto;
+  padding: 0;
+}
+.menuButton {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  background: #579;
+  border: none;
+  padding: 0 1em;
+  color: #fff;
+}

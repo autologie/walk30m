@@ -1,0 +1,23 @@
+.staticContent {
+  margin: 0 auto;
+  max-width: 1000px;
+}
+
+button:focus,
+input:focus {
+  outline: none;
+}
+
+a,
+a:visited {
+  color: #4ca;
+}
+
+button[action] {
+  border-radius: 6px;
+  border: 3px solid #4ca;
+  background: #fff;
+  font-size: 1.2em;
+  padding: .3em 1em;
+  margin: 0 .5em;
+}
