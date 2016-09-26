@@ -17,7 +17,6 @@
   justify-content: center;
 }
 .tools .basic .toolItem {
-  font-size: 1.3em;
   margin-right: .5em;
 }
 .tools .basic .toolItem.travelMode label {

@@ -1,6 +1,10 @@
 .staticContent {
   margin: 0 auto;
-  max-width: 1000px;
+  max-width: 960px;
+}
+
+.staticContent h2 {
+  margin: 2em 0;
 }
 
 button:focus,
@@ -20,4 +24,14 @@ button[action] {
   font-size: 1.2em;
   padding: .3em 1em;
   margin: 0 .5em;
+}
+button[action]:disabled {
+  opacity: .6;
+}
+
+select,
+input[type=radio],
+input[type=checkbox] {
+  margin-left: .5em;
+  margin-right: .5em;
 }

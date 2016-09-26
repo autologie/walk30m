@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <Route path="/about" component={About} />
         <Route path="/release-note" component={ReleaseNote} />
         <Route path="/message-form" component={MessageForm} />
-        <IndexRoute component={Map} />
+        <IndexRoute component={Map}/>
       </Route>
     </Router>
   ), document.getElementById('app-root'));

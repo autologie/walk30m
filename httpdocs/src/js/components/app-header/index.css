@@ -1,5 +1,5 @@
 .appHeader {
-  background: #7ae;
+  background: #eee;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -7,11 +7,28 @@
   align-items: center;
   z-index: 1000;
   padding: .5em;
+  transition: all 500ms ease;
+  min-height: 92px;
 }
 .appHeader p,
 .appHeader h1 {
   margin: 0;
 }
+.titleText {
+  color: #333!important;
+  text-decoration: none;
+}
+.appHeader h1:before {
+  display: inline-block;
+  content: '.';
+  color: transparent;
+  width: 48px;
+  height: 48px;
+  background-image: url(/images/favicon-96x96.png);
+  background-size: contain;
+  vertical-align: middle;
+}
+
 .menu {
   display: flex;
   list-style-type: none;
@@ -35,7 +52,6 @@
   vertical-align: middle;
   padding: .8em 1em;
   width: 200px;
-  margin-right: 3px;
   text-decoration: none;
   transition: all 500ms ease;
   display: flex;
@@ -47,7 +63,13 @@
 }
 
 .entrance.appHeader {
-  height: 40vh;
+  min-height: 30vh;
+}
+.entrance.appHeader h1 {
+  padding: .5em 0;
+}
+.entrance .menu a {
+  margin-right: 3px;
 }
 .entrance .menu {
   flex-direction: row;
@@ -63,6 +85,10 @@
   height: 100%;
   background: #579;
   border: none;
-  padding: 0 1em;
+  width: 64px;
   color: #fff;
+  cursor: pointer;
+}
+.menu .active a {
+  background-color: #555;
 }

@@ -22,12 +22,12 @@
   justify-content: center;
   height: 320px;
   max-height: 20vh;
-  display: inline-block;
   pointer: cursor;
-  text-shadow: 0 0 .5em rgba(0, 0, 0, .7);
+  text-shadow: 0 0 1em rgba(0, 0, 0, 1);
   transition: all 500ms ease;
   cursor: pointer;
   zoom: .9;
+  background-size: cover;
 }
 .recommends li:hover {
   opacity: 0.7;

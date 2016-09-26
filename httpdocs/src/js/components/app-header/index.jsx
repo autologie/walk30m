@@ -2,40 +2,38 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import styles from './index.css';
 
+const menuList = [
+  {path: '/', label: 'HOME'},
+  {path: '/about', label: 'このサービスについて'},
+  {path: '/release-note', label: 'リリース履歴'},
+  {path: '/message-form', label: 'お問い合わせ'},
+];
+
 export default class AppHeader extends Component {
-
-  constructor(props) {
-    super(props);
-    this.handleClickMenuButton = this.handleClickMenuButton.bind(this);
-    this.state = {
-      menuShown: this.props.status === 'entrance'
-    };
-  }
-
-  handleClickMenuButton() {
-    this.setState(prev => ({menuShown: !prev.menuShown}));
-  }
-
   render() {
-    const menu = this.state.menuShown ? (
-      <ul className={styles.menu}>
-        <li><Link to="/">HOME</Link></li>
-        <li><Link to="/about">このサービスについて</Link></li>
-        <li><Link to="/release-note">リリース履歴</Link></li>
-        <li><Link to="/message-form">お問い合わせ</Link></li>
-      </ul>
+    const {status, menuShown, onClickMenuButton} = this.props;
+    const menuElements = menuList.map(item => (
+      <li
+        className={window.location.pathname === item.path ? styles.active : null}
+        key={item.path}
+      >
+        <Link to={item.path}>{item.label}</Link>
+      </li>
+    ));
+    const menu = menuShown ? (
+      <ul className={styles.menu}>{menuElements}</ul>
     ) : null;
-    const menuButton = this.props.status !== 'entrance' ? (
+    const menuButton = status !== 'entrance' ? (
       <button
-        onClick={this.handleClickMenuButton}
+        onClick={onClickMenuButton}
         className={styles.menuButton}
         type="button"
-      >{this.state.menuShown ? '閉じる' : '出す'}</button>
+      >{menuShown ? '閉じる' : '出す'}</button>
     ) : null;
 
     return (
-      <section className={`${styles[this.props.status]} ${styles.appHeader}`}>
-        <h1>30分でどこまでいける？</h1>
+      <section className={`${styles[status]} ${styles.appHeader}`}>
+        <h1><Link className={styles.titleText} to="/">30分でどこまでいける？</Link></h1>
         <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
         {menu}
         {menuButton}
