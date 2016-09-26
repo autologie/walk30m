@@ -8,6 +8,7 @@ import About from '../about';
 import MessageForm from '../message-form';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
+import CalculationService from '../../CalculationService';
 
 export default class App extends Component {
   constructor(props) {
@@ -22,6 +23,7 @@ export default class App extends Component {
       mapZoom: 13,
       mySettings: new Settings(null, 'WALKING', 30 * 60),
       advancedSettingsShown: false,
+      recommendShown: true,
       recommendItems: [
         {
           title: '札幌市街から車で60分',
@@ -102,6 +104,8 @@ export default class App extends Component {
     this.handleClickShowAdvancedSettingsButton = this.handleClickShowAdvancedSettingsButton.bind(this);
     this.handleClickMenuButton = this.handleClickMenuButton.bind(this);
     this.handleClickInitializeAdvancedSettingsButton = this.handleClickInitializeAdvancedSettingsButton.bind(this);
+    this.handleClickExecuteButton = this.handleClickExecuteButton.bind(this);
+    this.handleClickRecommendToggleButton = this.handleClickRecommendToggleButton.bind(this);
   }
 
   handleChangeSettings(property, value) {
@@ -137,7 +141,7 @@ export default class App extends Component {
         .withTravelMode(travelMode)
         .withTime(time),
       mapCenter: _.pick(origin, 'lat', 'lng'),
-      mapZoom: 19,
+      mapZoom: 13,
     }));
   }
 
@@ -158,6 +162,21 @@ export default class App extends Component {
     }));
   }
 
+  handleClickExecuteButton() {
+    this.setState({
+      status: 'normal',
+      advancedSettingsShown: false,
+      recommendShown: false,
+    }, () => {
+      new CalculationService().start(Object.assign({
+        origin: new google.maps.LatLng(
+          this.state.mySettings.lat,
+          this.state.mySettings.lng,
+        ),
+      }, this.state.mySettings));
+    });
+  }
+
   componentWillUpdate(nextProps, nextState) {
     if (this.state.status === 'entrance' && nextState.status !== 'entrance') {
       this.setState({menuShown: false});
@@ -176,11 +195,16 @@ export default class App extends Component {
     }
   }
 
+  handleClickRecommendToggleButton() {
+    this.setState(prev => ({recommendShown: !prev.recommendShown}));
+  }
+
   render() {
     const cls = this.props.location.pathname.split('/')[1] ? null : 'fixedHeight';
     const children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         settings: this.state.mySettings,
+        recommendShown: this.state.recommendShown,
         recommendItems: this.state.recommendItems,
         advancedSettingsShown: this.state.advancedSettingsShown,
         mapCenter: this.state.mapCenter,
@@ -190,6 +214,8 @@ export default class App extends Component {
         onClickShowAdvancedSettingsButton: this.handleClickShowAdvancedSettingsButton,
         onClickRecommendItem: this.handleClickRecommendItem,
         onClickInitializeAdvancedSettingsButton: this.handleClickInitializeAdvancedSettingsButton,
+        onClickExecuteButton: this.handleClickExecuteButton,
+        onClickRecommendToggleButton: this.handleClickRecommendToggleButton,
       });
     });
 

@@ -1,6 +1,9 @@
 import React, { Component } from 'react';
 import Recommends from '../recommends';
 import Tools from '../tools';
+import ObjectManager from '../../ObjectManager';
+import ResultVisualizer from '../../ResultVisualizer';
+import locale from '../../locale_ja';
 
 export default class Map extends Component {
   componentDidMount() {
@@ -18,6 +21,11 @@ export default class Map extends Component {
     });
 
     this.map = map;
+    this.objectManager = new ObjectManager(map);
+    this.resultVisualizer = new ResultVisualizer({
+      getMessage: (key) => locale[key],
+    }, map, this.objectManager);
+
   }
 
   componentWillUpdate(props) {
@@ -30,27 +38,33 @@ export default class Map extends Component {
   render() {
     const {
       settings,
-      onChangeSettings,
       recommendItems,
-      onClickRecommendItem,
+      recommendShown,
       advancedSettingsShown,
+      onClickRecommendItem,
+      onChangeSettings,
       onClickShowAdvancedSettingsButton,
       onClickInitializeAdvancedSettingsButton,
+      onClickExecuteButton,
+      onClickRecommendToggleButton,
     } = this.props;
 
     return (
       <section style={{height: '100%'}}>
         <Tools
           settings={settings}
-          onChange={onChangeSettings}
           advancedShown={advancedSettingsShown}
+          onChange={onChangeSettings}
           onClickShowAdvancedButton={onClickShowAdvancedSettingsButton}
           onClickInitializeAdvancedSettingsButton={onClickInitializeAdvancedSettingsButton}
+          onClickExecuteButton={onClickExecuteButton}
         />
         <div ref="mapWrapper" style={{height: '100%'}}></div>
         <Recommends
-          items = {recommendItems}
+          items={recommendItems}
+          shown={recommendShown}
           onClickItem={onClickRecommendItem}
+          onClickToggleButton={onClickRecommendToggleButton}
         />
       </section>
     );

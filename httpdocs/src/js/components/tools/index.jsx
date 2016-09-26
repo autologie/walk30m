@@ -32,6 +32,7 @@ export default class Tools extends Component {
       advancedShown,
       onClickShowAdvancedButton,
       onClickInitializeAdvancedSettingsButton,
+      onClickExecuteButton,
     } = this.props;
     const {address, lat, lng} = settings.origin || {};
     const advanced = advancedShown ? (<AdvancedTools
@@ -92,6 +93,7 @@ export default class Tools extends Component {
           <button
             action
             type="button"
+            onClick={onClickExecuteButton}
             disabled={!settings.isValid}
           >調べる</button>
           <button

@@ -64,4 +64,10 @@ export default class Settings {
       && this.travelMode
       && this.time;
   }
+
+  get anglePerStep() {
+    if (this.preference === 'PRECISION') return 5;
+    if (this.preference === 'SPEED') return 20;
+    return 10;
+  }
 }
