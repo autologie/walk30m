@@ -148,7 +148,8 @@ export default class App extends Component {
   handleClickShowAdvancedSettingsButton() {
     this.setState(prev => ({
       advancedSettingsShown: !prev.advancedSettingsShown,
-      status: prev.advancedSettingsShown === false ? 'normal' : prev.status,
+      status: prev.advancedSettingsShown === false ? 'normal' : 'entrance',
+      menuShown: prev.advancedSettingsShown,
     }));
   }
 
