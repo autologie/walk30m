@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import React, { Component } from 'react';
+import request from 'superagent';
 import AppHeader from '../app-header';
 import Tools from '../tools';
 import Map from '../map';
@@ -9,6 +10,7 @@ import MessageForm from '../message-form';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
 import CalculationService from '../../CalculationService';
+import { PUBLIC_API_URL_BASE } from '../../config';
 
 export default class App extends Component {
   constructor(props) {
@@ -23,6 +25,8 @@ export default class App extends Component {
       mapZoom: 13,
       mySettings: new Settings(null, 'WALKING', 30 * 60),
       advancedSettingsShown: false,
+      inquiryMessage: '',
+      notification: null,
       recommendShown: true,
       recommendItems: [
         {
@@ -106,6 +110,8 @@ export default class App extends Component {
     this.handleClickInitializeAdvancedSettingsButton = this.handleClickInitializeAdvancedSettingsButton.bind(this);
     this.handleClickExecuteButton = this.handleClickExecuteButton.bind(this);
     this.handleClickRecommendToggleButton = this.handleClickRecommendToggleButton.bind(this);
+    this.handleChangeInquiryMessage = this.handleChangeInquiryMessage.bind(this);
+    this.handleClickSubmitInquiryMessageButton = this.handleClickSubmitInquiryMessageButton.bind(this);
   }
 
   handleChangeSettings(property, value) {
@@ -200,6 +206,32 @@ export default class App extends Component {
     this.setState(prev => ({recommendShown: !prev.recommendShown}));
   }
 
+  handleChangeInquiryMessage(inquiryMessage) {
+    this.setState({inquiryMessage});
+  }
+
+  handleClickSubmitInquiryMessageButton() {
+    request
+      .post(`${PUBLIC_API_URL_BASE}/messages`)
+      .set('Content-Type': 'application/json; charset=UTF-8')
+      .send({
+        message: `${uuid}, ${message}`,
+        url: window.location.href,
+      }).end((err, data) => {
+        if (err) {
+          this.notify('E', err);
+        } else {
+          this.setState({inquiryMessage: ''});
+          this.notify('I', '送信しました');
+        }
+      });
+  }
+
+  notify(level, message) {
+    this.setState({notification: {level, message}});
+    setTimeout(() => this.setState({notification: null}), 3000);
+  }
+
   render() {
     const cls = this.props.location.pathname.split('/')[1] ? null : 'fixedHeight';
     const children = React.Children.map(this.props.children, (child) => {
@@ -211,12 +243,15 @@ export default class App extends Component {
         mapCenter: this.state.mapCenter,
         mapZoom: this.state.mapZoom,
         menuShown: this.state.menuShown,
+        inquiryMessage: this.state.inquiryMessage,
         onChangeSettings: this.handleChangeSettings,
         onClickShowAdvancedSettingsButton: this.handleClickShowAdvancedSettingsButton,
         onClickRecommendItem: this.handleClickRecommendItem,
         onClickInitializeAdvancedSettingsButton: this.handleClickInitializeAdvancedSettingsButton,
         onClickExecuteButton: this.handleClickExecuteButton,
         onClickRecommendToggleButton: this.handleClickRecommendToggleButton,
+        onChangeInquiryMessage: this.handleChangeInquiryMessage,
+        onClickSubmitInquiryMessageButton: this.handleClickSubmitInquiryMessageButton,
       });
     });
 
