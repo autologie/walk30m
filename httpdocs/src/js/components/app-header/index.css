@@ -14,6 +14,12 @@
 .appHeader h1 {
   margin: 0;
 }
+.appHeader .description {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
 .titleText {
   color: #333!important;
   text-decoration: none;
@@ -72,10 +78,8 @@
   margin-right: 3px;
 }
 .entrance .menu {
+  position: static;
   flex-direction: row;
-  bottom: 8px;
-  top: auto;
-  right: auto;
   padding: 0;
 }
 .menuButton {

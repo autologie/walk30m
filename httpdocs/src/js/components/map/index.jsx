@@ -4,6 +4,7 @@ import Tools from '../tools';
 import ObjectManager from '../../ObjectManager';
 import ResultVisualizer from '../../ResultVisualizer';
 import locale from '../../locale_ja';
+import styles from './index.css';
 
 export default class Map extends Component {
   componentDidMount() {
@@ -25,7 +26,6 @@ export default class Map extends Component {
     this.resultVisualizer = new ResultVisualizer({
       getMessage: (key) => locale[key],
     }, map, this.objectManager);
-
   }
 
   componentWillUpdate(props) {
@@ -50,7 +50,7 @@ export default class Map extends Component {
     } = this.props;
 
     return (
-      <section style={{height: '100%'}}>
+      <section className={styles.map}>
         <Tools
           settings={settings}
           advancedShown={advancedSettingsShown}
@@ -59,7 +59,7 @@ export default class Map extends Component {
           onClickInitializeAdvancedSettingsButton={onClickInitializeAdvancedSettingsButton}
           onClickExecuteButton={onClickExecuteButton}
         />
-        <div ref="mapWrapper" style={{height: '100%'}}></div>
+        <div ref="mapWrapper" className={styles.mapWrapper}>aaa</div>
         <Recommends
           items={recommendItems}
           shown={recommendShown}

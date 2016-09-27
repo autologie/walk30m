@@ -33,3 +33,7 @@
   opacity: 0.7;
   zoom: 1;
 }
+.recommends li h3 {
+  text-align: center;
+  margin: 0 1em;
+}

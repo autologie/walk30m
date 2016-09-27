@@ -9,6 +9,7 @@ import About from '../about';
 import MessageForm from '../message-form';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
+import recommendItems from 'json!../../../resources/recommends.json';
 import CalculationService from '../../CalculationService';
 import { PUBLIC_API_URL_BASE } from '../../config';
 
@@ -28,80 +29,7 @@ export default class App extends Component {
       inquiryMessage: '',
       notification: null,
       recommendShown: true,
-      recommendItems: [
-        {
-          title: '札幌市街から車で60分',
-          image: 'http://www.welcome.city.sapporo.jp/sightseeing.photolibrary/img/c011-068-preview.jpg',
-          params: {
-            origin: {
-              address: '〒060-0042 Hokkaido Prefecture, Sapporo, Odorinishi, 1丁目-12丁目',
-              lat: 43.0599007,
-              lng: 141.3455438,
-            },
-            travelMode: 'DRIVING',
-            time: 60 * 60,
-            avoidTolls: false,
-            avoidHighways: false,
-            avoidFerries: false,
-          },
-        },
-        {
-          title: '東京駅から歩いて10分',
-          image: 'http://www.tokyo-date.net/etc_tokyo_st/images/71.jpg',
-          params: {
-            origin: {
-              address: '〒100-0005 丁目, 1 Chome Marunouchi, Chiyoda, Tokyo 100-0005',
-              lat: 35.681298,
-              lng: 139.7640582,
-            },
-            travelMode: 'WALKING',
-            time: 10 * 60,
-            avoidTolls: false,
-            avoidHighways: false,
-            avoidFerries: false,
-          },
-        },
-        {
-          title: 'JR金沢駅から歩いて30分',
-          image: 'http://www.kanazawa-kankoukyoukai.or.jp/com/img/movphoto/photolib/02shisetsu/low/003_n.jpg',
-          params: {
-            origin: {
-              address: '〒920-0858 Ishikawa Prefecture, 木ノ新保町1番1号',
-              lat: 36.5780574,
-              lng: 136.6464709,
-            },
-            travelMode: 'WALKING',
-            time: 30 * 60,
-            avoidTolls: false,
-            avoidHighways: false,
-            avoidFerries: false,
-          },
-        },
-        {
-          title: 'JR函館駅から歩いて20分',
-          image: 'http://www.hakobura.jp/photo_library/img/The_night_view_from_Mt_Hakodate-1-10MB.jpg',
-          params: {
-            origin: {
-              address: '〒040-0063 Hokkaidō, Hakodate-shi, Wakamatsuchō, 12',
-              lat: 41.77378,
-              lng: 140.7242853,
-            },
-            travelMode: 'WALKING',
-            time: 20 * 60,
-            avoidTolls: false,
-            avoidHighways: false,
-            avoidFerries: false,
-          },
-        },
-        {
-          title: '雷門から歩いて10分',
-          image: 'http://www.tokyo-date.net/machi_asakusa/images/37.jpg',
-        },
-        {
-          title: '小樽運河から歩いて20分',
-          image: 'http://photo.hokkaido-blog.com/photo-l/01/otaruunga.jpg',
-        },
-      ],
+      recommendItems,
     };
     this.handleChangeSettings = this.handleChangeSettings.bind(this);
     this.handleClickRecommendItem = this.handleClickRecommendItem.bind(this);

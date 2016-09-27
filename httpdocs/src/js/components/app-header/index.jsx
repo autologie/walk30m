@@ -33,8 +33,11 @@ export default class AppHeader extends Component {
 
     return (
       <section className={`${styles[status]} ${styles.appHeader}`}>
-        <h1><Link className={styles.titleText} to="/">30分でどこまでいける？</Link></h1>
-        <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
+        <div className={styles.description}>
+          <h1><Link className={styles.titleText} to="/">30分でどこまでいける？</Link></h1>
+          <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
+        </div>
+        <div className={styles.socialButtons}></div>
         {menu}
         {menuButton}
       </section>

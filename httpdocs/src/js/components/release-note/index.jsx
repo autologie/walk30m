@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { releases } from 'json!yaml!../../../releases.yml';
+import { releases } from 'json!yaml!../../../resources/releases.yml';
 import styles from './index.css';
 import commonStyles from '../common.css';
 
