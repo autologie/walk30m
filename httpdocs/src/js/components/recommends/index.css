@@ -28,6 +28,7 @@
   cursor: pointer;
   zoom: .9;
   background-size: cover;
+  background-color: #666;
 }
 .recommends li:hover {
   opacity: 0.7;

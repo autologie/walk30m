@@ -1,23 +1,33 @@
-import _ from 'lodash';
 import React, { Component } from 'react';
-import request from 'superagent';
 import AppHeader from '../app-header';
 import Tools from '../tools';
 import Map from '../map';
 import ReleaseNote from '../release-note';
 import About from '../about';
 import MessageForm from '../message-form';
+import Notification from '../notification';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
 import recommendItems from 'json!../../../resources/recommends.json';
-import CalculationService from '../../CalculationService';
-import { PUBLIC_API_URL_BASE } from '../../config';
+import {
+  haneldChangeSettings,
+  handleClickRecommendItem,
+  handleClickShowAdvancedSettingsButton,
+  handleClickMenuButton,
+  handleClickInitializeAdvancedSettingsButton,
+  handleClickExecuteButton,
+  handleClickRecommendToggleButton,
+  handleChangeSettings,
+  handleChangeInquiryMessage,
+  handleClickSubmitInquiryMessageButton,
+} from '../../actions';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
     this.state = {
       status: 'entrance',
+      calculations: [],
       menuShown: true,
       mapCenter: {
         lat: 35.6618349,
@@ -31,84 +41,11 @@ export default class App extends Component {
       recommendShown: true,
       recommendItems,
     };
-    this.handleChangeSettings = this.handleChangeSettings.bind(this);
-    this.handleClickRecommendItem = this.handleClickRecommendItem.bind(this);
-    this.handleClickShowAdvancedSettingsButton = this.handleClickShowAdvancedSettingsButton.bind(this);
-    this.handleClickMenuButton = this.handleClickMenuButton.bind(this);
-    this.handleClickInitializeAdvancedSettingsButton = this.handleClickInitializeAdvancedSettingsButton.bind(this);
-    this.handleClickExecuteButton = this.handleClickExecuteButton.bind(this);
-    this.handleClickRecommendToggleButton = this.handleClickRecommendToggleButton.bind(this);
-    this.handleChangeInquiryMessage = this.handleChangeInquiryMessage.bind(this);
-    this.handleClickSubmitInquiryMessageButton = this.handleClickSubmitInquiryMessageButton.bind(this);
-  }
 
-  handleChangeSettings(property, value) {
-    return this.setState(prev => {
-      switch (property) {
-        case 'origin':
-          return {
-            mySettings: prev.mySettings.withOrigin(value),
-            mapCenter: _.pick(value, 'lat', 'lng'),
-          };
-        case 'travelMode':
-          return {mySettings: prev.mySettings.withTravelMode(value)};
-        case 'time':
-          return {mySettings: prev.mySettings.withTime(value)};
-        case 'preference':
-          return {mySettings: prev.mySettings.withPreference(value)};
-        case 'avoidTolls':
-          return {mySettings: prev.mySettings.withAvoidTolls(value)};
-        case 'avoidHighways':
-          return {mySettings: prev.mySettings.withAvoidHighways(value)};
-        case 'avoidFerries':
-          return {mySettings: prev.mySettings.withAvoidFerries(value)};
+    document.addEventListener('click', (ev) => {
+      if (this.state.status !== 'entrance') {
+        this.setState({menuShown: false});
       }
-    });
-  }
-
-  handleClickRecommendItem(item) {
-    const {origin, travelMode, time} = item.params || {};
-
-    this.setState(prev => ({
-      mySettings: prev.mySettings
-        .withOrigin(origin)
-        .withTravelMode(travelMode)
-        .withTime(time),
-      mapCenter: _.pick(origin, 'lat', 'lng'),
-      mapZoom: 13,
-    }));
-  }
-
-  handleClickShowAdvancedSettingsButton() {
-    this.setState(prev => ({
-      advancedSettingsShown: !prev.advancedSettingsShown,
-      status: prev.advancedSettingsShown === false ? 'normal' : 'entrance',
-      menuShown: prev.advancedSettingsShown,
-    }));
-  }
-
-  handleClickMenuButton() {
-    this.setState(prev => ({menuShown: !prev.menuShown}));
-  }
-
-  handleClickInitializeAdvancedSettingsButton() {
-    this.setState(prev => ({
-      mySettings: prev.mySettings.withDefaultAdvancedSettings(),
-    }));
-  }
-
-  handleClickExecuteButton() {
-    this.setState({
-      status: 'normal',
-      advancedSettingsShown: false,
-      recommendShown: false,
-    }, () => {
-      new CalculationService().start(Object.assign({
-        origin: new google.maps.LatLng(
-          this.state.mySettings.lat,
-          this.state.mySettings.lng,
-        ),
-      }, this.state.mySettings));
     });
   }
 
@@ -130,36 +67,6 @@ export default class App extends Component {
     }
   }
 
-  handleClickRecommendToggleButton() {
-    this.setState(prev => ({recommendShown: !prev.recommendShown}));
-  }
-
-  handleChangeInquiryMessage(inquiryMessage) {
-    this.setState({inquiryMessage});
-  }
-
-  handleClickSubmitInquiryMessageButton() {
-    request
-      .post(`${PUBLIC_API_URL_BASE}/messages`)
-      .set('Content-Type': 'application/json; charset=UTF-8')
-      .send({
-        message: `${uuid}, ${message}`,
-        url: window.location.href,
-      }).end((err, data) => {
-        if (err) {
-          this.notify('E', err);
-        } else {
-          this.setState({inquiryMessage: ''});
-          this.notify('I', '送信しました');
-        }
-      });
-  }
-
-  notify(level, message) {
-    this.setState({notification: {level, message}});
-    setTimeout(() => this.setState({notification: null}), 3000);
-  }
-
   render() {
     const cls = this.props.location.pathname.split('/')[1] ? null : 'fixedHeight';
     const children = React.Children.map(this.props.children, (child) => {
@@ -172,25 +79,28 @@ export default class App extends Component {
         mapZoom: this.state.mapZoom,
         menuShown: this.state.menuShown,
         inquiryMessage: this.state.inquiryMessage,
-        onChangeSettings: this.handleChangeSettings,
-        onClickShowAdvancedSettingsButton: this.handleClickShowAdvancedSettingsButton,
-        onClickRecommendItem: this.handleClickRecommendItem,
-        onClickInitializeAdvancedSettingsButton: this.handleClickInitializeAdvancedSettingsButton,
-        onClickExecuteButton: this.handleClickExecuteButton,
-        onClickRecommendToggleButton: this.handleClickRecommendToggleButton,
-        onChangeInquiryMessage: this.handleChangeInquiryMessage,
-        onClickSubmitInquiryMessageButton: this.handleClickSubmitInquiryMessageButton,
+        calculations: this.state.calculations,
+        onChangeSettings: (prop, value) => handleChangeSettings(this, prop, value),
+        onChangeInquiryMessage: (message) => handleChangeInquiryMessage(this, message),
+        onClickShowAdvancedSettingsButton: () => handleClickShowAdvancedSettingsButton(this),
+        onClickRecommendItem: (item) => handleClickRecommendItem(this, item),
+        onClickInitializeAdvancedSettingsButton: () => handleClickInitializeAdvancedSettingsButton(this),
+        onClickExecuteButton: () => handleClickExecuteButton(this),
+        onClickRecommendToggleButton: () => handleClickRecommendToggleButton(this),
+        onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
       });
     });
 
     return (
       <div className={`${styles[this.state.status]} ${styles.app} ${styles[cls]}`}>
         <AppHeader
+          debug={this.state.calculations}
           status={this.state.status}
           menuShown={this.state.menuShown}
-          onClickMenuButton={this.handleClickMenuButton}
+          onClickMenu={() => handleClickMenuButton(this)}
         />
         <div className={styles.main}>{children}</div>
+        <Notification content={this.state.notification} />
       </div>
     );
   }

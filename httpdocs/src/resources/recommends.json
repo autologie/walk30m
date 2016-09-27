@@ -65,10 +65,34 @@
 	},
 	{
 		"title": "雷門から歩いて10分",
-		"image": "http://www.tokyo-date.net/machi_asakusa/images/37.jpg"
+		"image": "http://www.tokyo-date.net/machi_asakusa/images/37.jpg",
+    "params": {
+			"origin": {
+				"address": "2 Chome-3-1 Asakusa, 台東区 Tokyo 111-0032",
+				"lat": 35.7110584,
+        "lng": 139.7963664
+			},
+			"travelMode": "WALKING",
+			"time": 600,
+			"avoidTolls": false,
+			"avoidHighways": false,
+			"avoidFerries": false
+		}
 	},
 	{
 		"title": "小樽運河から歩いて20分",
-		"image": "http://photo.hokkaido-blog.com/photo-l/01/otaruunga.jpg"
+		"image": "http://photo.hokkaido-blog.com/photo-l/01/otaruunga.jpg",
+    "params": {
+			"origin": {
+				"address": "5-4 Minatomachi, Otaru, Hokkaido Prefecture 047-0007",
+				"lat": 43.1999173,
+        "lng": 141.0018088
+			},
+			"travelMode": "WALKING",
+			"time": 1200,
+			"avoidTolls": false,
+			"avoidHighways": false,
+			"avoidFerries": false
+		}
 	}
 ]

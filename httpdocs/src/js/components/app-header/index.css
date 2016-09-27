@@ -9,6 +9,9 @@
   padding: .5em;
   transition: all 500ms ease;
   min-height: 92px;
+  background-image: url(http://www.graphicsfuel.com/wp-content/uploads/2014/09/polygon-background3-preview.jpg);
+  background-size: cover;
+  background-blend-mode: overlay;
 }
 .appHeader p,
 .appHeader h1 {
@@ -70,12 +73,13 @@
 
 .entrance.appHeader {
   min-height: 30vh;
+  padding-bottom: 2px;
 }
 .entrance.appHeader h1 {
   padding: .5em 0;
 }
 .entrance .menu a {
-  margin-right: 3px;
+  margin-right: 2px;
 }
 .entrance .menu {
   position: static;

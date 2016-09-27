@@ -1,9 +1,6 @@
 import React, { Component } from 'react';
 import Recommends from '../recommends';
 import Tools from '../tools';
-import ObjectManager from '../../ObjectManager';
-import ResultVisualizer from '../../ResultVisualizer';
-import locale from '../../locale_ja';
 import styles from './index.css';
 
 export default class Map extends Component {
@@ -22,10 +19,6 @@ export default class Map extends Component {
     });
 
     this.map = map;
-    this.objectManager = new ObjectManager(map);
-    this.resultVisualizer = new ResultVisualizer({
-      getMessage: (key) => locale[key],
-    }, map, this.objectManager);
   }
 
   componentWillUpdate(props) {
@@ -33,6 +26,21 @@ export default class Map extends Component {
 
     this.map.setCenter(new google.maps.LatLng(lat, lng));
     this.map.setZoom(props.mapZoom);
+
+    if (props.calculations.length > 0) {
+      console.log(this.map.data.addGeoJson({
+        type: 'FeatureCollection',
+        features: props.calculations[0].vertices.map(vertex => ({
+          id: Math.random().toString(),
+          type: 'Feature',
+          properties: {},
+          geometry: {
+            type: 'Point',
+            coordinates: [vertex.lng, vertex.lat]
+          },
+        })),
+      }));
+    }
   }
 
   render() {

@@ -1,81 +1,65 @@
-import google from 'google';
-import _ from 'lodash';
-import GeoUtil from './GeoUtil';
+import Emittable from './emittable';
 
-let twicePI = 2 * Math.PI,
-  halfPI = Math.PI / 2;
+export default class Calculation extends Emittable {
+  constructor(settings) {
+    super();
+    this._settings = settings;
+    this._timer = null;
+    this._vertices = [];
+  }
 
-function Calculation(request) {
-  const me = this;
+  start() {
+    console.log('started', this._settings);
 
-  me.config = request;
-  me.startTime = new Date();
-  me.pauseTime = 0;
-  me.vertices = new google.maps.MVCArray();
+    this._progress = 0;
 
-  me.vertices.addListener('insert_at', function (n) {
-    const added = me.vertices.getAt(n);
+    this.setTimeout(() => this.next(), 1000);
+  }
 
-    google.maps.event.trigger(me, 'progress', me.getProgress(), added, me.getGoals());
-  });
+  next() {
+    console.log('next');
+    const {lat, lng} = this._settings.origin;
+
+    this._progress += 0.001;
+    this._vertices = this._vertices.concat([
+      {lat: lat + this.progress, lng: lng - this.progress}
+    ]);
+
+    if (this.isCompleted) {
+      this.trigger('complete', this._settings);
+    } else {
+      this.trigger('progress', this._settings, this._progress);
+      this.setTimeout(() => this.next(), 1000);
+    }
+  }
+
+  abort() {
+    if (!this._timer) return;
+
+    clearTimeout(this._timer);
+    this._timer = null;
+
+    this.trigger('aborted', this._settings);
+  }
+
+  setTimeout(callback, timeout) {
+    if (this._timer) throw new Error('attempt to execute duplicate timeout');
+
+    this._timer = setTimeout(() => {
+      this._timer = null;
+      callback();
+    }, timeout);
+  }
+
+  get progress() {
+    return this._progress;
+  }
+
+  get isCompleted() {
+    return this._progress >= 0.01;
+  }
+
+  get vertices() {
+    return this._vertices;
+  }
 }
-
-Calculation.prototype = new google.maps.MVCObject();
-
-Calculation.prototype.getGoals = function () {
-  return _.map(this.vertices.getArray(), 'endLocation');
-};
-
-Calculation.prototype.getProgress = function () {
-  const me = this;
-
-  return Math.round(100 * me.accumulateAngles(me.getGoals()) / twicePI);
-};
-
-Calculation.prototype.getVelocity = function () {
-  let me = this,
-    progress = me.getProgress(),
-    consumedTime = new Date() - me.startTime - me.pauseTime;
-
-  return progress === 0 ? 0 : 1000 * progress / consumedTime;
-};
-
-Calculation.prototype.isComplete = function (vertices) {
-  const me = this;
-
-  return me.accumulateAngles(vertices || me.getGoals()) >= twicePI;
-};
-
-Calculation.prototype.hasVisited = function (location) {
-  let me = this,
-    sameLocation = function (v) {
-      return GeoUtil.distance(v.endLocation, location) < 0.0005;
-    };
-
-  return _.some(me.vertices.getArray(), sameLocation);
-};
-
-Calculation.prototype.accumulateAngles = function (vertices) {
-  let me = this,
-    checked = 0,
-    diff,
-    angles = _.map(vertices, function (v) {
-      return GeoUtil.calcAngle(me.config.origin, v);
-    });
-
-  return _.reduce(angles, function (passed, angle, idx, arr) {
-    return passed + (idx > 0 ? ((diff = angle - arr[idx - 1]) < -1 * Math.PI ? (diff + twicePI) : diff) : 0);
-  }, 0);
-};
-
-Calculation.prototype.serialize = function () {
-  const me = this;
-
-  return {
-    config: _.defaults({
-      origin: GeoUtil.latLngToLiteral(me.config.origin),
-    }, me.config),
-  };
-};
-
-export default Calculation;

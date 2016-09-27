@@ -1,0 +1,29 @@
+.notification {
+  padding: 1em 2em;
+  position: fixed;
+  left: 0;
+  margin: 1em;
+  width: 280px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, .7);
+  transition: bottom 500ms ease;
+}
+
+.notification.shown {
+  bottom: 0;
+}
+.notification.hidden {
+  bottom: -100px;
+}
+
+.notification.I {
+  background: #333;
+  color: #fff;
+}
+.notification.W {
+  background: #cc9;
+  color: #fff;
+}
+.notification.E {
+  background: #e44;
+  color: #fff;
+}

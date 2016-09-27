@@ -11,7 +11,7 @@ const menuList = [
 
 export default class AppHeader extends Component {
   render() {
-    const {status, menuShown, onClickMenuButton} = this.props;
+    const {status, menuShown, onClickMenu, debug} = this.props;
     const menuElements = menuList.map(item => (
       <li
         className={window.location.pathname === item.path ? styles.active : null}
@@ -25,9 +25,10 @@ export default class AppHeader extends Component {
     ) : null;
     const menuButton = status !== 'entrance' ? (
       <button
-        onClick={onClickMenuButton}
         className={styles.menuButton}
+        onClick={onClickMenu}
         type="button"
+        style={{pointerEvents: menuShown ? 'none' : 'auto'}}
       >{menuShown ? '閉じる' : '出す'}</button>
     ) : null;
 
@@ -37,7 +38,7 @@ export default class AppHeader extends Component {
           <h1><Link className={styles.titleText} to="/">30分でどこまでいける？</Link></h1>
           <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
         </div>
-        <div className={styles.socialButtons}></div>
+        <pre style={{maxHeight: '100px', overflow: 'scroll'}} className={styles.socialButtons}>{JSON.stringify(debug, null, '\t')}</pre>
         {menu}
         {menuButton}
       </section>
