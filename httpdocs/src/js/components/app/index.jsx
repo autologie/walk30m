@@ -16,6 +16,7 @@ import {
   handleClickMenuButton,
   handleClickInitializeAdvancedSettingsButton,
   handleClickExecuteButton,
+  handleClickAbortButton,
   handleClickRecommendToggleButton,
   handleChangeSettings,
   handleChangeInquiryMessage,
@@ -50,11 +51,14 @@ export default class App extends Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
+    const prevRoute = this.props.location.pathname.split('/')[1];
+    const nextRoute = nextProps.location.pathname.split('/')[1];
+
     if (this.state.status === 'entrance' && nextState.status !== 'entrance') {
       this.setState({menuShown: false});
     }
-    if (this.props.location.pathname !== nextProps.location.pathname) {
-      if (nextProps.location.pathname.split('/')[1]) {
+    if (prevRoute !== nextRoute) {
+      if (nextRoute !== 'home') {
         // HOME以外に移動
         this.setState({menuShown: true, status: 'entrance'});
       } else {
@@ -68,7 +72,7 @@ export default class App extends Component {
   }
 
   render() {
-    const cls = this.props.location.pathname.split('/')[1] ? null : 'fixedHeight';
+    const cls = this.props.location.pathname.split('/')[1] !== 'home' ? null : 'fixedHeight';
     const children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         settings: this.state.mySettings,
@@ -86,6 +90,7 @@ export default class App extends Component {
         onClickRecommendItem: (item) => handleClickRecommendItem(this, item),
         onClickInitializeAdvancedSettingsButton: () => handleClickInitializeAdvancedSettingsButton(this),
         onClickExecuteButton: () => handleClickExecuteButton(this),
+        onClickAbortButton: () => handleClickAbortButton(this),
         onClickRecommendToggleButton: () => handleClickRecommendToggleButton(this),
         onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
       });

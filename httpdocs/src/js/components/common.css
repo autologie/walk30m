@@ -17,14 +17,17 @@ a:visited {
   color: #4ca;
 }
 
+a[action],
 button[action] {
   border-radius: 6px;
   border: 3px solid #4ca;
   background: #fff;
+  color: #000;
   font-size: 1.2em;
   padding: .3em 1em;
   margin: 0 .5em;
 }
+a[action]:disabled,
 button[action]:disabled {
   opacity: .6;
 }

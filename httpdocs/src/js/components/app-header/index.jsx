@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import styles from './index.css';
 
-const menuList = [
+export const menuList = [
   {path: '/', label: 'HOME'},
   {path: '/about', label: 'このサービスについて'},
   {path: '/release-note', label: 'リリース履歴'},
@@ -32,13 +32,13 @@ export default class AppHeader extends Component {
       >{menuShown ? '閉じる' : '出す'}</button>
     ) : null;
 
+    // <pre style={{maxHeight: '100px', overflow: 'scroll'}} className={styles.socialButtons}>{JSON.stringify(debug, null, '\t')}</pre>
     return (
       <section className={`${styles[status]} ${styles.appHeader}`}>
         <div className={styles.description}>
           <h1><Link className={styles.titleText} to="/">30分でどこまでいける？</Link></h1>
           <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
         </div>
-        <pre style={{maxHeight: '100px', overflow: 'scroll'}} className={styles.socialButtons}>{JSON.stringify(debug, null, '\t')}</pre>
         {menu}
         {menuButton}
       </section>

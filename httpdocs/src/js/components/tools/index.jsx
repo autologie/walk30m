@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import AdvancedTools from './advanced';
 import styles from './index.css';
 
-const timeOptions = [
+export const timeOptions = [
   {value: 5 * 60, label: '5分'},
   {value: 10 * 60, label: '10分'},
   {value: 15 * 60, label: '15分'},
@@ -28,16 +28,16 @@ export default class Tools extends Component {
   render() {
     const {
       settings,
-      onChange,
-      advancedShown,
-      onClickShowAdvancedButton,
+      onChangeSettings,
+      advancedSettingsShown,
+      onClickShowAdvancedSettingsButton,
       onClickInitializeAdvancedSettingsButton,
       onClickExecuteButton,
     } = this.props;
     const {address, lat, lng} = settings.origin || {};
-    const advanced = advancedShown ? (<AdvancedTools
+    const advanced = advancedSettingsShown ? (<AdvancedTools
       settings={settings}
-      onChange={onChange}
+      onChange={onChangeSettings}
       onClickInitializeButton={onClickInitializeAdvancedSettingsButton}
     />) : null;
     const timeOptionElements = timeOptions.map(opt => (
@@ -54,7 +54,7 @@ export default class Tools extends Component {
               <input
                 type="text"
                 value={address}
-                onChange={(ev) => onChange('origin', {address: ev.target.value})}
+                onChange={(ev) => onChangeSettings('origin', {address: ev.target.value})}
               />
               から
             </label>
@@ -65,7 +65,7 @@ export default class Tools extends Component {
                 type="radio"
                 value="WALKING"
                 checked={settings.travelMode === 'WALKING'}
-                onChange={(ev) => onChange('travelMode', 'WALKING')}
+                onChange={(ev) => onChangeSettings('travelMode', 'WALKING')}
               />
               歩いて
             </label>
@@ -74,7 +74,7 @@ export default class Tools extends Component {
                 type="radio"
                 value="DRIVING"
                 checked={settings.travelMode === 'DRIVING'}
-                onChange={(ev) => onChange('travelMode', 'DRIVING')}
+                onChange={(ev) => onChangeSettings('travelMode', 'DRIVING')}
               />
               車で
             </label>
@@ -83,7 +83,7 @@ export default class Tools extends Component {
             <label>
               <select
                 value={settings.time}
-                onChange={(ev) => onChange('time', ev.target.value)}
+                onChange={(ev) => onChangeSettings('time', ev.target.value)}
               >
                 {timeOptionElements}
               </select>
@@ -97,7 +97,7 @@ export default class Tools extends Component {
             disabled={!settings.isValid}
           >調べる</button>
           <button
-            onClick={onClickShowAdvancedButton}
+            onClick={onClickShowAdvancedSettingsButton}
             type="button"
             role="open-advanced"
           >詳細設定</button>

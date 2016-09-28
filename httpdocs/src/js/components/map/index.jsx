@@ -56,17 +56,12 @@ export default class Map extends Component {
       onClickExecuteButton,
       onClickRecommendToggleButton,
     } = this.props;
+    const children = React.Children.map(this.props.children, child => React.cloneElement(child, this.props));
+    console.log(children)
 
     return (
       <section className={styles.map}>
-        <Tools
-          settings={settings}
-          advancedShown={advancedSettingsShown}
-          onChange={onChangeSettings}
-          onClickShowAdvancedButton={onClickShowAdvancedSettingsButton}
-          onClickInitializeAdvancedSettingsButton={onClickInitializeAdvancedSettingsButton}
-          onClickExecuteButton={onClickExecuteButton}
-        />
+        {children}
         <div ref="mapWrapper" className={styles.mapWrapper}>aaa</div>
         <Recommends
           items={recommendItems}

@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import request from 'superagent';
+import {browserHistory} from 'react-router';
 import ja from './locale_ja';
 import Walk30mUtils from './Walk30mUtils';
 import { PUBLIC_API_URL_BASE } from './config';
@@ -83,12 +84,19 @@ export function handleClickExecuteButton(view) {
     }));
     const calc = new Calculation(settings);
 
-    notify(view, 'I', `${description}を計算しています...`, true);
+    notify(view, 'I', '計算を開始しました。');
 
     calc.on('progress', () => view.forceUpdate());
-    calc.on('complete', () => view.forceUpdate());
-    calc.on('abort', () => view.forceUpdate());
+    calc.on('complete', () => {
+      view.forceUpdate();
+      notify(view, 'I', '完了しました。');
+    });
+    calc.on('abort', () => {
+      view.forceUpdate();
+      notify(view, 'I', '計算をキャンセルしました。');
+    });
     view.setState({calculations: view.state.calculations.concat([calc])});
+    browserHistory.push('/home/calculations/new');
 
     calc.start();
   });
@@ -118,3 +126,8 @@ export function handleClickSubmitInquiryMessageButton(view) {
     });
 }
 
+export function handleClickAbortButton(view) {
+  view.state.calculations
+    .filter(calc => calc.isInProgress)
+    .map(calc => calc.abort());
+}

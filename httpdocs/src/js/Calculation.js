@@ -6,6 +6,7 @@ export default class Calculation extends Emittable {
     this._settings = settings;
     this._timer = null;
     this._vertices = [];
+    this._isAborted = false;
   }
 
   start() {
@@ -20,9 +21,9 @@ export default class Calculation extends Emittable {
     console.log('next');
     const {lat, lng} = this._settings.origin;
 
-    this._progress += 0.001;
+    this._progress += 0.1;
     this._vertices = this._vertices.concat([
-      {lat: lat + this.progress, lng: lng - this.progress}
+      {lat: lat + this.progress * 0.01, lng: lng - this.progress * 0.01}
     ]);
 
     if (this.isCompleted) {
@@ -38,8 +39,9 @@ export default class Calculation extends Emittable {
 
     clearTimeout(this._timer);
     this._timer = null;
+    this._isAborted = true;
 
-    this.trigger('aborted', this._settings);
+    this.trigger('abort', this._settings);
   }
 
   setTimeout(callback, timeout) {
@@ -56,10 +58,18 @@ export default class Calculation extends Emittable {
   }
 
   get isCompleted() {
-    return this._progress >= 0.01;
+    return this.progress >= 1;
+  }
+
+  get isAborted() {
+    return this._isAborted;
   }
 
   get vertices() {
     return this._vertices;
+  }
+
+  get isInProgress() {
+    return !this.isCompleted && !this.isAborted;
   }
 }

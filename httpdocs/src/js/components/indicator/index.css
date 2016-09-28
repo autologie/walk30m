@@ -1,0 +1,15 @@
+.entrance .indicator {
+  padding: 2em 1em;
+}
+
+.indicator {
+  background: #ddd;
+  text-align: center;
+  position: relative;
+  z-index: 100;
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}

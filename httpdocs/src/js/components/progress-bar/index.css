@@ -1,0 +1,15 @@
+.progressBar {
+  height: 6px;
+  background: rgba(64, 237, 190, .3);
+  width: 100%;
+  display: flex;
+  position: absolute;
+  bottom: 0px;
+  left: 0px;
+}
+
+.progress {
+  width: 0px;
+  background: #0a6;
+  transition: all 500ms ease;
+}
