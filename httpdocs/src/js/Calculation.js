@@ -1,4 +1,6 @@
+import uuid from 'uuid';
 import Emittable from './emittable';
+import Settings from './domain/Settings';
 
 export default class Calculation extends Emittable {
   constructor(settings) {
@@ -7,6 +9,16 @@ export default class Calculation extends Emittable {
     this._timer = null;
     this._vertices = [];
     this._isAborted = false;
+    this._id = uuid.v4();
+  }
+
+  static deserialize(serialized) {
+    const instance = new Calculation();
+
+    Object.assign(instance, Object.assign(serialized, {
+      _settings: new Settings(serialized._settings),
+    }));
+    return instance;
   }
 
   start() {
@@ -18,7 +30,6 @@ export default class Calculation extends Emittable {
   }
 
   next() {
-    console.log('next');
     const {lat, lng} = this._settings.origin;
 
     this._progress += 0.1;
@@ -53,6 +64,10 @@ export default class Calculation extends Emittable {
     }, timeout);
   }
 
+  get id() {
+    return this._id;
+  }
+
   get progress() {
     return this._progress;
   }
@@ -71,5 +86,9 @@ export default class Calculation extends Emittable {
 
   get isInProgress() {
     return !this.isCompleted && !this.isAborted;
+  }
+
+  get settings() {
+    return this._settings;
   }
 }

@@ -16,16 +16,16 @@
 		}
 	},
 	{
-		"title": "東京駅から歩いて10分",
-		"image": "http://www.tokyo-date.net/etc_tokyo_st/images/71.jpg",
+		"title": "大阪市から車で3時間",
+		"image": "http://komekami.sakura.ne.jp/wp-content/uploads/P1030188.jpg",
 		"params": {
 			"origin": {
-				"address": "〒100-0005 丁目, 1 Chome Marunouchi, Chiyoda, Tokyo 100-0005",
-				"lat": 35.681298,
-				"lng": 139.7640582
+				"address": "3 Chome-1-1 Umeda, Kita-ku, Ōsaka-shi, Ōsaka-fu 530-8202",
+				"lat": 34.678395,
+        "lng": 135.4601305
 			},
-			"travelMode": "WALKING",
-			"time": 600,
+			"travelMode": "DRIVING",
+			"time": 10800,
 			"avoidTolls": false,
 			"avoidHighways": false,
 			"avoidFerries": false

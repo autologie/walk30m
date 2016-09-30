@@ -1,18 +1,17 @@
-.recommends {
+.calculations {
   position: fixed;
   bottom: 0;
   left: 0;
   width: 100%;
 }
-.recommends ul {
+.calculations ul {
   list-style-type: none;
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: flex-end;
-  padding-left: 0;
+  padding-left: 1em;
 }
-.recommends li {
+.calculations li {
   width: 15vw;
   border-radius: 2px;
   box-shadow: 0 0 6px rgba(0, 0, 0, .5);
@@ -28,15 +27,32 @@
   transition: all 500ms ease;
   cursor: pointer;
   zoom: .9;
-  background-size: cover;
-  background-color: #666;
+  background: #555;
+  position: relative;
 }
-.recommends li:hover {
+.calculations li:hover {
   opacity: 0.7;
   zoom: 1;
 }
-.recommends li h3 {
+.calculations li h3 {
   text-align: center;
   margin: 0 1em;
   font-size: 1em;
+}
+.calculations button {
+  margin-bottom: 60px;
+}
+button[action].deleteButton {
+  border-radius: 24px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  background: #555;
+  color: #fff;
+  box-shadow: 0 0 6px rgba(0, 0, 0, .7);
+  position: absolute;
+  right: -8px;
+  top: -8px;
+  margin: 0;
+  padding: 0 5px;
+  cursor: pointer;
 }

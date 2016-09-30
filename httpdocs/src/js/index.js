@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         <Route path="/release-note" component={ReleaseNote} />
         <Route path="/message-form" component={MessageForm} />
         <Route path="/home" component={Map}>
-          <Route path="/home/calculations/new" component={Indicator} />
           <Route path="/home/calculations/:id" component={Indicator} />
           <IndexRoute component={Tools} />
         </Route>

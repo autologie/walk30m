@@ -19,7 +19,6 @@ export function handleChangeSettings(view, property, value) {
       case 'origin':
         return {
           mySettings: prev.mySettings.withOrigin(value),
-          mapCenter: _.pick(value, 'lat', 'lng'),
         };
       case 'travelMode':
         return {mySettings: prev.mySettings.withTravelMode(value)};
@@ -45,6 +44,7 @@ export function handleClickRecommendItem(view, item) {
       .withOrigin(origin)
       .withTravelMode(travelMode)
       .withTime(time),
+    mapVersion: +new Date(),
     mapCenter: _.pick(origin, 'lat', 'lng'),
     mapZoom: 16,
   }));
@@ -86,24 +86,30 @@ export function handleClickExecuteButton(view) {
 
     notify(view, 'I', '計算を開始しました。');
 
-    calc.on('progress', () => view.forceUpdate());
+    calc.on('progress', () => view.setState({dataVersion: +new Date()}));
     calc.on('complete', () => {
-      view.forceUpdate();
+      view.setState({dataVersion: +new Date()});
       notify(view, 'I', '完了しました。');
     });
     calc.on('abort', () => {
-      view.forceUpdate();
+      view.setState({dataVersion: +new Date()});
       notify(view, 'I', '計算をキャンセルしました。');
     });
-    view.setState({calculations: view.state.calculations.concat([calc])});
-    browserHistory.push('/home/calculations/new');
+    view.setState({
+      dataVersion: +new Date(),
+      calculations: view.state.calculations.concat([calc]),
+    });
+    browserHistory.push(`/home/calculations/${calc.id}`);
 
     calc.start();
   });
 }
 
 export function handleClickRecommendToggleButton(view) {
-  view.setState(prev => ({recommendShown: !prev.recommendShown}));
+  view.setState(prev => ({
+    recommendShown: !prev.recommendShown,
+    calculationsShown: prev.recommendShown ? prev.calculationsShown : false,
+  }));
 }
 
 export function handleChangeInquiryMessage(view, inquiryMessage) {
@@ -130,4 +136,22 @@ export function handleClickAbortButton(view) {
   view.state.calculations
     .filter(calc => calc.isInProgress)
     .map(calc => calc.abort());
+}
+
+export function handleMapBoundsChange(view, mapCenter, mapZoom) {
+  view.setState({mapVersion: +new Date(), mapZoom, mapCenter});
+}
+
+export function handleClickCalculationsToggleButton(view) {
+  view.setState(prev => ({
+    calculationsShown: !prev.calculationsShown,
+    recommendShown: prev.calculationsShown ? prev.recommendShown : false,
+  }));
+}
+
+export function handleClickCalculationDeleteButton(view, clicked) {
+  view.setState(prev => ({
+    calculations: prev.calculations.filter(calc => calc !== clicked),
+    dataVersion: +new Date(),
+  }));
 }

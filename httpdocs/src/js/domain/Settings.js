@@ -1,6 +1,6 @@
 export default class Settings {
   constructor(
-    origin,
+    first,
     travelMode,
     time,
     preference = 'BALANCE',
@@ -8,13 +8,17 @@ export default class Settings {
     avoidHighways = false,
     avoidFerries = false
   ) {
-    this._origin = origin;
-    this._travelMode = travelMode;
-    this._time = time;
-    this._preference = preference;
-    this._avoidTolls = avoidTolls;
-    this._avoidHighways = avoidHighways;
-    this._avoidFerries = avoidFerries;
+    if (first && first._origin) {
+      Object.assign(this, first);
+    } else {
+      this._origin = first;
+      this._travelMode = travelMode;
+      this._time = time;
+      this._preference = preference;
+      this._avoidTolls = avoidTolls;
+      this._avoidHighways = avoidHighways;
+      this._avoidFerries = avoidFerries;
+    }
   }
 
   get origin() { return this._origin; }
@@ -69,5 +73,12 @@ export default class Settings {
     if (this.preference === 'PRECISION') return 5;
     if (this.preference === 'SPEED') return 20;
     return 10;
+  }
+
+  get hasDefaultAdvancedSettings() {
+    return this.preference === 'BALANCE'
+      && !this.avoidTolls
+      && !this.avoidHighways
+      && !this.avoidFerries;
   }
 }

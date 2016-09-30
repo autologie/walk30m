@@ -17,6 +17,7 @@ export default class AdvancedTools extends Component {
             onClick={onClickInitializeButton}
             action
             type="button"
+            disabled={settings.hasDefaultAdvancedSettings}
           >初期値に戻す</button>
         </div>
         <div className={styles.toolItem}>

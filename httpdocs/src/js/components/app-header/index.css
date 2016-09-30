@@ -9,9 +9,6 @@
   padding: .5em;
   transition: all 500ms ease;
   min-height: 92px;
-  background-image: url(http://www.graphicsfuel.com/wp-content/uploads/2014/09/polygon-background3-preview.jpg);
-  background-size: cover;
-  background-blend-mode: overlay;
 }
 .appHeader p,
 .appHeader h1 {
