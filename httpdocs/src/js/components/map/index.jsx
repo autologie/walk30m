@@ -51,7 +51,8 @@ export default class Map extends Component {
       }
     }
 
-    const newCalcs = _.flatten(this.props.calculations.map(calc => {
+    const calcs = this.props.calculations.filter(calc => !calc.isAborted);
+    const newCalcs = _.flatten(calcs.map(calc => {
       return calc.vertices.map((vertex, vid) => ({
         id: `calculation-${calc.id}-vertex-${vid}`,
         type: 'Feature',

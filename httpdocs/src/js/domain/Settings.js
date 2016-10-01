@@ -30,31 +30,45 @@ export default class Settings {
   get avoidFerries() { return this._avoidFerries; }
 
   withOrigin(origin) {
-    return new Settings(origin, this.travelMode, this.time, this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
+    return new Settings(
+        origin, this.travelMode, this.time,
+        this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
   }
 
   withTravelMode(travelMode) {
-    return new Settings(this.origin, travelMode, this.time, this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
+    return new Settings(
+        this.origin, travelMode, this.time,
+        this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
   }
 
   withTime(time) {
-    return new Settings(this.origin, this.travelMode, time, this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
+    return new Settings(
+        this.origin, this.travelMode, time,
+        this.preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
   }
 
   withPreference(preference) {
-    return new Settings(this.origin, this.travelMode, this.time, preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
+    return new Settings(
+        this.origin, this.travelMode, this.time,
+        preference, this.avoidTolls, this.avoidHighways, this.avoidFerries);
   }
 
   withAvoidTolls(avoidTolls) {
-    return new Settings(this.origin, this.travelMode, this.time, this.preference, avoidTolls, this.avoidHighways, this.avoidFerries);
+    return new Settings(
+        this.origin, this.travelMode, this.time,
+        this.preference, avoidTolls, this.avoidHighways, this.avoidFerries);
   }
 
   withAvoidHighways(avoidHighways) {
-    return new Settings(this.origin, this.travelMode, this.time, this.preference, this.avoidTolls, avoidHighways, this.avoidFerries);
+    return new Settings(
+        this.origin, this.travelMode, this.time,
+        this.preference, this.avoidTolls, avoidHighways, this.avoidFerries);
   }
 
   withAvoidFerries(avoidFerries) {
-    return new Settings(this.origin, this.travelMode, this.time, this.preference, this.avoidTolls, this.avoidHighways, avoidFerries);
+    return new Settings(
+        this.origin, this.travelMode, this.time,
+        this.preference, this.avoidTolls, this.avoidHighways, avoidFerries);
   }
 
   withDefaultAdvancedSettings() {

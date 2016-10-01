@@ -6,7 +6,8 @@ import ProgressBar from '../progress-bar';
 
 export default class Indicator extends Component {
   render() {
-    const {settings, onClickAbortButton, calculations} = this.props;
+    const {calculation, onClickAbortButton, calculations} = this.props;
+    const settings = (calculation || {}).settings || {};
     const {address, lat, lng} = settings.origin || {};
     const timeExpr = (timeOptions.find(opt => opt.value === settings.time) || {}).label;
     const inProgress = calculations.find(calc => calc.isInProgress);
@@ -21,7 +22,7 @@ export default class Indicator extends Component {
       <section className={styles.indicator}>
         <label>{address}から</label>
         <label>{settings.travelMode === 'WALKING' ? '歩いて' : '車で'}</label>
-        <label>{timeExpr}圏内の範囲を{inProgress ? '調べています。' : '調べました。'}</label>
+        <label>{timeExpr}圏内の範囲{inProgress ? 'を調べています。' : ''}</label>
         {button}
         {progressBar}
       </section>

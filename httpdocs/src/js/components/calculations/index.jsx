@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import { browserHistory } from 'react-router';
 import React, { Component } from 'react';
 import styles from './index.css';
 
@@ -6,12 +8,16 @@ export default class Calculations extends Component {
     const {items, shown, onClickToggleButton, onClickDeleteButton} = this.props;
     const elements = items.map((item, idx) => {
       return (
-        <li key={idx}>
+        <li
+          key={idx}
+          onClick={() => browserHistory.push(`/home/calculations/${item.id}`)}
+        >
           <h3>{item.settings.origin.address}</h3>
+          <p>{item.isCompleted ? '完了' : (item.isAborted ? '中止' : '実行中')}</p>
           <button
             action
             className={styles.deleteButton}
-            onClick={() => onClickDeleteButton(item)}
+            onClick={() => _.defer(() => onClickDeleteButton(item))}
             type="button"
           >
             X
@@ -20,7 +26,7 @@ export default class Calculations extends Component {
       );
     });
     const body = shown ? (<ul>{elements}</ul>) : null;
-    const buttonMessage = shown ? '閉じる' : '計算結果の履歴';
+    const buttonMessage = shown ? '閉じる' : `計算結果の履歴（${items.length}）`;
     const button = items.length > 0 ? (
       <button onClick={this.props.onClickToggleButton} type="button" role="close">
         {buttonMessage}

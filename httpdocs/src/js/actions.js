@@ -4,9 +4,10 @@ import {browserHistory} from 'react-router';
 import ja from './locale_ja';
 import Walk30mUtils from './Walk30mUtils';
 import { PUBLIC_API_URL_BASE } from './config';
-import Calculation from './calculation';
+import Calculation from './domain/Calculation';
+import CalculationService from './domain/CalculationService';
 
-function notify(view, level, message, persist = false) {
+export function notify(view, level, message, persist = false) {
   view.setState({notification: {level, message}});
   if (!persist) {
     setTimeout(() => view.setState({notification: null}), 3000);
@@ -38,6 +39,8 @@ export function handleChangeSettings(view, property, value) {
 
 export function handleClickRecommendItem(view, item) {
   const {origin, travelMode, time} = item.params || {};
+
+  browserHistory.push('/home');
 
   view.setState(prev => ({
     mySettings: prev.mySettings
@@ -86,22 +89,10 @@ export function handleClickExecuteButton(view) {
 
     notify(view, 'I', '計算を開始しました。');
 
-    calc.on('progress', () => view.setState({dataVersion: +new Date()}));
-    calc.on('complete', () => {
-      view.setState({dataVersion: +new Date()});
-      notify(view, 'I', '完了しました。');
-    });
-    calc.on('abort', () => {
-      view.setState({dataVersion: +new Date()});
-      notify(view, 'I', '計算をキャンセルしました。');
-    });
-    view.setState({
-      dataVersion: +new Date(),
-      calculations: view.state.calculations.concat([calc]),
-    });
+    view.bindCalculation(calc);
     browserHistory.push(`/home/calculations/${calc.id}`);
 
-    calc.start();
+    calc.start(new CalculationService);
   });
 }
 
@@ -150,8 +141,20 @@ export function handleClickCalculationsToggleButton(view) {
 }
 
 export function handleClickCalculationDeleteButton(view, clicked) {
-  view.setState(prev => ({
-    calculations: prev.calculations.filter(calc => calc !== clicked),
+  const newCalculations = view.state.calculations.filter(calc => calc !== clicked);
+
+  notify(view, 'I', '計算結果を削除しました');
+  view.setState({
+    calculations: newCalculations,
     dataVersion: +new Date(),
-  }));
+    calculationsShown: newCalculations.length > 0,
+  });
+  browserHistory.push('/home');
+}
+
+export function handleClickCalculation(view, clicked) {
+  view.setState({
+    mapCenter: _.pick(clicked.settings.origin, 'lat', 'lng'),
+    mapVersion: +new Date(),
+  });
 }

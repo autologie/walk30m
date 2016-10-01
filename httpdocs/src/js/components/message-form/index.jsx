@@ -17,7 +17,12 @@ export default class MessageForm extends Component {
         ></textarea>
         <p>ご意見・ご感想などがあればお願いしますｍ(_ _)ｍ<br/>
           返信が必要な方は本文中にメールアドレスを記載してください</p>
-        <button onClick={onClickSubmitInquiryMessageButton} action type="button">送信する</button>
+        <button
+          onClick={onClickSubmitInquiryMessageButton}
+          action
+          type="button"
+          disabled={inquiryMessage.length === 0}
+        >送信する</button>
       </section>
     );
   }

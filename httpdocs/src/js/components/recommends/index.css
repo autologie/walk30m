@@ -3,6 +3,7 @@
   bottom: 0;
   left: 0;
   width: 100%;
+  pointer-events: none;
 }
 .recommends ul {
   list-style-type: none;
@@ -30,6 +31,7 @@
   zoom: .9;
   background-size: cover;
   background-color: #666;
+  pointer-events: auto;
 }
 .recommends li:hover {
   opacity: 0.7;
@@ -39,4 +41,7 @@
   text-align: center;
   margin: 0 1em;
   font-size: 1em;
+}
+.recommends button {
+  pointer-events: auto;
 }

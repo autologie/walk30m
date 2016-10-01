@@ -3,7 +3,7 @@ import { Link } from 'react-router';
 import styles from './index.css';
 
 export const menuList = [
-  {path: '/', label: 'HOME'},
+  {path: '/home', label: 'HOME'},
   {path: '/about', label: 'このサービスについて'},
   {path: '/release-note', label: 'リリース履歴'},
   {path: '/message-form', label: 'お問い合わせ'},
@@ -12,9 +12,10 @@ export const menuList = [
 export default class AppHeader extends Component {
   render() {
     const {status, menuShown, onClickMenu, debug} = this.props;
+    const currentMenuPath = window.location.pathname.split('/').slice(0, 2).join('/');
     const menuElements = menuList.map(item => (
       <li
-        className={window.location.pathname === item.path ? styles.active : null}
+        className={currentMenuPath === item.path ? styles.active : null}
         key={item.path}
       >
         <Link to={item.path}>{item.label}</Link>

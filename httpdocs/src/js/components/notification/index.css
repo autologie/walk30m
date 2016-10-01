@@ -1,7 +1,7 @@
 .notification {
   padding: 1em 2em;
   position: fixed;
-  left: 0;
+  right: 0;
   margin: 1em;
   width: 280px;
   box-shadow: 0 0 12px rgba(0, 0, 0, .7);

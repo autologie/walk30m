@@ -1,9 +1,8 @@
-import window from 'window';
+import request from 'superagent';
 import _ from 'lodash';
-import $ from 'jquery';
 import { PUBLIC_API_URL_BASE } from './config';
 
-const endPoint = `${PUBLIC_API_URL_BASE}/execution_log/`;
+const endPoint = 'dummy'; //`${PUBLIC_API_URL_BASE}/execution_log/`;
 
 export default class Logger {
 
@@ -47,24 +46,20 @@ export default class Logger {
       })),
     }, this.executions[taskId]);
 
-    $.ajax({
-      url: endPoint + taskId,
-      type: 'PUT',
-      dataType: 'json',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(data),
-    });
     this.sendGA('complete', data, took);
+    request
+      .put(endPoint + taskId)
+      .set('Content-Type', 'application/json; charset=utf-8')
+      .send(data)
+      .end();
   }
 
   collectClientInfo() {
-    const $win = $(window);
-
     return {
       url: window.location.href,
       viewport: {
-        width: $win.width(),
-        height: $win.height(),
+        width: window.innerWidth,
+        height: window.innerHeight,
       },
     };
   }
@@ -79,17 +74,11 @@ export default class Logger {
       lng: val.lng(),
     } : val)), this.collectClientInfo()), (value, key) => _.snakeCase(key));
 
-    $.ajax({
-      url: endPoint,
-      type: 'POST',
-      dataType: 'json',
-      contentType: 'application/json; charset=utf-8',
-      data: JSON.stringify(data),
-    }).done((res) => {
-      this.executions[res.uuid] = data;
-
-      task.taskId = res.uuid;
-    });
     this.sendGA('start', data);
+    request
+      .post(endPoint)
+      .set('Content-Type', 'application/json; charset=utf-8')
+      .send(data)
+      .end();
   }
 }

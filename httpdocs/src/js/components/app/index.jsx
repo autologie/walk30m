@@ -9,7 +9,9 @@ import Notification from '../notification';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
 import recommendItems from 'json!../../../resources/recommends.json';
-import Calculation from '../../calculation';
+import Calculation from '../../domain/Calculation';
+import CalculationService from '../../domain/CalculationService';
+import { browserHistory } from 'react-router';
 import {
   haneldChangeSettings,
   handleClickRecommendItem,
@@ -25,6 +27,7 @@ import {
   handleChangeInquiryMessage,
   handleClickSubmitInquiryMessageButton,
   handleMapBoundsChange,
+  notify,
 } from '../../actions';
 
 export default class App extends Component {
@@ -78,6 +81,22 @@ export default class App extends Component {
     }
   }
 
+  bindCalculation(calc) {
+    calc.on('progress', () => this.setState({dataVersion: +new Date()}));
+    calc.on('complete', () => {
+      this.setState({dataVersion: +new Date()});
+      notify(this, 'I', '完了しました。');
+    });
+    calc.on('abort', () => {
+      this.setState({dataVersion: +new Date()});
+      notify(this, 'I', '計算をキャンセルしました。');
+    });
+    this.setState({
+      dataVersion: +new Date(),
+      calculations: this.state.calculations.concat([calc]),
+    });
+  }
+
   componentWillMount() {
     const serialized = window.localStorage.getItem('walk30m-data');
 
@@ -85,17 +104,23 @@ export default class App extends Component {
 
     const data = JSON.parse(serialized);
     const status = this.isAtHome() ? data.status : 'entrance';
+    const calculations = data.calculations.map(calc => Calculation.deserialize(calc));
+    const inProgressCalc = calculations.find(calc => calc.isInProgress);
 
     this.setState(Object.assign(data, {
       mySettings: new Settings(data.mySettings),
-      calculations: data.calculations
-        .map(calc => Calculation.deserialize(calc))
-        .filter(calc => calc.isCompleted),
+      calculations,
       status,
       menuShown: status === 'entrance',
       notification: null,
       recommendItems: this.state.recommendItems,
     }));
+
+    if (inProgressCalc) {
+      this.bindCalculation(inProgressCalc);
+      inProgressCalc.resume(new CalculationService);
+      browserHistory.push(`/home/calculations/${inProgressCalc.id}`)
+    }
   }
 
   componentDidUpdate() {
@@ -122,6 +147,9 @@ export default class App extends Component {
         menuShown: this.state.menuShown,
         inquiryMessage: this.state.inquiryMessage,
         calculations: this.state.calculations,
+        calculation: this.state.calculations.find(calc => {
+          return this.props.location.pathname.split('/')[3] === calc.id;
+        }),
         onChangeSettings: (prop, value) => handleChangeSettings(this, prop, value),
         onChangeInquiryMessage: (message) => handleChangeInquiryMessage(this, message),
         onMapBoundsChange: (center, zoom) => handleMapBoundsChange(this, center, zoom),
