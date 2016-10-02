@@ -1,0 +1,38 @@
+.entrance .detail {
+  padding: 2em 1em;
+}
+
+.detail {
+  background: #ddd;
+  text-align: center;
+  position: relative;
+  z-index: 100;
+  padding: 1em;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail .status {
+  border-radius: 4px;
+  color: #fff;
+  padding: .2em .5em;
+  margin: 0 1em;
+}
+
+.detail .status.completed {
+  background-color: #080;
+}
+
+.detail .status.inProgress {
+  background-color: #008;
+}
+
+.detail .status.aborted {
+  background-color: #c44;
+}
+
+.detail .status.unknown {
+  background-color: #888;
+}

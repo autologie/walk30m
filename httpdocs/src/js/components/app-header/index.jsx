@@ -30,7 +30,7 @@ export default class AppHeader extends Component {
         onClick={onClickMenu}
         type="button"
         style={{pointerEvents: menuShown ? 'none' : 'auto'}}
-      >{menuShown ? '閉じる' : '出す'}</button>
+      >{menuShown ? '閉じる' : 'メニュー'}</button>
     ) : null;
 
     // <pre style={{maxHeight: '100px', overflow: 'scroll'}} className={styles.socialButtons}>{JSON.stringify(debug, null, '\t')}</pre>

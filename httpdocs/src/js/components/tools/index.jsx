@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import AdvancedTools from './advanced';
 import styles from './index.css';
 
-export const timeOptions = [
+const timeOptions = [
   {value: 5 * 60, label: '5分'},
   {value: 10 * 60, label: '10分'},
   {value: 15 * 60, label: '15分'},

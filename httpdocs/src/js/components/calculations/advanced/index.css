@@ -1,0 +1,51 @@
+.advanced {
+  position: absolute;
+  width: 100%;
+  background: rgba(239, 239, 239, .9);
+  box-shadow: 0 2px 2px rgba(0, 0, 0, .3);
+  display: flex;
+  flex-direction: row;
+  left: 0;
+  top: 100%;
+}
+.advanced .header {
+  padding: 1em;
+  color: #fff;
+  background: #579;
+}
+.advanced .body {
+  display: flex;
+  flex-direction: column;
+}
+.advanced .toolItems {
+  display: flex;
+  flex-direction: row;
+}
+.advanced .toolItem {
+  padding: 1em;
+  flex: 1;
+}
+.advanced .toolItem ul {
+  list-style-type: none;
+}
+.advanced .toolItem li {
+  text-align: left;
+}
+.advanced .toolItem h3 {
+  border-bottom: 1px solid #999;
+}
+.advanced .toolItem dl {
+  text-align: left;
+}
+.advanced .toolItem dt {
+  font-weight: bold;
+  display: inline;
+  margin: 0 1em 0 0;
+}
+.advanced .toolItem dd {
+  display: inline;
+  margin-left: 0;
+}
+.advanced .actions {
+  margin: 1em;
+}

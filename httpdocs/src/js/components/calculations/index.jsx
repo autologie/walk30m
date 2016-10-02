@@ -2,18 +2,19 @@ import _ from 'lodash';
 import { browserHistory } from 'react-router';
 import React, { Component } from 'react';
 import styles from './index.css';
+import * as Helper from '../../utils/TextHelper';
 
 export default class Calculations extends Component {
   render() {
-    const {items, shown, onClickToggleButton, onClickDeleteButton} = this.props;
+    const {items, shown, onClickToggleButton, onClickDeleteButton, onClickCalculation} = this.props;
     const elements = items.map((item, idx) => {
       return (
         <li
           key={idx}
-          onClick={() => browserHistory.push(`/home/calculations/${item.id}`)}
+          onClick={() => onClickCalculation(item)}
         >
           <h3>{item.settings.origin.address}</h3>
-          <p>{item.isCompleted ? '完了' : (item.isAborted ? '中止' : '実行中')}</p>
+          <p>ステータス: {Helper.getStatusText(item)}</p>
           <button
             action
             className={styles.deleteButton}

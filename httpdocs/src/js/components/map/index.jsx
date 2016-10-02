@@ -28,6 +28,9 @@ export default class Map extends Component {
 
     this.updateMap();
     this.updateData();
+
+    // for debugging
+    window.gmap = map;
   }
 
   componentDidUpdate({calculations, mapVersion, dataVersion}) {
@@ -99,6 +102,7 @@ export default class Map extends Component {
       onClickRecommendToggleButton,
       onClickCalculationsToggleButton,
       onClickCalculationDeleteButton,
+      onClickCalculation,
     } = this.props;
     const children = React.Children.map(this.props.children, child => React.cloneElement(child, this.props));
 
@@ -111,6 +115,7 @@ export default class Map extends Component {
           shown={calculationsShown}
           onClickToggleButton={onClickCalculationsToggleButton}
           onClickDeleteButton={onClickCalculationDeleteButton}
+          onClickCalculation={onClickCalculation}
         />
         <Recommends
           items={recommendItems}

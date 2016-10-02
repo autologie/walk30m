@@ -11,6 +11,7 @@ import Settings from '../../domain/Settings';
 import recommendItems from 'json!../../../resources/recommends.json';
 import Calculation from '../../domain/Calculation';
 import CalculationService from '../../domain/CalculationService';
+import routeProvider from '../../domain/RouteProvider';
 import { browserHistory } from 'react-router';
 import {
   haneldChangeSettings,
@@ -21,12 +22,15 @@ import {
   handleClickExecuteButton,
   handleClickAbortButton,
   handleClickRecommendToggleButton,
+  handleClickCalculation,
   handleClickCalculationsToggleButton,
   handleClickCalculationDeleteButton,
+  handleClickCalculationDetailToggleButton,
   handleChangeSettings,
   handleChangeInquiryMessage,
   handleClickSubmitInquiryMessageButton,
   handleMapBoundsChange,
+  handleCalculationNotFound,
   notify,
 } from '../../actions';
 
@@ -49,6 +53,7 @@ export default class App extends Component {
       inquiryMessage: '',
       notification: null,
       calculationsShown: false,
+      showCalculationDetail: false,
       recommendShown: true,
       recommendItems,
     };
@@ -118,7 +123,7 @@ export default class App extends Component {
 
     if (inProgressCalc) {
       this.bindCalculation(inProgressCalc);
-      inProgressCalc.resume(new CalculationService);
+      inProgressCalc.resume(new CalculationService(routeProvider));
       browserHistory.push(`/home/calculations/${inProgressCalc.id}`)
     }
   }
@@ -145,6 +150,7 @@ export default class App extends Component {
         mapCenter: this.state.mapCenter,
         mapZoom: this.state.mapZoom,
         menuShown: this.state.menuShown,
+        showCalculationDetail: this.state.showCalculationDetail,
         inquiryMessage: this.state.inquiryMessage,
         calculations: this.state.calculations,
         calculation: this.state.calculations.find(calc => {
@@ -159,9 +165,12 @@ export default class App extends Component {
         onClickExecuteButton: () => handleClickExecuteButton(this),
         onClickAbortButton: () => handleClickAbortButton(this),
         onClickRecommendToggleButton: () => handleClickRecommendToggleButton(this),
+        onClickCalculation: (item) => handleClickCalculation(this, item),
         onClickCalculationsToggleButton: () => handleClickCalculationsToggleButton(this),
         onClickCalculationDeleteButton: (item) => handleClickCalculationDeleteButton(this, item),
+        onClickCalculationDetailToggleButton: () => handleClickCalculationDetailToggleButton(this),
         onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
+        onCalculationNotFound: () => handleCalculationNotFound(this),
       });
     });
 

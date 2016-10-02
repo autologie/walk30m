@@ -26,10 +26,12 @@ button[action] {
   font-size: 1.2em;
   padding: .3em 1em;
   margin: 0 .5em;
+  cursor: pointer;
 }
 a[action]:disabled,
 button[action]:disabled {
-  opacity: .6;
+  opacity: .4;
+  cursor: auto;
 }
 
 select,

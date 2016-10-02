@@ -6,11 +6,12 @@ import Walk30mUtils from './Walk30mUtils';
 import { PUBLIC_API_URL_BASE } from './config';
 import Calculation from './domain/Calculation';
 import CalculationService from './domain/CalculationService';
+import routeProvider from './domain/RouteProvider';
 
-export function notify(view, level, message, persist = false) {
+export function notify(view, level, message, timeout = 3000) {
   view.setState({notification: {level, message}});
-  if (!persist) {
-    setTimeout(() => view.setState({notification: null}), 3000);
+  if (timeout > 0) {
+    setTimeout(() => view.setState({notification: null}), timeout);
   }
 }
 
@@ -92,7 +93,7 @@ export function handleClickExecuteButton(view) {
     view.bindCalculation(calc);
     browserHistory.push(`/home/calculations/${calc.id}`);
 
-    calc.start(new CalculationService);
+    calc.start(new CalculationService(routeProvider));
   });
 }
 
@@ -143,18 +144,34 @@ export function handleClickCalculationsToggleButton(view) {
 export function handleClickCalculationDeleteButton(view, clicked) {
   const newCalculations = view.state.calculations.filter(calc => calc !== clicked);
 
-  notify(view, 'I', '計算結果を削除しました');
+  browserHistory.push('/home');
   view.setState({
     calculations: newCalculations,
     dataVersion: +new Date(),
     calculationsShown: newCalculations.length > 0,
+  }, () => {
+    notify(view, 'I', '計算結果を削除しました');
   });
-  browserHistory.push('/home');
 }
 
 export function handleClickCalculation(view, clicked) {
+  browserHistory.push(`/home/calculations/${clicked.id}`);
   view.setState({
     mapCenter: _.pick(clicked.settings.origin, 'lat', 'lng'),
+    mapZoom: 15,
     mapVersion: +new Date(),
   });
+}
+
+export function handleCalculationNotFound(view) {
+  const calculationId = view.props.location.pathname.split('/')[3];
+
+  notify(view, 'W', `計算 ${calculationId} は削除されたか、参照する権限がありません。`);
+  browserHistory.push('/home');
+}
+
+export function handleClickCalculationDetailToggleButton(view) {
+  view.setState(prev => ({
+    showCalculationDetail: !prev.showCalculationDetail,
+  }));
 }
