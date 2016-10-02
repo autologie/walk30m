@@ -71,10 +71,26 @@ export default class Calculation extends Emittable {
   }
 
   get progress() {
-    const lastComponent = _.last(this.components);
+    const headComponent = _.head(this.components);
 
-    if (!lastComponent) return 0;
-    return calcAngle(this.settings.origin, lastComponent.vertex) / (Math.PI * 2);
+    if (!headComponent) return 0;
+
+    let headAngle = calcAngle(this.settings.origin, headComponent.vertex);
+
+    if (Math.PI * 2 - headAngle < headAngle) headAngle -= Math.PI * 2;
+
+    const angles = _.map(this.components.slice(1), (c) => {
+      const myAngle = calcAngle(this.settings.origin, c.vertex);
+
+      return Math.min(Math.PI * 2, myAngle - headAngle);
+    });
+    const angleDiffs = _.zip(
+      angles.slice(0, angles.length - 1),
+      angles.slice(1)
+    ).map(([prev, next]) => next - prev);
+
+    if (_.some(angleDiffs, d => d < 0)) return 1;
+    return _.max(angles) / (Math.PI * 2);
   }
 
   get isCompleted() {

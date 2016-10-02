@@ -18,7 +18,7 @@ export default class Calculations extends Component {
           <button
             action
             className={styles.deleteButton}
-            onClick={() => _.defer(() => onClickDeleteButton(item))}
+            onClick={() => onClickDeleteButton(item)}
             type="button"
           >
             X

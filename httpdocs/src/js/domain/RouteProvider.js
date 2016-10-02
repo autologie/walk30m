@@ -35,7 +35,7 @@ function doRoute(request, retry, maxRetry) {
     directionsService.route(request, (resp, status) => {
       switch (status) {
         case google.maps.DirectionsStatus.ZERO_RESULTS: return resolve(null);
-        case google.maps.DirectionsStatus.OK: return resolve(resp);
+        case google.maps.DirectionsStatus.OK: return resolve(resp.routes[0].legs[0]);
         case google.maps.DirectionsStatus.OVER_QUERY_LIMIT:
           if (retry >= maxRetry) return reject(resp);
           const interval = Math.pow(2, retry) * 1000;
@@ -50,6 +50,13 @@ function doRoute(request, retry, maxRetry) {
 }
 
 class RouteProvider {
+  constructor(interval) {
+    this._interval = interval;
+  }
+
+  get interval() {
+    return this._interval;
+  }
 
   route(origin, destination, settings) {
     const request = createRequest(origin, destination, settings);
@@ -63,8 +70,15 @@ class RouteProvider {
       });
     }
 
-    return doRoute(request, 0, 3);
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        doRoute(request, 0, 3)
+        .then((result) => resolve(result))
+        .catch((err) => reject(err));
+
+      }, this.interval);
+    });
   }
 }
 
-export default new RouteProvider;
+export default new RouteProvider(1000);
