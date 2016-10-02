@@ -18,7 +18,8 @@ module.exports = {
 	},
 	output: {
 		path: path.join(__dirname, '/target'),
-		filename: 'js/app.js'
+		filename: 'js/app.js',
+    publicPath: '/'
 	},
 	externals: {
 		'window': 'window',
