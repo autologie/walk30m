@@ -7,6 +7,26 @@ import { PUBLIC_API_URL_BASE } from './config';
 import Calculation from './domain/Calculation';
 import CalculationService from './domain/CalculationService';
 import routeProvider from './domain/RouteProvider';
+import toKML from 'tokml';
+
+function createGeoJson(calculations) {
+  return {
+    type: 'FeatureCollection',
+    features: calculations.map(calc => ({
+      type: 'Feature',
+      geometry: {
+        type: 'Point',
+        coordinates: [
+          calc.settings.origin.lng,
+          calc.settings.origin.lat,
+        ]
+      },
+      properties: {
+        name: calc.settings.origin.address,
+      },
+    })),
+  };
+}
 
 export function notify(view, level, message, timeout = 3000) {
   view.setState({notification: {level, message}});
@@ -174,4 +194,23 @@ export function handleClickCalculationDetailToggleButton(view) {
   view.setState(prev => ({
     showCalculationDetail: !prev.showCalculationDetail,
   }));
+}
+
+export function handleClickCalculationRetryButton(view, item) {
+  browserHistory.push('/home');
+  view.setState({
+    advancedSettingsShown: true,
+    showCalculationDetail: false,
+    mySettings: item.settings,
+  });
+}
+
+export function handleClickDownloadAllButton(view, dataType) {
+  const geoJSON = createGeoJson(view.state.calculations);
+
+  const data = dataType === 'kml'
+    ? `data:text/xml;charset=UTF-8,${encodeURIComponent(toKML(geoJSON))}`
+    : `data:application/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(geoJSON))}`;
+
+  document.location = data;
 }

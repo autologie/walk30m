@@ -149,7 +149,13 @@ export default class CalculationService {
         .then(({destination, routeLeg}) => {
           const appendableVertex = getAppendableVertex(time, routeLeg);
 
-          resolve({destination, vertex: appendableVertex});
+          resolve({
+            destination,
+            vertex: appendableVertex,
+            route: _.flatten(routeLeg.steps.map((step) => {
+              return step.path.map(pt => pt.toJSON());
+            })),
+          });
         })
         .catch(reject);
     });

@@ -24,6 +24,16 @@ function next(service) {
     });
 }
 
+function getHeadAngle(components, origin) {
+  if (components.length === 0) return null;
+
+  const headComponent = _.head(components);
+  const headAngle = calcAngle(origin, headComponent.vertex);
+
+  if (Math.PI * 2 - headAngle < headAngle) return headAngle - Math.PI * 2;
+  return headAngle;
+}
+
 export default class Calculation extends Emittable {
   constructor(settings) {
     super();
@@ -71,26 +81,18 @@ export default class Calculation extends Emittable {
   }
 
   get progress() {
-    const headComponent = _.head(this.components);
+    const origin = this.settings.origin;
+    const offset = getHeadAngle(this.components, origin);
+    const DP = Math.PI * 2;
 
-    if (!headComponent) return 0;
+    if (offset === null) return 0;
 
-    let headAngle = calcAngle(this.settings.origin, headComponent.vertex);
-
-    if (Math.PI * 2 - headAngle < headAngle) headAngle -= Math.PI * 2;
-
-    const angles = _.map(this.components.slice(1), (c) => {
-      const myAngle = calcAngle(this.settings.origin, c.vertex);
-
-      return Math.min(Math.PI * 2, myAngle - headAngle);
-    });
-    const angleDiffs = _.zip(
-      angles.slice(0, angles.length - 1),
-      angles.slice(1)
-    ).map(([prev, next]) => next - prev);
+    const angles = _.tail(this.components).map(c => Math.min(DP, calcAngle(origin, c.vertex) - offset));
+    const diff = ([prev, next]) => next - prev;
+    const angleDiffs = _.zip(_.initial(angles), _.tail(angles)).map(diff);
 
     if (_.some(angleDiffs, d => d < 0)) return 1;
-    return _.max(angles) / (Math.PI * 2);
+    return _.max(angles) / DP;
   }
 
   get isCompleted() {
@@ -107,6 +109,10 @@ export default class Calculation extends Emittable {
 
   get vertices() {
     return this._components.map(cmp => cmp.vertex);
+  }
+
+  get routes() {
+    return this._components.map(cmp => cmp.route);
   }
 
   get isInProgress() {
@@ -130,5 +136,15 @@ export default class Calculation extends Emittable {
     if (this.isInProgress) return 'inProgress';
     if (this.isAborted) return 'aborted';
     return 'unknown';
+  }
+
+  get bounds() {
+    const lats = this.vertices.map(v => v.lat);
+    const lngs = this.vertices.map(v => v.lng);
+
+    return {
+      sw: {lat: _.min(lats), lng: _.min(lngs)},
+      ne: {lat: _.max(lats), lng: _.max(lngs)},
+    };
   }
 }

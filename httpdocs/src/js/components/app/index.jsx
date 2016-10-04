@@ -26,9 +26,11 @@ import {
   handleClickCalculationsToggleButton,
   handleClickCalculationDeleteButton,
   handleClickCalculationDetailToggleButton,
+  handleClickCalculationRetryButton,
   handleChangeSettings,
   handleChangeInquiryMessage,
   handleClickSubmitInquiryMessageButton,
+  handleClickDownloadAllButton,
   handleMapBoundsChange,
   handleCalculationNotFound,
   notify,
@@ -168,8 +170,10 @@ export default class App extends Component {
         onClickCalculation: (item) => handleClickCalculation(this, item),
         onClickCalculationsToggleButton: () => handleClickCalculationsToggleButton(this),
         onClickCalculationDeleteButton: (item) => handleClickCalculationDeleteButton(this, item),
+        onClickCalculationRetryButton: (item) => handleClickCalculationRetryButton(this, item),
         onClickCalculationDetailToggleButton: () => handleClickCalculationDetailToggleButton(this),
         onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
+        onClickDownloadAllButton: (dataType) => handleClickDownloadAllButton(this, dataType),
         onCalculationNotFound: () => handleCalculationNotFound(this),
       });
     });

@@ -4,10 +4,11 @@ import Recommends from '../recommends';
 import Calculations from '../calculations';
 import Tools from '../tools';
 import styles from './index.css';
+import CalcGeoJson from '../../domain/CalcGeoJson';
 
 export default class Map extends Component {
   componentDidMount() {
-    const {mapCenter, mapZoom, onMapBoundsChange} = this.props;
+    const {mapCenter, mapZoom, onMapBoundsChange, onClickCalculation} = this.props;
     const el = this.refs.mapWrapper;
     const map = new google.maps.Map(el, {
       center: new google.maps.LatLng(mapCenter.lat, mapCenter.lng),
@@ -22,6 +23,16 @@ export default class Map extends Component {
 
     google.maps.event.addListener(map, 'idle', () => {
       onMapBoundsChange(map.getCenter().toJSON(), map.getZoom());
+    });
+
+    map.data.setStyle((feature) => {
+      if (feature.getId().match(/route/)) return {visible: false};
+      if (feature.getId().match(/vertex/)) return {visible: false};
+      return {};
+    });
+
+    google.maps.event.addListener(map.data, 'click', ({feature}) => {
+      onClickCalculation(feature.getProperty('calculation'));
     });
 
     this.map = map;
@@ -47,42 +58,35 @@ export default class Map extends Component {
   }
 
   updateData() {
-    class FeatureCollection {
-      constructor(features) {
-        this.type = 'FeatureCollection';
-        this.features = features;
-      }
-    }
+    console.log('updating map data...');
 
+    const mapData = this.map.data;
     const calcs = this.props.calculations.filter(calc => !calc.isAborted);
-    const newCalcs = _.flatten(calcs.map(calc => {
-      return calc.vertices.map((vertex, vid) => ({
-        id: `calculation-${calc.id}-vertex-${vid}`,
-        type: 'Feature',
-        properties: {},
-        geometry: {
-          type: 'Point',
-          coordinates: [vertex.lng, vertex.lat]
-        },
-      }));
-    }));
+    const [newFeatures, toUpdate]  = _.reduce(calcs, ([features, polygons], calc) => {
+      const {origin, vertexArray, polygon, routes} = new CalcGeoJson(calc);
 
-    this.map.data.toGeoJson(oldGeoJson => {
-      const oldCalcs = oldGeoJson.features;
-      const added = _.differenceBy(newCalcs, oldCalcs, calc => calc.id);
-      const deleted = _.differenceBy(oldCalcs, newCalcs, calc => calc.id);
+      return [
+        features.concat([origin]).concat(vertexArray).concat(polygon ? [polygon] : []).concat(routes),
+        polygons.concat(polygon && calc.isInProgress ? [polygon] : []),
+      ];
+    }, [[], []]);
 
-      // add
-      this.map.data.addGeoJson(new FeatureCollection(added));
+    mapData.toGeoJson(({features}) => {
+      const getId = _.property('id');
+      const toAdd = _.differenceBy(newFeatures, features, getId).concat(toUpdate);
+      const toRemove = _.differenceBy(features, newFeatures, getId).concat(toUpdate);
+
+      console.log(toUpdate, toRemove, toAdd);
 
       // delete
-      deleted.forEach(calc => {
-        const feature = this.map.data.getFeatureById(calc.id);
+      toRemove.forEach((feature) => {
+        const found = mapData.getFeatureById(feature.id);
 
-        if (feature) {
-          this.map.data.remove(feature);
-        }
+        found && mapData.remove(found);
       });
+
+      // add
+      mapData.addGeoJson({type: 'FeatureCollection', features: toAdd});
     });
   }
 

@@ -1,0 +1,18 @@
+.history table {
+  border-collapse: collapse;
+}
+
+.history tr {
+  border-top: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+}
+.history th,
+.history td {
+  padding: .5em 1em;
+}
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}

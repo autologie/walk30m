@@ -7,11 +7,13 @@ export default class CalculationDetail extends Component {
     const {
       item,
       onClickDeleteButton,
+      onClickRetryButton,
     } = this.props;
     const {origin, travelMode, time} = item.settings;
     const timeTook = item.isInProgress
       ? ((+new Date() - +item.startAt) / 1000) / item.progress
       : (+item.endAt - +item.startAt) / 1000
+      const progress = item.isInProgress ? `（${Math.round(item.progress * 10000) / 100}%）` : '';
 
     return (
       <div className={styles.advanced}>
@@ -36,7 +38,7 @@ export default class CalculationDetail extends Component {
               </dl>
               <dl>
                 <dt>ステータス</dt>
-                <dd>{Helper.getStatusText(item)}</dd>
+                <dd>{Helper.getStatusText(item)}{progress}</dd>
               </dl>
             </div>
             <div className={styles.toolItem}>
@@ -79,7 +81,7 @@ export default class CalculationDetail extends Component {
             <button action type="button" disabled={item.isInProgress || item.isAborted}>KMLダウンロード</button>
             <button action type="button" disabled={item.isInProgress || item.isAborted}>GeoJsonダウンロード</button>
             <button action type="button" onClick={() => onClickDeleteButton(item)} disabled={item.isInProgress}>削除</button>
-            <button action type="button" disabled={item.isInProgress}>再計算</button>
+            <button action type="button" onClick={() => onClickRetryButton(item)} disabled={item.isInProgress}>再計算</button>
           </div>
         </div>
       </div>

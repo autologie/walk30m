@@ -25,6 +25,7 @@ export default class CalculationDetail extends Component {
       onClickAbortButton,
       onClickCalculationDetailToggleButton,
       onClickCalculationDeleteButton,
+      onClickCalculationRetryButton,
       showCalculationDetail,
     } = this.props;
 
@@ -39,7 +40,11 @@ export default class CalculationDetail extends Component {
     const tryAnotherButton = !inProgress ? <Link to="/home">別の条件で調べる</Link> : null;
     const cancelButton = inProgress ? <button action type="button" onClick={onClickAbortButton}>キャンセル</button> : null;
     const detailPanel = showCalculationDetail
-      ? <Detail item={calculation} onClickDeleteButton={onClickCalculationDeleteButton} />
+      ? <Detail
+          item={calculation}
+          onClickDeleteButton={onClickCalculationDeleteButton}
+          onClickRetryButton={onClickCalculationRetryButton}
+        />
       : null;
 
     return (

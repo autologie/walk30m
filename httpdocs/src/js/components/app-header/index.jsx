@@ -4,6 +4,7 @@ import styles from './index.css';
 
 export const menuList = [
   {path: '/home', label: 'HOME'},
+  {path: '/calculation-list', label: '計算履歴'},
   {path: '/about', label: 'このサービスについて'},
   {path: '/release-note', label: 'リリース履歴'},
   {path: '/message-form', label: 'お問い合わせ'},
