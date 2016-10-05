@@ -8,59 +8,17 @@ import MessageForm from '../message-form';
 import Notification from '../notification';
 import styles from './index.css';
 import Settings from '../../domain/Settings';
-import recommendItems from 'json!../../../resources/recommends.json';
 import Calculation from '../../domain/Calculation';
 import CalculationService from '../../domain/CalculationService';
 import routeProvider from '../../domain/RouteProvider';
 import { browserHistory } from 'react-router';
-import {
-  haneldChangeSettings,
-  handleClickRecommendItem,
-  handleClickShowAdvancedSettingsButton,
-  handleClickMenuButton,
-  handleClickInitializeAdvancedSettingsButton,
-  handleClickExecuteButton,
-  handleClickAbortButton,
-  handleClickRecommendToggleButton,
-  handleClickCalculation,
-  handleClickCalculationsToggleButton,
-  handleClickCalculationDeleteButton,
-  handleClickCalculationDetailToggleButton,
-  handleClickCalculationRetryButton,
-  handleClickToggleCalculationRoutesButton,
-  handleChangeSettings,
-  handleChangeInquiryMessage,
-  handleClickSubmitInquiryMessageButton,
-  handleClickDownloadAllButton,
-  handleMapBoundsChange,
-  handleCalculationNotFound,
-  notify,
-} from '../../actions';
+import * as actions from '../../actions';
+import stateProvider from '../../StateProvider';
+import { isMobile } from '../../utils/BrowserUtil';
 
 export default class App extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      status: 'entrance',
-      calculations: [],
-      menuShown: true,
-      routesShown: null,
-      mapVersion: +new Date(),
-      dataVersion: +new Date(),
-      mapCenter: {
-        lat: 35.6618349,
-        lng: 139.722119,
-      },
-      mapZoom: 13,
-      mySettings: new Settings(null, 'WALKING', 30 * 60),
-      advancedSettingsShown: false,
-      inquiryMessage: '',
-      notification: null,
-      calculationsShown: false,
-      showCalculationDetail: false,
-      recommendShown: true,
-      recommendItems,
-    };
 
     document.addEventListener('click', (ev) => {
       if (this.state.status !== 'entrance') {
@@ -93,11 +51,11 @@ export default class App extends Component {
     calc.on('progress', () => this.setState({dataVersion: +new Date()}));
     calc.on('complete', () => {
       this.setState({dataVersion: +new Date()});
-      notify(this, 'I', '完了しました。');
+      actions.notify(this, 'I', '完了しました。');
     });
     calc.on('abort', () => {
       this.setState({dataVersion: +new Date()});
-      notify(this, 'I', '計算をキャンセルしました。');
+      actions.notify(this, 'I', '計算をキャンセルしました。');
     });
     this.setState({
       dataVersion: +new Date(),
@@ -106,23 +64,11 @@ export default class App extends Component {
   }
 
   componentWillMount() {
-    const serialized = window.localStorage.getItem('walk30m-data');
-
-    if (!serialized) return;
-
-    const data = JSON.parse(serialized);
+    const data = stateProvider.getInitialState();
     const calculations = data.calculations.map(calc => Calculation.deserialize(calc));
     const inProgressCalc = calculations.find(calc => calc.isInProgress);
 
-    this.setState(Object.assign(data, {
-      mySettings: new Settings(data.mySettings),
-      calculations,
-      menuShown: data.status === 'entrance',
-      advancedSettingsShown: false,
-      showCalculationDetail: false,
-      notification: null,
-      recommendItems: this.state.recommendItems,
-    }));
+    this.setState(data);
 
     if (inProgressCalc) {
       this.bindCalculation(inProgressCalc);
@@ -132,7 +78,7 @@ export default class App extends Component {
   }
 
   componentDidUpdate() {
-    window.localStorage.setItem('walk30m-data', JSON.stringify(this.state));
+    stateProvider.save(this.state);
   }
 
   isAtHome() {
@@ -140,10 +86,9 @@ export default class App extends Component {
   }
 
   shouldFixHeight() {
-    const isMobile = window.matchMedia('(orientation: portrait)').matches;
     const panelShown = this.state.advancedSettingsShown || this.state.showCalculationDetail;
 
-    return this.isAtHome() && !(isMobile && panelShown);
+    return this.isAtHome() && !(isMobile() && panelShown);
   }
 
   render() {
@@ -167,24 +112,24 @@ export default class App extends Component {
         calculation: this.state.calculations.find(calc => {
           return this.props.location.pathname.split('/')[3] === calc.id;
         }),
-        onChangeSettings: (prop, value) => handleChangeSettings(this, prop, value),
-        onChangeInquiryMessage: (message) => handleChangeInquiryMessage(this, message),
-        onMapBoundsChange: (center, zoom) => handleMapBoundsChange(this, center, zoom),
-        onClickShowAdvancedSettingsButton: () => handleClickShowAdvancedSettingsButton(this),
-        onClickRecommendItem: (item) => handleClickRecommendItem(this, item),
-        onClickInitializeAdvancedSettingsButton: () => handleClickInitializeAdvancedSettingsButton(this),
-        onClickExecuteButton: () => handleClickExecuteButton(this),
-        onClickAbortButton: () => handleClickAbortButton(this),
-        onClickRecommendToggleButton: () => handleClickRecommendToggleButton(this),
-        onClickCalculation: (item) => handleClickCalculation(this, item),
-        onClickCalculationsToggleButton: () => handleClickCalculationsToggleButton(this),
-        onClickCalculationDeleteButton: (item) => handleClickCalculationDeleteButton(this, item),
-        onClickCalculationRetryButton: (item) => handleClickCalculationRetryButton(this, item),
-        onClickCalculationDetailToggleButton: () => handleClickCalculationDetailToggleButton(this),
-        onClickToggleCalculationRoutesButton: (item) => handleClickToggleCalculationRoutesButton(this, item),
-        onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
-        onClickDownloadAllButton: (dataType) => handleClickDownloadAllButton(this, dataType),
-        onCalculationNotFound: () => handleCalculationNotFound(this),
+        onChangeSettings: (prop, value) => actions.handleChangeSettings(this, prop, value),
+        onChangeInquiryMessage: (message) => actions.handleChangeInquiryMessage(this, message),
+        onMapBoundsChange: (center, zoom) => actions.handleMapBoundsChange(this, center, zoom),
+        onClickShowAdvancedSettingsButton: () => actions.handleClickShowAdvancedSettingsButton(this),
+        onClickRecommendItem: (item) => actions.handleClickRecommendItem(this, item),
+        onClickInitializeAdvancedSettingsButton: () => actions.handleClickInitializeAdvancedSettingsButton(this),
+        onClickExecuteButton: () => actions.handleClickExecuteButton(this),
+        onClickAbortButton: () => actions.handleClickAbortButton(this),
+        onClickRecommendToggleButton: () => actions.handleClickRecommendToggleButton(this),
+        onClickCalculation: (item) => actions.handleClickCalculation(this, item),
+        onClickCalculationsToggleButton: () => actions.handleClickCalculationsToggleButton(this),
+        onClickCalculationDeleteButton: (item) => actions.handleClickCalculationDeleteButton(this, item),
+        onClickCalculationRetryButton: (item) => actions.handleClickCalculationRetryButton(this, item),
+        onClickCalculationDetailToggleButton: () => actions.handleClickCalculationDetailToggleButton(this),
+        onClickToggleCalculationRoutesButton: (item) => actions.handleClickToggleCalculationRoutesButton(this, item),
+        onClickSubmitInquiryMessageButton: () => actions.handleClickSubmitInquiryMessageButton(this),
+        onClickDownloadAllButton: (dataType) => actions.handleClickDownloadAllButton(this, dataType),
+        onCalculationNotFound: () => actions.handleCalculationNotFound(this),
       });
     });
 
@@ -193,7 +138,7 @@ export default class App extends Component {
         <AppHeader
           status={this.state.status}
           menuShown={this.state.menuShown}
-          onClickMenu={() => handleClickMenuButton(this)}
+          onClickMenu={() => actions.handleClickMenuButton(this)}
         />
         <div className={styles.main}>{children}</div>
         <Notification content={this.state.notification} />

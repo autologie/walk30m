@@ -45,3 +45,9 @@
 .recommends button {
   pointer-events: auto;
 }
+@media(orientation: portrait) {
+  .recommends li {
+    width: 30vw;
+    height: 20vh;
+  }
+}
