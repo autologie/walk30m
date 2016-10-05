@@ -61,6 +61,7 @@ class RouteProvider {
   route(origin, destination, settings) {
     const request = createRequest(origin, destination, settings);
 
+    /*
     if (window.gmap) {
       // debug
       new google.maps.Marker({
@@ -69,6 +70,7 @@ class RouteProvider {
         icon: 'http://www.famfamfam.com/lab/icons/mini/icons/icon_accept.gif',
       });
     }
+    */
 
     return new Promise((resolve, reject) => {
       setTimeout(() => {

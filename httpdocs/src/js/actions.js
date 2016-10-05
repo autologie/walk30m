@@ -28,6 +28,10 @@ function createGeoJson(calculations) {
   };
 }
 
+function getCalculationId(view) {
+  return view.props.location.pathname.split('/')[3] || null;
+}
+
 export function notify(view, level, message, timeout = 3000) {
   view.setState({notification: {level, message}});
   if (timeout > 0) {
@@ -77,8 +81,6 @@ export function handleClickRecommendItem(view, item) {
 export function handleClickShowAdvancedSettingsButton(view) {
   view.setState(prev => ({
     advancedSettingsShown: !prev.advancedSettingsShown,
-    status: prev.advancedSettingsShown === false ? 'normal' : 'entrance',
-    menuShown: prev.advancedSettingsShown,
   }));
 }
 
@@ -175,16 +177,17 @@ export function handleClickCalculationDeleteButton(view, clicked) {
 }
 
 export function handleClickCalculation(view, clicked) {
-  browserHistory.push(`/home/calculations/${clicked.id}`);
-  view.setState({
+  view.setState(prev => ({
     mapCenter: _.pick(clicked.settings.origin, 'lat', 'lng'),
     mapZoom: 15,
+    routesShown: prev.routesShown && getCalculationId(view),
     mapVersion: +new Date(),
-  });
+  }));
+  browserHistory.push(`/home/calculations/${clicked.id}`);
 }
 
 export function handleCalculationNotFound(view) {
-  const calculationId = view.props.location.pathname.split('/')[3];
+  const calculationId = getCalculationId(view);
 
   notify(view, 'W', `計算 ${calculationId} は削除されたか、参照する権限がありません。`);
   browserHistory.push('/home');
@@ -213,4 +216,11 @@ export function handleClickDownloadAllButton(view, dataType) {
     : `data:application/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(geoJSON))}`;
 
   document.location = data;
+}
+
+export function handleClickToggleCalculationRoutesButton(view, item) {
+  view.setState(prev => ({
+    routesShown: prev.routesShown ? null : item.id,
+    mapVersion: +new Date(),
+  }));
 }

@@ -27,6 +27,7 @@ import {
   handleClickCalculationDeleteButton,
   handleClickCalculationDetailToggleButton,
   handleClickCalculationRetryButton,
+  handleClickToggleCalculationRoutesButton,
   handleChangeSettings,
   handleChangeInquiryMessage,
   handleClickSubmitInquiryMessageButton,
@@ -43,6 +44,7 @@ export default class App extends Component {
       status: 'entrance',
       calculations: [],
       menuShown: true,
+      routesShown: null,
       mapVersion: +new Date(),
       dataVersion: +new Date(),
       mapCenter: {
@@ -77,12 +79,11 @@ export default class App extends Component {
     if (prevRoute !== nextRoute) {
       if (nextRoute !== 'home') {
         // HOME以外に移動
-        this.setState({menuShown: true, status: 'entrance'});
+        this.setState({menuShown: false, status: 'normal'});
       } else {
         // HOMEに移動
         this.setState({
-          menuShown: nextState.advancedSettingsShown ? false : true,
-          status: nextState.advancedSettingsShown ? 'normal' : 'entrance',
+          menuShown: nextState.status === 'entrance',
         });
       }
     }
@@ -110,15 +111,13 @@ export default class App extends Component {
     if (!serialized) return;
 
     const data = JSON.parse(serialized);
-    const status = this.isAtHome() ? data.status : 'entrance';
     const calculations = data.calculations.map(calc => Calculation.deserialize(calc));
     const inProgressCalc = calculations.find(calc => calc.isInProgress);
 
     this.setState(Object.assign(data, {
       mySettings: new Settings(data.mySettings),
       calculations,
-      status,
-      menuShown: status === 'entrance',
+      menuShown: data.status === 'entrance',
       notification: null,
       recommendItems: this.state.recommendItems,
     }));
@@ -143,6 +142,7 @@ export default class App extends Component {
     const children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         settings: this.state.mySettings,
+        routesShown: this.state.routesShown,
         calculationsShown: this.state.calculationsShown,
         recommendShown: this.state.recommendShown,
         recommendItems: this.state.recommendItems,
@@ -172,6 +172,7 @@ export default class App extends Component {
         onClickCalculationDeleteButton: (item) => handleClickCalculationDeleteButton(this, item),
         onClickCalculationRetryButton: (item) => handleClickCalculationRetryButton(this, item),
         onClickCalculationDetailToggleButton: () => handleClickCalculationDetailToggleButton(this),
+        onClickToggleCalculationRoutesButton: (item) => handleClickToggleCalculationRoutesButton(this, item),
         onClickSubmitInquiryMessageButton: () => handleClickSubmitInquiryMessageButton(this),
         onClickDownloadAllButton: (dataType) => handleClickDownloadAllButton(this, dataType),
         onCalculationNotFound: () => handleCalculationNotFound(this),

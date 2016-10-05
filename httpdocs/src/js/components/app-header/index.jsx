@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import styles from './index.css';
+import MenuIcon from '../../icons/MenuIcon';
 
 export const menuList = [
   {path: '/home', label: 'HOME'},
@@ -31,10 +32,9 @@ export default class AppHeader extends Component {
         onClick={onClickMenu}
         type="button"
         style={{pointerEvents: menuShown ? 'none' : 'auto'}}
-      >{menuShown ? '閉じる' : 'メニュー'}</button>
+      ><MenuIcon mode={menuShown ? 'hide' : 'show'} /></button>
     ) : null;
 
-    // <pre style={{maxHeight: '100px', overflow: 'scroll'}} className={styles.socialButtons}>{JSON.stringify(debug, null, '\t')}</pre>
     return (
       <section className={`${styles[status]} ${styles.appHeader}`}>
         <div className={styles.description}>

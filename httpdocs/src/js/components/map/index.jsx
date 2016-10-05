@@ -25,12 +25,6 @@ export default class Map extends Component {
       onMapBoundsChange(map.getCenter().toJSON(), map.getZoom());
     });
 
-    map.data.setStyle((feature) => {
-      if (feature.getId().match(/route/)) return {visible: false};
-      if (feature.getId().match(/vertex/)) return {visible: false};
-      return {};
-    });
-
     google.maps.event.addListener(map.data, 'click', ({feature}) => {
       onClickCalculation(feature.getProperty('calculation'));
     });
@@ -44,6 +38,17 @@ export default class Map extends Component {
     window.gmap = map;
   }
 
+  applyStyle() {
+    this.map.data.setStyle((feature) => {
+      const id = feature.getId();
+      const calc = feature.getProperty('calculation');
+
+      if (id.match(/route/) && this.props.routesShown !== calc.id) return {visible: false};
+      if (id.match(/vertex/)) return {visible: false};
+      return {};
+    });
+  }
+
   componentDidUpdate({calculations, mapVersion, dataVersion}) {
     console.log(calculations);
     if (this.props.mapVersion !== mapVersion) this.updateMap()
@@ -55,6 +60,7 @@ export default class Map extends Component {
 
     this.map.setCenter(new google.maps.LatLng(lat, lng));
     this.map.setZoom(this.props.mapZoom);
+    this.applyStyle();
   }
 
   updateData() {
@@ -107,12 +113,13 @@ export default class Map extends Component {
       onClickCalculationsToggleButton,
       onClickCalculationDeleteButton,
       onClickCalculation,
+      children,
     } = this.props;
-    const children = React.Children.map(this.props.children, child => React.cloneElement(child, this.props));
+    const childElements = React.Children.map(children, child => React.cloneElement(child, this.props));
 
     return (
       <section className={styles.map}>
-        {children}
+        {childElements}
         <div ref="mapWrapper" className={styles.mapWrapper}>aaa</div>
         <Calculations
           items={calculations}

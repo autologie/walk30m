@@ -2,9 +2,12 @@ import React, { Component } from 'react';
 import { browserHistory } from 'react-router';
 import { Link } from 'react-router';
 import styles from './detail.css';
+import commonStyles from '../common.css';
 import ProgressBar from '../progress-bar';
 import Detail from './advanced';
 import * as Helper from '../../utils/TextHelper';
+import ExpandIcon from '../../icons/Expand';
+import BackIcon from '../../icons/Back';
 
 export default class CalculationDetail extends Component {
   componentWillMount() {
@@ -26,6 +29,7 @@ export default class CalculationDetail extends Component {
       onClickCalculationDetailToggleButton,
       onClickCalculationDeleteButton,
       onClickCalculationRetryButton,
+      onClickToggleCalculationRoutesButton,
       showCalculationDetail,
     } = this.props;
 
@@ -37,19 +41,24 @@ export default class CalculationDetail extends Component {
     const progressBar = inProgress
       ? <ProgressBar value={calculation.progress} />
       : null;
-    const tryAnotherButton = !inProgress ? <Link to="/home">別の条件で調べる</Link> : null;
     const cancelButton = inProgress ? <button action type="button" onClick={onClickAbortButton}>キャンセル</button> : null;
     const detailPanel = showCalculationDetail
       ? <Detail
           item={calculation}
           onClickDeleteButton={onClickCalculationDeleteButton}
           onClickRetryButton={onClickCalculationRetryButton}
+          onClickToggleRoutesButton={onClickToggleCalculationRoutesButton}
         />
       : null;
 
     return (
       <section className={styles.detail}>
-        {tryAnotherButton}
+        <button
+          className={`${commonStyles.toolButton} ${commonStyles.left}`}
+          type="button"
+        >
+          <Link to="/home"><BackIcon /></Link>
+        </button>
         <label
           className={`${styles.status} ${styles[calculation.status]}`}>
             ステータス: {Helper.getStatusText(calculation)}
@@ -58,7 +67,12 @@ export default class CalculationDetail extends Component {
         <label>{Helper.getTravelModeText(settings)}</label>
         <label>{Helper.getTimeText(settings)}圏内の範囲</label>
         {cancelButton}
-        <button type="button" onClick={onClickCalculationDetailToggleButton}>詳細</button>
+        <button
+          className={`${commonStyles.toolButton} ${commonStyles.right}`}
+          type="button"
+          onClick={onClickCalculationDetailToggleButton}>
+          <ExpandIcon mode={showCalculationDetail ? 'collapse' : 'expand'} />
+        </button>
         {progressBar}
         {detailPanel}
       </section>

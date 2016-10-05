@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router';
 import styles from './index.css';
 import * as Helper from '../../../utils/TextHelper';
 
@@ -8,6 +9,7 @@ export default class CalculationDetail extends Component {
       item,
       onClickDeleteButton,
       onClickRetryButton,
+      onClickToggleRoutesButton,
     } = this.props;
     const {origin, travelMode, time} = item.settings;
     const timeTook = item.isInProgress
@@ -19,6 +21,7 @@ export default class CalculationDetail extends Component {
       <div className={styles.advanced}>
         <div className={styles.header}>
           <h2>計算の詳細</h2>
+          <Link to="/calculation-list">一覧へ</Link>
         </div>
         <div className={styles.body}>
           <div className={styles.toolItems}>
@@ -82,6 +85,7 @@ export default class CalculationDetail extends Component {
             <button action type="button" disabled={item.isInProgress || item.isAborted}>GeoJsonダウンロード</button>
             <button action type="button" onClick={() => onClickDeleteButton(item)} disabled={item.isInProgress}>削除</button>
             <button action type="button" onClick={() => onClickRetryButton(item)} disabled={item.isInProgress}>再計算</button>
+            <button action type="button" onClick={() => onClickToggleRoutesButton(item)}>ルートの{}表示</button>
           </div>
         </div>
       </div>

@@ -3,6 +3,7 @@ import { browserHistory } from 'react-router';
 import React, { Component } from 'react';
 import styles from './index.css';
 import * as Helper from '../../utils/TextHelper';
+import CloseCircle from '../../icons/CloseCircle';
 
 export default class Calculations extends Component {
   render() {
@@ -20,9 +21,7 @@ export default class Calculations extends Component {
             className={styles.deleteButton}
             onClick={() => onClickDeleteButton(item)}
             type="button"
-          >
-            X
-          </button>
+          ><CloseCircle /></button>
         </li>
       );
     });

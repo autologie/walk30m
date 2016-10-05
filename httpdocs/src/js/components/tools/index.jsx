@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import AdvancedTools from './advanced';
 import styles from './index.css';
+import commonStyles from '../common.css';
+import ExpandIcon from '../../icons/Expand.jsx';
 
 const timeOptions = [
   {value: 5 * 60, label: '5分'},
@@ -97,10 +99,10 @@ export default class Tools extends Component {
             disabled={!settings.isValid}
           >調べる</button>
           <button
+            className={`${commonStyles.toolButton} ${commonStyles.right}`}
             onClick={onClickShowAdvancedSettingsButton}
             type="button"
-            role="open-advanced"
-          >詳細設定</button>
+          ><ExpandIcon mode={advancedSettingsShown ? 'collapse' : 'expand'} /></button>
           <ul className={styles.methods}>
             <li>現在地</li>
             <li>地図上で場所を指定</li>

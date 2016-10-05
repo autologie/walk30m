@@ -40,3 +40,20 @@ input[type=checkbox] {
   margin-left: .5em;
   margin-right: .5em;
 }
+
+.toolButton {
+  position: absolute;
+  top: 0;
+  width: 64px;
+  border: none;
+  background: rgba(85, 119, 153, .2);
+  padding: 16px;
+  height: 100%;
+  cursor: pointer;
+}
+.toolButton.left {
+  left: 0;
+}
+.toolButton.right {
+  right: 0;
+}

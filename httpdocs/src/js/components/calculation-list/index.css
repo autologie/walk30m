@@ -1,5 +1,6 @@
 .history table {
   border-collapse: collapse;
+  min-width: 960px;
 }
 
 .history tr {

@@ -4,21 +4,34 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  align-items: center;
+  align-items: stretch;
   z-index: 1000;
   padding: .5em;
   transition: all 500ms ease;
-  min-height: 92px;
+  min-height: 56px;
 }
 .appHeader p,
 .appHeader h1 {
-  margin: 0;
+  margin: 0 1em;
+}
+.appHeader:not(.entrance) h1 {
+  font-size: 1.5em;
+}
+.appHeader:not(.entrance)  h1:before {
+  width: 32px;
+  height: 32px;
+}
+.entrance.appHeader .description {
+  flex-direction: column;
+  margin-right: 0;
 }
 .appHeader .description {
   flex: 1;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
+  align-items: center;
+  margin-right: 64px;
 }
 .titleText {
   color: #333!important;
@@ -93,6 +106,7 @@
   width: 64px;
   color: #fff;
   cursor: pointer;
+  padding: 12px;
 }
 .menu .active a {
   background-color: #555;
