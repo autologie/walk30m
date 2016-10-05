@@ -1,10 +1,10 @@
 import Settings from './domain/Settings';
 import Calculation from './domain/Calculation';
 import recommendItems from 'json!../resources/recommends.json';
-import { save, load } from './utils/BrowserUtil';
+import { isMobile, save, load } from './utils/BrowserUtil';
 
 const defaultState = {
-  status: 'entrance',
+  status: isMobile() ? 'normal' : 'entrance',
   calculations: [],
   menuShown: true,
   routesShown: null,
@@ -23,8 +23,8 @@ const defaultState = {
 
 class StateProvider {
   getInitialState() {
-    const data = load('walk30m-data');
-    const calculations = data.calculations
+    const data = load('walk30m-data') || {};
+    const calculations = (data.calculations || [])
       .map(calc => Calculation.deserialize(calc));
 
     return Object.assign({}, defaultState, data, {
