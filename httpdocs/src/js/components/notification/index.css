@@ -6,6 +6,8 @@
   width: 280px;
   box-shadow: 0 0 12px rgba(0, 0, 0, .7);
   transition: bottom 500ms ease;
+  z-index: 200;
+  max-width: calc(100% - 6em);
 }
 
 .notification.shown {

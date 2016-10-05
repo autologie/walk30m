@@ -33,10 +33,6 @@
   align-items: center;
   margin-right: 64px;
 }
-.titleText {
-  color: #333!important;
-  text-decoration: none;
-}
 .appHeader h1:before {
   display: inline-block;
   content: '.';
@@ -110,4 +106,26 @@
 }
 .menu .active a {
   background-color: #555;
+}
+
+@media(orientation: portrait) {
+  .appHeader {
+    min-height: 36px;
+  }
+  .appHeader .description {
+    margin-right: 48px;
+  }
+  .appHeader .description h1 {
+    font-size: 1em;
+  }
+  .appHeader .description p {
+    display: none;
+  }
+  .menuButton {
+    width: 48px;
+  }
+}
+.titleText {
+  color: #333!important;
+  text-decoration: none;
 }

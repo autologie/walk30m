@@ -63,9 +63,7 @@ export default class CalculationDetail extends Component {
           className={`${styles.status} ${styles[calculation.status]}`}>
             ステータス: {Helper.getStatusText(calculation)}
         </label>
-        <label>{address}から</label>
-        <label>{Helper.getTravelModeText(settings)}</label>
-        <label>{Helper.getTimeText(settings)}圏内の範囲</label>
+        <span>{address}から{Helper.getTravelModeText(settings)}{Helper.getTimeText(settings)}圏内</span>
         {cancelButton}
         <button
           className={`${commonStyles.toolButton} ${commonStyles.right}`}

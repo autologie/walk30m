@@ -1,5 +1,6 @@
 .staticContent {
   margin: 0 auto;
+  padding: 0 1em;
   max-width: 960px;
 }
 
@@ -56,4 +57,14 @@ input[type=checkbox] {
 }
 .toolButton.right {
   right: 0;
+}
+
+@media(orientation: portrait) {
+  .toolButton {
+    width: 48px;
+  }
+  a[action],
+  button[action] {
+    font-size: 1em;
+  }
 }

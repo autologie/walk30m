@@ -15,6 +15,7 @@
   flex-direction: row;
   align-items: center;
   justify-content: center;
+  padding-right: calc(64px + 1em);
 }
 .tools .basic .toolItem {
   margin-right: .5em;
@@ -32,4 +33,14 @@
   background: transparent;
   border-bottom: 3px solid #4ca;
 }
-
+@media(orientation: portrait) {
+  .tools .basic {
+    padding-right: calc(48px + 1em);
+  }
+  .tools .basic {
+    flex-direction: column;
+  }
+  .tools .basic .toolItem.travelMode label {
+    display: inline-block;
+  }
+}

@@ -17,3 +17,9 @@
   justify-content: space-between;
   align-items: center;
 }
+@media(orientation: portrait) {
+  .history table {
+    min-width: initial;
+    width: 100%;
+  }
+}

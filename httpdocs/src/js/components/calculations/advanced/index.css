@@ -49,3 +49,14 @@
 .advanced .actions {
   margin: 1em;
 }
+@media(orientation: portrait) {
+  .advanced {
+    flex-direction: column;
+  }
+  .advanced h2 {
+    font-size: 1em;
+  }
+  .advanced .toolItems {
+    flex-direction: column;
+  }
+}

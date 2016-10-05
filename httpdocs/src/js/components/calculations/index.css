@@ -59,3 +59,9 @@ button[action].deleteButton {
   margin: 0;
   padding: 0;
 }
+@media(orientation: portrait) {
+  .calculations li {
+    width: 30vw;
+    height: 20vh;
+  }
+}

@@ -118,6 +118,8 @@ export default class App extends Component {
       mySettings: new Settings(data.mySettings),
       calculations,
       menuShown: data.status === 'entrance',
+      advancedSettingsShown: false,
+      showCalculationDetail: false,
       notification: null,
       recommendItems: this.state.recommendItems,
     }));
@@ -137,8 +139,15 @@ export default class App extends Component {
     return this.props.location.pathname.split('/')[1] === 'home';
   }
 
+  shouldFixHeight() {
+    const isMobile = window.matchMedia('(orientation: portrait)').matches;
+    const panelShown = this.state.advancedSettingsShown || this.state.showCalculationDetail;
+
+    return this.isAtHome() && !(isMobile && panelShown);
+  }
+
   render() {
-    const cls = this.isAtHome() ? 'fixedHeight' : null;
+    const cls = this.shouldFixHeight() ? 'fixedHeight' : null;
     const children = React.Children.map(this.props.children, (child) => {
       return React.cloneElement(child, {
         settings: this.state.mySettings,
@@ -182,7 +191,6 @@ export default class App extends Component {
     return (
       <div className={`${styles[this.state.status]} ${styles.app} ${styles[cls]}`}>
         <AppHeader
-          debug={this.state.calculations}
           status={this.state.status}
           menuShown={this.state.menuShown}
           onClickMenu={() => handleClickMenuButton(this)}

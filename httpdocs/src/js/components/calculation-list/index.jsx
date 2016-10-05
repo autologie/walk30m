@@ -6,9 +6,8 @@ import * as Helper from '../../utils/TextHelper';
 
 export default class CalculationList extends Component {
 
-  render() {
-    const {calculations, onClickDownloadAllButton} = this.props;
-    const items = calculations.map((calc) => {
+  renderTableRows(calculations) {
+    return calculations.map((calc) => {
       return (
         <tr key={calc.id}>
           <td><Link to={`/home/calculations/${calc.id}`}>表示</Link></td>
@@ -19,7 +18,14 @@ export default class CalculationList extends Component {
           <td>{Helper.getStatusText(calc)}</td>
         </tr>
       );
-    });
+    })
+  }
+
+  render() {
+    const {calculations, onClickDownloadAllButton} = this.props;
+    const items = calculations.length > 0
+      ? this.renderTableRows(calculations)
+      : (<tr><td colspan="6">まだ計算履歴がありません</td></tr>);
 
     return (
       <section className={`${commonStyles.staticContent} ${styles.history}`}>

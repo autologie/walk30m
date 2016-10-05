@@ -25,3 +25,11 @@
 .advanced .toolItem h3 {
   border-bottom: 1px solid #999;
 }
+@media(orientation: portrait) {
+  .advanced {
+    flex-direction: column;
+  }
+  .advanced h2 {
+    font-size: 1em;
+  }
+}

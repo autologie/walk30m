@@ -38,3 +38,10 @@
 .detail .status.unknown {
   background-color: #888;
 }
+@media(orientation: portrait) {
+  .detail {
+    padding-left: calc(1em + 48px);
+    padding-right: calc(1em + 48px);
+    flex-direction: column;
+  }
+}
