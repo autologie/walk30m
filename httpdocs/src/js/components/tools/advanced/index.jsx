@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import styles from './index.css';
+import GoToTop from '../../../icons/GoToTop';
+import commonStyles from '../../common.css';
 
 export default class AdvancedTools extends Component {
   render() {
@@ -7,6 +9,7 @@ export default class AdvancedTools extends Component {
       settings,
       onClickInitializeButton,
       onChange,
+      onClickScrollToTopButton,
     } = this.props;
 
     return (
@@ -92,6 +95,15 @@ export default class AdvancedTools extends Component {
               </label>
             </li>
           </ul>
+        </div>
+        <div className={styles.footer} >
+          <button
+            className={`${commonStyles.toolButton} ${commonStyles.bottom}`}
+            type="button"
+            onClick={onClickScrollToTopButton}
+          >
+            <GoToTop />
+          </button>
         </div>
       </div>
     );

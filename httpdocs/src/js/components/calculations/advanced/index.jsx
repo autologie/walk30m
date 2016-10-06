@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import { Link } from 'react-router';
 import styles from './index.css';
 import * as Helper from '../../../utils/TextHelper';
+import commonStyles from '../../common.css';
+import GoToTop from '../../../icons/GoToTop';
 
 export default class CalculationDetail extends Component {
   render() {
@@ -10,6 +12,7 @@ export default class CalculationDetail extends Component {
       onClickDeleteButton,
       onClickRetryButton,
       onClickToggleRoutesButton,
+      onClickScrollToTopButton,
     } = this.props;
     const {origin, travelMode, time} = item.settings;
     const timeTook = item.isInProgress
@@ -87,6 +90,15 @@ export default class CalculationDetail extends Component {
             <button action type="button" onClick={() => onClickRetryButton(item)} disabled={item.isInProgress}>再計算</button>
             <button action type="button" onClick={() => onClickToggleRoutesButton(item)}>ルートの{}表示</button>
           </div>
+        </div>
+        <div className={styles.footer}>
+          <button
+            type="button"
+            onClick={onClickScrollToTopButton}
+            className={`${commonStyles.toolButton} ${commonStyles.bottom}`}
+          >
+            <GoToTop />
+          </button>
         </div>
       </div>
     );

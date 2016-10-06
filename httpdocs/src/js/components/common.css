@@ -43,25 +43,39 @@ input[type=checkbox] {
 }
 
 .toolButton {
-  position: absolute;
-  top: 0;
-  width: 64px;
   border: none;
   background: rgba(85, 119, 153, .2);
   padding: 16px;
-  height: 100%;
   cursor: pointer;
 }
+.toolButton.bottom {
+  width: 100%;
+  height: 64px;
+  display: none;
+  background: rgb(194, 201, 208);
+}
 .toolButton.left {
+  position: absolute;
+  top: 0;
   left: 0;
+  width: 64px;
+  height: 100%;
 }
 .toolButton.right {
+  position: absolute;
+  top: 0;
   right: 0;
+  width: 64px;
+  height: 100%;
 }
 
 @media(orientation: portrait) {
-  .toolButton {
+  .toolButton.right,
+  .toolButton.left {
     width: 48px;
+  }
+  .toolButton.bottom {
+    display: inline-block;
   }
   a[action],
   button[action] {

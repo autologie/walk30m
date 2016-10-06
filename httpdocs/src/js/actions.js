@@ -224,3 +224,7 @@ export function handleClickToggleCalculationRoutesButton(view, item) {
     mapVersion: +new Date(),
   }));
 }
+
+export function handleClickScrollToTopButton(view) {
+  window.scrollTo(0, 0);
+}

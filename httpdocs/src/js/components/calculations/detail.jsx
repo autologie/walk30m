@@ -30,6 +30,7 @@ export default class CalculationDetail extends Component {
       onClickCalculationDeleteButton,
       onClickCalculationRetryButton,
       onClickToggleCalculationRoutesButton,
+      onClickScrollToTopButton,
       showCalculationDetail,
     } = this.props;
 
@@ -48,6 +49,7 @@ export default class CalculationDetail extends Component {
           onClickDeleteButton={onClickCalculationDeleteButton}
           onClickRetryButton={onClickCalculationRetryButton}
           onClickToggleRoutesButton={onClickToggleCalculationRoutesButton}
+          onClickScrollToTopButton={onClickScrollToTopButton}
         />
       : null;
 

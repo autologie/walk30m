@@ -35,12 +35,14 @@ export default class Tools extends Component {
       onClickShowAdvancedSettingsButton,
       onClickInitializeAdvancedSettingsButton,
       onClickExecuteButton,
+      onClickScrollToTopButton,
     } = this.props;
     const {address, lat, lng} = settings.origin || {};
     const advanced = advancedSettingsShown ? (<AdvancedTools
       settings={settings}
       onChange={onChangeSettings}
       onClickInitializeButton={onClickInitializeAdvancedSettingsButton}
+      onClickScrollToTopButton={onClickScrollToTopButton}
     />) : null;
     const timeOptionElements = timeOptions.map(opt => (
       <option key={opt.value} value={opt.value}>

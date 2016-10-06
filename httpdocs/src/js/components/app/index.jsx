@@ -130,6 +130,7 @@ export default class App extends Component {
         onClickSubmitInquiryMessageButton: () => actions.handleClickSubmitInquiryMessageButton(this),
         onClickDownloadAllButton: (dataType) => actions.handleClickDownloadAllButton(this, dataType),
         onCalculationNotFound: () => actions.handleCalculationNotFound(this),
+        onClickScrollToTopButton: () => actions.handleClickScrollToTopButton(this),
       });
     });
 
