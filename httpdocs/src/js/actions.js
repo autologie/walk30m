@@ -227,4 +227,8 @@ export function handleClickToggleCalculationRoutesButton(view, item) {
 
 export function handleClickScrollToTopButton(view) {
   window.scrollTo(0, 0);
+  view.setState({
+    advancedSettingsShown: false,
+    showCalculationDetail: false,
+  });
 }
