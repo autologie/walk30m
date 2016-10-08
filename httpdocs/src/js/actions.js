@@ -180,9 +180,12 @@ export function handleClickCalculationDeleteButton(view, clicked) {
 }
 
 export function handleClickCalculation(view, clicked) {
+  const lngs = clicked.vertices.map(v => v.lng);
+  const r = _.max(lngs) - _.min(lngs);
+
   view.setState(prev => ({
     mapCenter: _.pick(clicked.settings.origin, 'lat', 'lng'),
-    mapZoom: 15,
+    mapZoom: 1 + Math.ceil(Math.log(r / 180) / Math.log(1 / 2)),
     routesShown: prev.routesShown && getCalculationId(view),
     mapVersion: +new Date(),
   }));
