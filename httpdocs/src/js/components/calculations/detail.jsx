@@ -58,8 +58,9 @@ export default class CalculationDetail extends Component {
         <button
           className={`${commonStyles.toolButton} ${commonStyles.left}`}
           type="button"
+          onClick={() => browserHistory.push('/home')}
         >
-          <Link to="/home"><BackIcon /></Link>
+          <BackIcon />
         </button>
         <label
           className={`${styles.status} ${styles[calculation.status]}`}>
