@@ -84,8 +84,6 @@ export default class CalculationDetail extends Component {
           </div>
           <div className={styles.actions}>
             <button action type="button" disabled={item.isInProgress}>問題点を報告する</button>
-            <button action type="button" disabled={item.isInProgress || item.isAborted}>KMLダウンロード</button>
-            <button action type="button" disabled={item.isInProgress || item.isAborted}>GeoJsonダウンロード</button>
             <button action type="button" onClick={() => onClickDeleteButton(item)} disabled={item.isInProgress}>削除</button>
             <button action type="button" onClick={() => onClickRetryButton(item)} disabled={item.isInProgress}>再計算</button>
             <button action type="button" onClick={() => onClickToggleRoutesButton(item)}>ルートの{}表示</button>

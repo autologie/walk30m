@@ -8,6 +8,7 @@ import Calculation from './domain/Calculation';
 import CalculationService from './domain/CalculationService';
 import routeProvider from './domain/RouteProvider';
 import geocoderProvider from './domain/GeocoderProvider';
+import geolocationProvider from './domain/GeolocationProvider';
 import toKML from 'tokml';
 
 function createGeoJson(calculations) {
@@ -45,7 +46,8 @@ export function handleChangeSettings(view, property, value) {
     switch (property) {
       case 'origin':
         geocoderProvider.geocode(value.address)
-          .then(geocoderResults => view.setState({geocoderResults}));
+          .then(results => view.setState({geocoderResults: results.slice(0, 3)}))
+          .catch(results => view.setState({geocoderResults: []}));
         return {
           mySettings: prev.mySettings.withOrigin(value),
         };
@@ -77,7 +79,7 @@ export function handleClickRecommendItem(view, item) {
       .withTime(time),
     mapVersion: +new Date(),
     mapCenter: _.pick(origin, 'lat', 'lng'),
-    mapZoom: 16,
+    mapZoom: item.mapZoom,
   }));
 }
 
@@ -182,9 +184,10 @@ export function handleClickCalculationDeleteButton(view, clicked) {
 export function handleClickCalculation(view, clicked) {
   const lngs = clicked.vertices.map(v => v.lng);
   const r = _.max(lngs) - _.min(lngs);
+  const center = _.pick(clicked.settings.origin, 'lat', 'lng');
 
   view.setState(prev => ({
-    mapCenter: _.pick(clicked.settings.origin, 'lat', 'lng'),
+    mapCenter: {lat: center.lat - (r * 0.2), lng: center.lng},
     mapZoom: 1 + Math.ceil(Math.log(r / 180) / Math.log(1 / 2)),
     routesShown: prev.routesShown && getCalculationId(view),
     mapVersion: +new Date(),
@@ -247,5 +250,13 @@ export function handleClickSelMode(view, mode, values) {
         mapCenter: _.pick(values, 'lat', 'lng'),
         mapVersion: +new Date(),
       }));
+    case 'geolocation':
+      geolocationProvider.getCurrentLocation()
+        .then(values => view.setState(prev => ({
+          mySettings: prev.mySettings.withOrigin(values),
+          mapCenter: _.pick(values, 'lat', 'lng'),
+          mapVersion: +new Date(),
+        })))
+        .catch((err) => notify(view, 'E', err.message));
   }
 }

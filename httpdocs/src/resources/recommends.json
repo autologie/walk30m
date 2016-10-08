@@ -1,6 +1,7 @@
 [
 	{
 		"title": "札幌市街から車で60分",
+    "mapZoom": 10,
 		"image": "http://www.welcome.city.sapporo.jp/sightseeing.photolibrary/img/c011-068-preview.jpg",
 		"params": {
 			"origin": {
@@ -17,6 +18,7 @@
 	},
 	{
 		"title": "大阪市から車で3時間",
+    "mapZoom": 8,
 		"image": "http://komekami.sakura.ne.jp/wp-content/uploads/P1030188.jpg",
 		"params": {
 			"origin": {
@@ -33,6 +35,7 @@
 	},
 	{
 		"title": "JR金沢駅から歩いて30分",
+    "mapZoom": 15,
 		"image": "http://www.kanazawa-kankoukyoukai.or.jp/com/img/movphoto/photolib/02shisetsu/low/003_n.jpg",
 		"params": {
 			"origin": {
@@ -49,6 +52,7 @@
 	},
 	{
 		"title": "JR函館駅から歩いて20分",
+    "mapZoom": 15,
 		"image": "http://www.hakobura.jp/photo_library/img/The_night_view_from_Mt_Hakodate-1-10MB.jpg",
 		"params": {
 			"origin": {
@@ -65,6 +69,7 @@
 	},
 	{
 		"title": "雷門から歩いて10分",
+    "mapZoom": 15,
 		"image": "http://www.tokyo-date.net/machi_asakusa/images/37.jpg",
     "params": {
 			"origin": {
@@ -81,6 +86,7 @@
 	},
 	{
 		"title": "小樽運河から歩いて20分",
+    "mapZoom": 16,
 		"image": "http://photo.hokkaido-blog.com/photo-l/01/otaruunga.jpg",
     "params": {
 			"origin": {

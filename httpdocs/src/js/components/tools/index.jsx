@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import React, { Component } from 'react';
 import AdvancedTools from './advanced';
 import styles from './index.css';

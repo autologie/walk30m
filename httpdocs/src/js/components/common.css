@@ -1,6 +1,7 @@
 .staticContent {
   margin: 0 auto;
   padding: 0 1em;
+  margin-bottom: 10em;
   max-width: 960px;
 }
 
@@ -92,10 +93,6 @@ input[type=checkbox] {
   flex-direction: column;
 }
 .menuItem {
-  display: flex;
-  flex: 1;
-  align-items: stretch;
-  justify-content: center;
 }
 .menuItemLink {
   padding: 0 1em;
