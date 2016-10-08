@@ -25,7 +25,7 @@ export default class CalculationList extends Component {
     const {calculations, onClickDownloadAllButton} = this.props;
     const items = calculations.length > 0
       ? this.renderTableRows(calculations)
-      : (<tr><td colspan="6">まだ計算履歴がありません</td></tr>);
+      : (<tr><td colSpan="6">まだ計算履歴がありません</td></tr>);
 
     return (
       <section className={`${commonStyles.staticContent} ${styles.history}`}>

@@ -45,36 +45,10 @@
 }
 
 .menu {
-  display: flex;
-  list-style-type: none;
-  margin: 0;
-  position: absolute;
-  flex-direction: column;
+  composes: menu from '../common.css';
   bottom: auto;
   top: 100%;
   right: 0;
-}
-.menu li {
-  display: flex;
-  flex: 1;
-  align-items: stretch;
-  justify-content: center;
-}
-.menu a {
-  padding: 0 1em;
-  background: #333;
-  color: #fff;
-  vertical-align: middle;
-  padding: .8em 1em;
-  width: 200px;
-  text-decoration: none;
-  transition: all 500ms ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.menu a:hover {
-  background: #555;
 }
 
 .entrance.appHeader {

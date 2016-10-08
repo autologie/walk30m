@@ -3,6 +3,7 @@ import AdvancedTools from './advanced';
 import styles from './index.css';
 import commonStyles from '../common.css';
 import ExpandIcon from '../../icons/Expand.jsx';
+import SelModeList from './selection-modes';
 
 const timeOptions = [
   {value: 5 * 60, label: '5分'},
@@ -27,11 +28,47 @@ const timeOptions = [
 ];
 
 export default class Tools extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      isSelModeListOpen: false,
+    };
+    this.handleFocusAddressForm = this.handleFocusAddressForm.bind(this);
+    this.handleClickSelMode = this.handleClickSelMode.bind(this);
+    this.handleClickDocument = this.handleClickDocument.bind(this);
+  }
+
+  componentDidMount() {
+    document.addEventListener('click', this.handleClickDocument);
+  }
+
+  componentWillUnmount() {
+    document.removeEventListener('click', this.handleClickDocument);
+  }
+
+  handleClickDocument(ev) {
+    if (ev.target !== this.refs.addressForm) {
+      this.setState({isSelModeListOpen: false});
+    }
+  }
+
+  handleFocusAddressForm() {
+    this.setState({isSelModeListOpen: true});
+  }
+
+  handleClickSelMode(ev, value, args) {
+    ev.preventDefault();
+
+    this.refs.addressForm.blur();
+    this.props.onClickSelMode(value, args);
+  }
+
   render() {
     const {
       settings,
       onChangeSettings,
       advancedSettingsShown,
+      geocoderResults,
       onClickShowAdvancedSettingsButton,
       onClickInitializeAdvancedSettingsButton,
       onClickExecuteButton,
@@ -49,17 +86,27 @@ export default class Tools extends Component {
         {opt.label}
       </option>
     ));
+    const selModeList = this.state.isSelModeListOpen ? (
+      <SelModeList
+        className={`modalMenu ${styles.selModes}`}
+        onClickSelMode={(ev, value, args) => this.handleClickSelMode(ev, value, args)}
+        geocoderResults={geocoderResults}
+      />
+    ) : null;
 
     return (
       <section className={styles.tools}>
         <div className={styles.basic}>
-          <div className={styles.toolItem}>
+          <div className={`${styles.toolItem} ${styles.addressForm}`}>
             <label>
               <input
+                ref="addressForm"
                 type="text"
                 value={address}
+                onFocus={this.handleFocusAddressForm}
                 onChange={(ev) => onChangeSettings('origin', {address: ev.target.value})}
               />
+              {selModeList}
               から
             </label>
           </div>
@@ -105,11 +152,6 @@ export default class Tools extends Component {
             onClick={onClickShowAdvancedSettingsButton}
             type="button"
           ><ExpandIcon mode={advancedSettingsShown ? 'collapse' : 'expand'} /></button>
-          <ul className={styles.methods}>
-            <li>現在地</li>
-            <li>地図上で場所を指定</li>
-            <li>音声で入力</li>
-          </ul>
         </div>
         {advanced}
       </section>

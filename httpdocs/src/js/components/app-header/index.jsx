@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router';
 import styles from './index.css';
+import commonStyles from '../common.css';
 import MenuIcon from '../../icons/MenuIcon';
 
 export const menuList = [
@@ -17,10 +18,10 @@ export default class AppHeader extends Component {
     const currentMenuPath = window.location.pathname.split('/').slice(0, 2).join('/');
     const menuElements = menuList.map(item => (
       <li
-        className={currentMenuPath === item.path ? styles.active : null}
+        className={`${currentMenuPath === item.path ? styles.active : null} ${commonStyles.menuItem}`}
         key={item.path}
       >
-        <Link to={item.path}>{item.label}</Link>
+        <Link className={commonStyles.menuItemLink} to={item.path}>{item.label}</Link>
       </li>
     ));
     const menu = menuShown ? (

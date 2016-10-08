@@ -61,6 +61,15 @@ export default class Calculation extends Emittable {
     return instance;
   }
 
+  serialize() {
+    return this;
+    /*
+    return Object.assign({}, this, {
+      _components: this.components.map(cmp => _.pick(cmp, 'vertices')),
+    });
+    */
+  }
+
   start(service) {
     this.trigger('start', this._settings);
     next.bind(this)(service);

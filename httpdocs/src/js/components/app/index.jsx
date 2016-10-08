@@ -20,7 +20,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    document.addEventListener('click', (ev) => {
+    document.addEventListener('click', () => {
       if (this.state.status !== 'entrance') {
         this.setState({menuShown: false});
       }
@@ -65,16 +65,15 @@ export default class App extends Component {
 
   componentWillMount() {
     const data = stateProvider.getInitialState();
-    const calculations = data.calculations.map(calc => Calculation.deserialize(calc));
-    const inProgressCalc = calculations.find(calc => calc.isInProgress);
+    const inProgressCalc = data.calculations.find(calc => calc.isInProgress);
 
-    this.setState(data);
-
-    if (inProgressCalc) {
-      this.bindCalculation(inProgressCalc);
-      inProgressCalc.resume(new CalculationService(routeProvider));
-      browserHistory.push(`/home/calculations/${inProgressCalc.id}`)
-    }
+    this.setState(data, () => {
+      if (inProgressCalc) {
+        this.bindCalculation(inProgressCalc);
+        inProgressCalc.resume(new CalculationService(routeProvider));
+        browserHistory.push(`/home/calculations/${inProgressCalc.id}`)
+      }
+    });
   }
 
   componentDidUpdate() {
@@ -112,6 +111,7 @@ export default class App extends Component {
         calculation: this.state.calculations.find(calc => {
           return this.props.location.pathname.split('/')[3] === calc.id;
         }),
+        geocoderResults: this.state.geocoderResults,
         onChangeSettings: (prop, value) => actions.handleChangeSettings(this, prop, value),
         onChangeInquiryMessage: (message) => actions.handleChangeInquiryMessage(this, message),
         onMapBoundsChange: (center, zoom) => actions.handleMapBoundsChange(this, center, zoom),
@@ -131,6 +131,7 @@ export default class App extends Component {
         onClickDownloadAllButton: (dataType) => actions.handleClickDownloadAllButton(this, dataType),
         onCalculationNotFound: () => actions.handleCalculationNotFound(this),
         onClickScrollToTopButton: () => actions.handleClickScrollToTopButton(this),
+        onClickSelMode: (mode, values) => actions.handleClickSelMode(this, mode, values),
       });
     });
 

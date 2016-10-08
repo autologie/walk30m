@@ -82,3 +82,34 @@ input[type=checkbox] {
     font-size: 1em;
   }
 }
+
+.menu {
+  display: flex;
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  flex-direction: column;
+}
+.menuItem {
+  display: flex;
+  flex: 1;
+  align-items: stretch;
+  justify-content: center;
+}
+.menuItemLink {
+  padding: 0 1em;
+  background: #333;
+  color: #fff;
+  vertical-align: middle;
+  padding: .8em 1em;
+  width: 200px;
+  text-decoration: none;
+  transition: all 500ms ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.menuItemLink:hover {
+  background: #555;
+}

@@ -36,11 +36,14 @@ class StateProvider {
       showCalculationDetail: false,
       notification: null,
       recommendItems,
+      geocoderResults: [],
     });
   }
 
   save(state) {
-    save(STORAGE_KEY, state);
+    save(STORAGE_KEY, Object.assign({}, state, {
+      calculations: state.calculations.map(calc => calc.serialize()),
+    }));
   }
 }
 

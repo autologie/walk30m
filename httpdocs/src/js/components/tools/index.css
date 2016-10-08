@@ -24,8 +24,13 @@
   display: block;
   text-align: left;
 }
-.tools .basic .methods {
-  display: none;
+.tools .basic .toolItem.addressForm {
+  position: relative;
+}
+.selModes {
+  composes: menu from '../common.css';
+  top: 100%;
+  left: 0;
 }
 .tools .basic input[type=text] {
   padding: .5em 1em;

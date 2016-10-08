@@ -7,6 +7,7 @@ import { PUBLIC_API_URL_BASE } from './config';
 import Calculation from './domain/Calculation';
 import CalculationService from './domain/CalculationService';
 import routeProvider from './domain/RouteProvider';
+import geocoderProvider from './domain/GeocoderProvider';
 import toKML from 'tokml';
 
 function createGeoJson(calculations) {
@@ -43,6 +44,8 @@ export function handleChangeSettings(view, property, value) {
   return view.setState(prev => {
     switch (property) {
       case 'origin':
+        geocoderProvider.geocode(value.address)
+          .then(geocoderResults => view.setState({geocoderResults}));
         return {
           mySettings: prev.mySettings.withOrigin(value),
         };
@@ -231,4 +234,15 @@ export function handleClickScrollToTopButton(view) {
     advancedSettingsShown: false,
     showCalculationDetail: false,
   });
+}
+
+export function handleClickSelMode(view, mode, values) {
+  switch (mode) {
+    case 'geocoder':
+      view.setState(prev => ({
+        mySettings: prev.mySettings.withOrigin(values),
+        mapCenter: _.pick(values, 'lat', 'lng'),
+        mapVersion: +new Date(),
+      }));
+  }
 }
