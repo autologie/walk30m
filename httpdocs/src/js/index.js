@@ -10,8 +10,23 @@ import ReleaseNote from './components/release-note';
 import About from './components/about';
 import CalculationList from './components/calculation-list';
 import MessageForm from './components/message-form';
+import { STORAGE_KEY } from './constants';
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  window.onerror = (message, source, lineno, colno, error) => {
+    console.log(message, source, lineno, colno, error);
+
+    if (window.confirm([
+        'エラーが発生しました。',
+        'ブラウザに保存したwalk30mのデータを消去すると改善することがあります。',
+        'データをクリアしてページを開き直しますか？',
+      ].join(''))) {
+      window.localStorage.removeItem(STORAGE_KEY);
+      window.location.reload();
+    }
+  };
+
   render((
     <Router history={browserHistory}>
       <Route path="/" location="hash" component={App}>

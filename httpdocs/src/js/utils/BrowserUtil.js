@@ -4,11 +4,11 @@ export function isMobile() {
 }
 
 export function save(key, data) {
-  window.localStorage.setItem('walk30m-data', JSON.stringify(data));
+  window.localStorage.setItem(key, JSON.stringify(data));
 }
 
 export function load(key) {
-  const serialized = window.localStorage.getItem('walk30m-data');
+  const serialized = window.localStorage.getItem(key);
 
   if (!serialized) return {};
 
