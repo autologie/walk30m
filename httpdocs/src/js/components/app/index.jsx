@@ -20,7 +20,7 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    document.addEventListener('click', () => {
+    document.addEventListener('mousedown', () => {
       if (this.state.status !== 'entrance') {
         this.setState({menuShown: false});
       }
