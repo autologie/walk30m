@@ -39,11 +39,11 @@ export default class Tools extends Component {
   }
 
   componentDidMount() {
-    document.addEventListener('mousedown', this.handleClickDocument);
+    document.addEventListener('click', this.handleClickDocument);
   }
 
   componentWillUnmount() {
-    document.removeEventListener('mousedown', this.handleClickDocument);
+    document.removeEventListener('click', this.handleClickDocument);
   }
 
   handleClickDocument(ev) {
