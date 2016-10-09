@@ -245,16 +245,17 @@ export function handleClickScrollToTopButton(view) {
 export function handleClickSelMode(view, mode, values) {
   switch (mode) {
     case 'geocoder':
-      view.setState(prev => ({
+      return view.setState(prev => ({
         mySettings: prev.mySettings.withOrigin(values),
         mapCenter: _.pick(values, 'lat', 'lng'),
         mapVersion: +new Date(),
       }));
     case 'geolocation':
-      geolocationProvider.getCurrentLocation()
+      return geolocationProvider.getCurrentLocation()
         .then(values => view.setState(prev => ({
           mySettings: prev.mySettings.withOrigin(values),
           mapCenter: _.pick(values, 'lat', 'lng'),
+          mapZoom: 15,
           mapVersion: +new Date(),
         })))
         .catch((err) => notify(view, 'E', err.message));
