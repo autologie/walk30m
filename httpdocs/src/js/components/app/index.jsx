@@ -128,7 +128,6 @@ export default class App extends Component {
         onClickCalculationDetailToggleButton: () => actions.handleClickCalculationDetailToggleButton(this),
         onClickToggleCalculationRoutesButton: (item) => actions.handleClickToggleCalculationRoutesButton(this, item),
         onClickSubmitInquiryMessageButton: () => actions.handleClickSubmitInquiryMessageButton(this),
-        onClickDownloadAllButton: (dataType) => actions.handleClickDownloadAllButton(this, dataType),
         onCalculationNotFound: () => actions.handleCalculationNotFound(this),
         onClickScrollToTopButton: () => actions.handleClickScrollToTopButton(this),
         onClickSelMode: (mode, values) => actions.handleClickSelMode(this, mode, values),

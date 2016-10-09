@@ -3,6 +3,8 @@ import { Link } from 'react-router';
 import styles from './index.css';
 import commonStyles from '../common.css';
 import * as Helper from '../../utils/TextHelper';
+import toKML from 'tokml';
+import CalcGeoJson from '../../domain/CalcGeoJson';
 
 export default class CalculationList extends Component {
 
@@ -22,18 +24,21 @@ export default class CalculationList extends Component {
   }
 
   render() {
-    const {calculations, onClickDownloadAllButton} = this.props;
+    const {calculations} = this.props;
     const items = calculations.length > 0
       ? this.renderTableRows(calculations)
       : (<tr><td colSpan="6">まだ計算履歴がありません</td></tr>);
+    const geoJson = CalcGeoJson.collection(calculations);
+    const kmlUrl = `data:text/xml;charset=UTF-8,${encodeURIComponent(toKML(geoJson))}`;
+    const jsonUrl = `data:application/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(geoJson))}`;
 
     return (
       <section className={`${commonStyles.staticContent} ${styles.history}`}>
         <div className={styles.header}>
           <h2>計算履歴</h2>
           <div className={styles.actions}>
-            <button action onClick={() => onClickDownloadAllButton('kml')}>一括ダウンロード（KML）</button>
-            <button action onClick={() => onClickDownloadAllButton('geojson')}>一括ダウンロード（GeoJSON）</button>
+            <a action download={`walk30m-${+new Date()}.kml`} href={kmlUrl} target="_blank">一括ダウンロード（KML）</a>
+            <a action download={`walk30m-${+new Date()}.geojson`} href={jsonUrl} target="_blank">一括ダウンロード（GeoJSON）</a>
           </div>
         </div>
         <table>

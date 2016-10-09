@@ -9,26 +9,8 @@ import CalculationService from './domain/CalculationService';
 import routeProvider from './domain/RouteProvider';
 import geocoderProvider from './domain/GeocoderProvider';
 import geolocationProvider from './domain/GeolocationProvider';
+import CalcGeoJson from './domain/CalcGeoJson';
 import toKML from 'tokml';
-
-function createGeoJson(calculations) {
-  return {
-    type: 'FeatureCollection',
-    features: calculations.map(calc => ({
-      type: 'Feature',
-      geometry: {
-        type: 'Point',
-        coordinates: [
-          calc.settings.origin.lng,
-          calc.settings.origin.lat,
-        ]
-      },
-      properties: {
-        name: calc.settings.origin.address,
-      },
-    })),
-  };
-}
 
 function getCalculationId(view) {
   return view.props.location.pathname.split('/')[3] || null;
@@ -225,16 +207,6 @@ export function handleClickCalculationRetryButton(view, item) {
     showCalculationDetail: false,
     mySettings: item.settings,
   });
-}
-
-export function handleClickDownloadAllButton(view, dataType) {
-  const geoJSON = createGeoJson(view.state.calculations);
-
-  const data = dataType === 'kml'
-    ? `data:text/xml;charset=UTF-8,${encodeURIComponent(toKML(geoJSON))}`
-    : `data:application/json;charset=UTF-8,${encodeURIComponent(JSON.stringify(geoJSON))}`;
-
-  document.location = data;
 }
 
 export function handleClickToggleCalculationRoutesButton(view, item) {

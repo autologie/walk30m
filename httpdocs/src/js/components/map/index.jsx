@@ -84,7 +84,7 @@ export default class Map extends Component {
     const mapData = this.map.data;
     const calcs = this.props.calculations.filter(calc => !calc.isAborted);
     const [newFeatures, toUpdate]  = _.reduce(calcs, ([features, polygons], calc) => {
-      const {origin, vertexArray, polygon, routes} = new CalcGeoJson(calc);
+      const {origin, vertexArray, polygon, routes} = new CalcGeoJson(calc, {calculation: calc});
 
       return [
         features.concat([origin]).concat(vertexArray).concat(polygon ? [polygon] : []).concat(routes),
