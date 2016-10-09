@@ -26,6 +26,17 @@ function createRequest(origin, destination, {travelMode, avoidTolls, avoidFerrie
   };
 }
 
+function convertLeg(leg) {
+  return {
+    steps: leg.steps.map((step) => {
+      return step.path.map(pt => pt.toJSON());
+    }),
+    distance: leg.distance.value,
+    duration: leg.duration.value,
+    endLocation: leg.end_location.toJSON(),
+  };
+}
+
 function doRoute(request, retry, maxRetry) {
   if (retry > 0) {
     console.log(`DirectionsService#route retry count: ${retry}`);
@@ -35,7 +46,7 @@ function doRoute(request, retry, maxRetry) {
     directionsService.route(request, (resp, status) => {
       switch (status) {
         case google.maps.DirectionsStatus.ZERO_RESULTS: return resolve(null);
-        case google.maps.DirectionsStatus.OK: return resolve(resp.routes[0].legs[0]);
+        case google.maps.DirectionsStatus.OK: return resolve(convertLeg(resp.routes[0].legs[0]));
         case google.maps.DirectionsStatus.OVER_QUERY_LIMIT:
           if (retry >= maxRetry) return reject(resp);
           const interval = Math.pow(2, retry) * 1000;

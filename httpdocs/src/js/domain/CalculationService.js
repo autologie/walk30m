@@ -46,7 +46,7 @@ function getBetterDestination(
     }
   }
 
-  const timeTook = routeLeg.duration.value;
+  const timeTook = routeLeg.duration;
   const wasTooFar = timeTook > time * 1.2;
   const wasTooNear = !ignoreTooNear && !wasTooFar && timeTook < time;
 
@@ -84,15 +84,15 @@ function improveDestination(
 }
 
 function getReachableLocation(path, totalDistance) {
-  const distances = _.reduce(path, (passed, location) => {
+  const distances = _.reduce(path, (passed, pt) => {
     const last = passed.length > 0 ? _.last(passed): null;
     const accum = last ? last.distance : 0;
     const myDistance = last
-      ? distance(last.location.toJSON(), location.toJSON())
+      ? distance(last.location, pt)
       : 0;
 
     return passed.concat([
-      {location, distance: accum + myDistance, myDistance}
+      {location: pt, distance: accum + myDistance, myDistance}
     ]);
   }, []);
   const lastIndex = _.findIndex(distances, d => d.distance >= totalDistance);
@@ -107,7 +107,7 @@ function getReachableLocation(path, totalDistance) {
       lng: v2.lng * r + v1.lng * (1 - r),
     };
   } else {
-    return _.last(path).toJSON();
+    return _.last(path);
   }
 }
 
@@ -117,20 +117,20 @@ function getAppendableVertex(time, routeLeg) {
     const accum = passed.length > 0 ? _.last(passed).time : 0;
 
     return passed.concat([
-      {step, time: accum + step.duration.value}
+      {step, time: accum + step.duration}
     ]);
   }, []);
   const lastComponent = totalTimes.find(d => d.time >= time);
 
   if (lastComponent) {
     const timeForLastComponent = lastComponent.time - time;
-    const speed = routeLeg.distance.value / routeLeg.duration.value;
+    const speed = routeLeg.distance / routeLeg.duration;
     const distanceInLastComponent = timeForLastComponent * speed;
 
     return getReachableLocation(
         lastComponent.step.path, distanceInLastComponent);
   } else {
-    return routeLeg.end_location.toJSON();
+    return routeLeg.endLocation;
   }
 }
 
@@ -152,9 +152,7 @@ export default class CalculationService {
           resolve({
             destination,
             vertex: appendableVertex,
-            route: _.flatten(routeLeg.steps.map((step) => {
-              return step.path.map(pt => pt.toJSON());
-            })),
+            route: _.flatten(routeLeg.steps),
           });
         })
         .catch(reject);
