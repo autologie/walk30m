@@ -182,13 +182,23 @@ export function handleClickCalculationDeleteButton(view, clicked) {
 }
 
 export function handleClickCalculation(view, clicked) {
-  const lngs = clicked.vertices.map(v => v.lng);
-  const r = _.max(lngs) - _.min(lngs);
   const center = _.pick(clicked.settings.origin, 'lat', 'lng');
+  const mapState = (bounds => {
+    const r = bounds && (bounds.ne.lng - bounds.sw.lng);
 
-  view.setState(prev => ({
-    mapCenter: {lat: center.lat - (r * 0.2), lng: center.lng},
-    mapZoom: 1 + Math.ceil(Math.log(r / 180) / Math.log(1 / 2)),
+    if (bounds && r > 0) {
+      return {
+        mapCenter: {lat: center.lat - (r * 0.2), lng: center.lng},
+        mapZoom: 1 + Math.ceil(Math.log(r / 180) / Math.log(1 / 2)),
+      };
+    } else {
+      return {
+        mapCenter: {lat: center.lat, lng: center.lng},
+      };
+    }
+  })(clicked.bounds);
+
+  view.setState(prev => Object.assign(mapState, {
     routesShown: prev.routesShown && getCalculationId(view),
     mapVersion: +new Date(),
   }));
