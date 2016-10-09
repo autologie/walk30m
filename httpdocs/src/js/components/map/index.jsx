@@ -25,6 +25,8 @@ export default class Map extends Component {
       onMapBoundsChange(map.getCenter().toJSON(), map.getZoom());
     });
 
+    google.maps.event.addListener(map, 'maptypeid_changed', this.applyStyle.bind(this));
+
     google.maps.event.addListener(map.data, 'click', ({feature}) => {
       onClickCalculation(feature.getProperty('calculation'));
     });
@@ -39,13 +41,28 @@ export default class Map extends Component {
   }
 
   applyStyle() {
+    const mapType = this.map.getMapTypeId();
+    const color = [
+      google.maps.MapTypeId.ROADMAP,
+      google.maps.MapTypeId.TERRAIN,
+    ].includes(mapType) ? 'black' : 'white';
+
     this.map.data.setStyle((feature) => {
       const id = feature.getId();
       const calc = feature.getProperty('calculation');
 
-      if (id.match(/route/) && this.props.routesShown !== calc.id) return {visible: false};
+      if (id.match(/route/)) {
+        return {
+          visible: this.props.routesShown === calc.id,
+          strokeColor: color,
+          fillColor: color,
+        };
+      }
       if (id.match(/vertex/)) return {visible: false};
-      return {};
+      return {
+        strokeColor: color,
+        fillColor: color,
+      };
     });
   }
 
@@ -64,8 +81,6 @@ export default class Map extends Component {
   }
 
   updateData() {
-    console.log('updating map data...');
-
     const mapData = this.map.data;
     const calcs = this.props.calculations.filter(calc => !calc.isAborted);
     const [newFeatures, toUpdate]  = _.reduce(calcs, ([features, polygons], calc) => {
@@ -81,8 +96,6 @@ export default class Map extends Component {
       const getId = _.property('id');
       const toAdd = _.differenceBy(newFeatures, features, getId).concat(toUpdate);
       const toRemove = _.differenceBy(features, newFeatures, getId).concat(toUpdate);
-
-      console.log(toUpdate, toRemove, toAdd);
 
       // delete
       toRemove.forEach((feature) => {
