@@ -62,6 +62,7 @@ export function handleClickRecommendItem(view, item) {
     mapVersion: +new Date(),
     mapCenter: _.pick(origin, 'lat', 'lng'),
     mapZoom: item.mapZoom,
+    recommendShown: false,
   }));
 }
 

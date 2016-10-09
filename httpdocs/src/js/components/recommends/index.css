@@ -24,13 +24,13 @@
   justify-content: center;
   height: 10vw;
   max-height: 20vh;
-  pointer: cursor;
   text-shadow: 0 0 1em rgba(0, 0, 0, 1);
   transition: all 500ms ease;
   cursor: pointer;
   zoom: .9;
   background-size: cover;
   background-color: #666;
+  background-position-y: center;
   pointer-events: auto;
 }
 .recommends li:hover {
@@ -42,12 +42,45 @@
   margin: 0 1em;
   font-size: 1em;
 }
-.recommends button {
+.toggleButton {
+  top: 0;
+  right: 0;
   pointer-events: auto;
+  background: rgb(194, 201, 208);
+}
+.open .toggleButton {
+  width: 48px;
+  height: 48px;
+  position: absolute;
 }
 @media(orientation: portrait) {
+  .recommends {
+    z-index: 400;
+    height: calc(100vh - 52px);
+    overflow: scroll;
+    pointer-events: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+  .recommends ul {
+    flex-direction: column;
+    align-items: stretch;
+    margin: 0;
+    position: relative;
+  }
   .recommends li {
-    width: 30vw;
-    height: 20vh;
+    width: auto;
+    height: auto;
+    padding: 2em;
+    margin: 0;
+  }
+  .recommends li:hover {
+    opacity: 1;
+    zoom: .9;
+  }
+  .toggleButton {
+    composes: toolButton from '../common.css';
   }
 }

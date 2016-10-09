@@ -1,10 +1,11 @@
 import React, { Component } from 'react';
 import styles from './index.css';
+import Arrow from '../../icons/Arrow.jsx';
 
 export default class Recommends extends Component {
   render() {
     const {items, onClickItem, shown, onClickToggleButton} = this.props;
-    const elements = items.map((item, idx) => (
+    const elements = shown ? items.map((item, idx) => (
       <li
         key={idx}
         onClick={() => onClickItem(item)}
@@ -12,14 +13,21 @@ export default class Recommends extends Component {
       >
         <h3>{item.title}</h3>
       </li>
-    ));
-    const body = shown ? (<ul>{elements}</ul>) : null;
-    const buttonMessage = shown ? '閉じる' : 'おすすめスポット';
+    )) : null;
+    const buttonMessage = shown ? <Arrow direction="down"/> : 'おすすめスポット';
 
     return (
-      <section className={styles.recommends}>
-        <button onClick={onClickToggleButton} type="button" role="close">{buttonMessage}</button>
-        {body}
+      <section className={`${styles.recommends} ${styles[shown ? 'open' : 'closed']}`}>
+        <ul>
+          <button
+            className={styles.toggleButton}
+            onClick={onClickToggleButton}
+            type="button"
+            role="close">
+            {buttonMessage}
+          </button>
+          {elements}
+        </ul>
       </section>
     );
   }
