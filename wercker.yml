@@ -12,11 +12,6 @@ build:
         npm run build
 deploy:
   steps:
-    - script:
-      name: webpack-build
-      cwd: httpdocs/
-      code: |
-        npm run build
     - s3sync:
       key_id: $AWS_ACCESS_KEY_ID
       key_secret: $AWS_SECRET_ACCESS_KEY

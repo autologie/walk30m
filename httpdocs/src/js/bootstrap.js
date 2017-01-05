@@ -4,7 +4,7 @@ import window from 'window';
 import $ from 'jquery';
 import Application from './Application';
 
-if (process.env.NODE_ENV === 'production') require('./ga');
+if (window.location.origin === process.env.APP_URL) require('./ga');
 
 $(() => new Application($(window.document)));
 

@@ -23,4 +23,3 @@ https://www.walk30m.com
 | `S3_PUBLIC_BUCKET_NAME` | The name of an S3 bucket to host app |
 | `MESSAGE_TOPIC_ARN` | Amazon SNS topic ARN to receive messages from a form on the website
 | `APP_URL` | A URL to which we deploy the application |
-| `NODE_ENV` | A variable to switch JavaScript build. `production` or `development` |
