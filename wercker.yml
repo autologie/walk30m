@@ -12,8 +12,6 @@ build:
         npm run build
 deploy:
   steps:
-    - npm-install:
-      cwd: httpdocs/
     - script:
       name: webpack-build
       cwd: httpdocs/
