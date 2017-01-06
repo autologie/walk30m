@@ -16,11 +16,15 @@ function getInitialDestination(calc) {
   return {lat, lng: lng + meterToLng(100, lat)};
 }
 
-function getArgMaxAngle(origin, v1, v2) {
-  const [angleV1, angleV2] = [v1, v2].map(v => calcAngle(origin, v));
+function getArgMaxAngle(origin, ...vectors) {
+  if (vectors.length === 0) return null;
 
-  if (angleV1 <= angleV2) return v2;
-  else return v1;
+  const angles = vectors.map(vector => ({
+    vector,
+    value: calcAngle(origin, vector),
+  }));
+
+  return _.maxBy(angles, 'value').vector;
 }
 
 function guessDestination(calc) {
@@ -42,7 +46,7 @@ function getBetterDestination(
     if (vertices.length === 0) {
       return rotate(origin, destination, 60);
     } else {
-      return divide(origin, destination, 0.8);
+      return rotate(origin, divide(origin, destination, 0.8), 5);
     }
   }
 
