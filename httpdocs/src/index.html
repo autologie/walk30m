@@ -17,7 +17,7 @@
 <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
 <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
 <link rel="stylesheet" href="/css/main.css" />
-<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=false&language=ja&key=<%= process.env.GOOGLE_MAPS_API_KEY %>"></script>
+<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&language=ja&key=<%= process.env.GOOGLE_MAPS_API_KEY %>"></script>
 </head>
 <div id="fb-root"></div>
 <div id="contents-wrap">
@@ -114,6 +114,10 @@
 				<dd>電車・バスによる検索に対応しました。</dd>
 			</dl>
 			-->
+			<dl>
+				<dt>2017.1.6</dt>
+        <dd>計算アルゴリズムを微修正しました。また Google Map のサインイン機能を廃止しました（API の非推奨化への対応）。</dd>
+			</dl>
 			<dl>
 				<dt>2016.12.18</dt>
         <dd>iOS 10 で Google Map を操作できない問題が発生しているため、一時的な回避措置として Google Map のサインイン機能を無効化しました。</dd>
