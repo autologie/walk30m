@@ -218,7 +218,7 @@ CalculationService.prototype.dispatch = function (response, status, request) {
     nextDest;
 
   if (status === google.maps.DirectionsStatus.ZERO_RESULTS) {
-    nextDest = GeoUtil.divide(center, dest, 0.8);
+    nextDest = GeoUtil.rotate(center, GeoUtil.divide(center, dest, 0.8), 5);
     me.calcNext(nextDest, true);
   } else if (status !== google.maps.DirectionsStatus.OK) {
     google.maps.event.trigger(me, 'error', status);
