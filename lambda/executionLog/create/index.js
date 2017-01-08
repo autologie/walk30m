@@ -24,7 +24,20 @@ exports.handler = (event, context, callback) => {
       client_ip: event.sourceIp,
       y,
       ym: `${y}${m}`,
-      ymd: `${y}${m}${d}`
+      ymd: `${y}${m}${d}`,
+      encodedRequest: encodeURIComponent(JSON.stringify({
+        origin: {
+          lat: event.payload.origin.lat,
+          lng: event.payload.origin.lng,
+        },
+        time: event.payload.time,
+        mode: event.payload.mode,
+        preference: event.payload.preference,
+        anglePerStep: event.payload.angle_per_step,
+        avoidFerries: event.payload.avoid_ferries,
+        avoidTolls: event.payload.avoid_tolls,
+        avoidHighways: event.payload.avoid_highways,
+      })),
     })
   }, (err) => {
     let res = {uuid};
