@@ -1,4 +1,4 @@
 {
-  "plugins": ["lodash"],
+  "plugins": ["lodash", "es6-promise"],
   "presets": ["es2015"]
 }
