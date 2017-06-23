@@ -22,7 +22,7 @@ exports.handler = (event, context, callback) => {
         S: `${y}${m}${d}`
       }
     },
-    AttributeUpdates: _.mapValues(event.api_call_stats).map(count => ({
+    AttributeUpdates: _.mapValues(event.api_call_stats, count => ({
       Action: 'ADD',
       Value: {
         N: count
