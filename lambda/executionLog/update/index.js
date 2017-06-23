@@ -2,6 +2,7 @@
 console.log('Loading function');
 
 let aws = require('aws-sdk');
+let _ = require('lodash');
 let dynamo = new aws.DynamoDB();
 
 exports.handler = (event, context, callback) => {
@@ -14,21 +15,6 @@ exports.handler = (event, context, callback) => {
   if (d.length === 1) d = "0" + d;
 
   console.log(event);
-
-  dynamo.updateItem({
-    TableName: "directions_api_call",
-    Key: {
-      ymd: {
-        S: `${y}${m}${d}`
-      }
-    },
-    AttributeUpdates: _.mapValues(event.api_call_stats, count => ({
-      Action: 'ADD',
-      Value: {
-        N: count
-      }
-    }))
-  });
 
   dynamo.updateItem({
     TableName: "execution_log",
@@ -60,6 +46,24 @@ exports.handler = (event, context, callback) => {
     console.log(e);
     let error = !e || e.code === "ConditionalCheckFailedException" ? null : e;
 
-    callback(error, "");
+    if (error) {
+      callback(error, "");
+      return;
+    }
+
+    dynamo.updateItem({
+      TableName: "directions_api_call",
+      Key: {
+        ymd: {
+          S: `${y}${m}${d}`
+        }
+      },
+      AttributeUpdates: _.mapValues(event.payload.api_call_stats, (count) => ({
+        Action: "ADD",
+        Value: {
+          N: count.toString()
+        }
+      }))
+    }, (e2) => callback(e2, ""));
   });
 };
