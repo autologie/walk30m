@@ -45,6 +45,7 @@ export default class Logger {
         lat: latLng.lat(),
         lng: latLng.lng(),
       })),
+      api_call_stats: task.apiCallStats,
     }, this.executions[taskId]);
 
     $.ajax({

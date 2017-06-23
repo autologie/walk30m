@@ -15,7 +15,7 @@ function CalculationService() {
 
 CalculationService.prototype = new google.maps.MVCObject();
 
-CalculationService.prototype.calcRoute = function (dest, callback, successiveRateLimitCount) {
+CalculationService.prototype.calcRoute = function (dest, apiCallStats, callback, successiveRateLimitCount) {
   let me = this,
     task = me.currentTask,
     config, options;
@@ -34,15 +34,17 @@ CalculationService.prototype.calcRoute = function (dest, callback, successiveRat
     destination: dest,
     travelMode: google.maps.TravelMode[config.mode],
   }, options), function (res, status) {
+    const updatedApiCallStats = _.set(apiCallStats, [status], (apiCallStats[status] || 0) + 1);
+
     if (status !== google.maps.DirectionsStatus.OVER_QUERY_LIMIT) {
-      callback(res, status);
+      callback(res, status, updatedApiCallStats);
     } else if (successiveRateLimitCount < 3) {
       _.delay(function () {
-        me.calcRoute(dest, callback, ++successiveRateLimitCount);
+        me.calcRoute(dest, updatedApiCallStats, callback, ++successiveRateLimitCount);
       }, successiveRateLimitCount * 2000);
     } else {
       google.maps.event.trigger(me, 'warn', 'FREQUENT_OVER_QUERY_LIMIT');
-      me.calcRoute(dest, callback, 0);
+      me.calcRoute(dest, updatedApiCallStats, callback, 0);
     }
   });
 };
@@ -50,14 +52,14 @@ CalculationService.prototype.calcRoute = function (dest, callback, successiveRat
 CalculationService.prototype.calcNext = function (dest, isNarrowing) {
   const me = this;
 
-  function tryDispatch(res, status) {
+  function tryDispatch(res, status, apiCallStats) {
     if (me.isPausing) {
-      _.delay(function () { tryDispatch(res, status); }, 100);
+      _.delay(function () { tryDispatch(res, status, apiCallStats); }, 100);
     } else {
       me.dispatch(res, status, {
         destination: dest,
         isNarrowing,
-      });
+      }, apiCallStats);
     }
   }
 
@@ -65,9 +67,9 @@ CalculationService.prototype.calcNext = function (dest, isNarrowing) {
     google.maps.event.trigger(me, 'error', 'NO_DESTINATION');
   }
 
-  me.calcRoute(dest, function (res, status) {
+  me.calcRoute(dest, {}, function (res, status, apiCallStats) {
     if (me.isRunning) {
-      tryDispatch(res, status);
+      tryDispatch(res, status, apiCallStats);
     }
   }, 0);
 };
@@ -207,7 +209,7 @@ CalculationService.prototype.getAdvancedOne = function (task, p1, p2) {
     : p1;
 };
 
-CalculationService.prototype.dispatch = function (response, status, request) {
+CalculationService.prototype.dispatch = function (response, status, request, apiCallStats) {
   let leg, lastWayPoint, step,
     me = this,
     dest = request.destination,
@@ -216,6 +218,8 @@ CalculationService.prototype.dispatch = function (response, status, request) {
     center = task.config.origin,
     anglePerStep = task.config.anglePerStep,
     nextDest;
+
+  task.apiCallStats = _.mergeWith(task.apiCallStats || {}, apiCallStats || {}, (a, b) => (a || 0) + (b || 0));
 
   if (status === google.maps.DirectionsStatus.ZERO_RESULTS) {
     nextDest = GeoUtil.rotate(center, GeoUtil.divide(center, dest, 0.8), 5);
