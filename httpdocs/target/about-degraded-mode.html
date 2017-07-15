@@ -1,0 +1,97 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+<meta name="viewport" content="initial-scale=1.0, minimum-scale=1, maximum-scale=1">
+<title>30分でどこまでいける？ - 縮退運転について</title>
+<link rel="shortcut icon" href="/images/favicon-96x96.png">
+<link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+<link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap-glyphicons.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/earlyaccess/mplus1p.css" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.1.4/Chart.min.js"></script>
+<style>
+h1,h2,p {
+  text-align: center;
+  font-family: 'MPlus 1p';
+}
+p {
+  font-size: 1.2em;
+  line-height: 1.7em;
+}
+section {
+  margin: 3em auto;
+  max-width: 800px;
+}
+img {
+  max-width: 700px;
+  box-shadow: 0 0 .5em rgba(0, 0, 0, .5);
+  margin: 1em;
+}
+</style>
+</head>
+<body>
+  <section>
+
+    <h1>縮退運転について（2017.7.15）</h1>
+    <p>「30分でどこまでいける？」は現在縮退運転中です。</p>
+    <p>このページではユーザーの皆様への縮退運転の影響や、縮退運転に至った経緯を説明いたします。</p>
+
+    <h2>縮退運転の影響</h2>
+    <p>縮退運転中は時間帯によってサービスがご利用いただけないことがあります。<br/>
+    開始地点をどこに設定しても計算が進まない場合は、お手数ですが時間帯を変えて再度お試しください。</p>
+    <p>日頃からご利用いているユーザーの皆様にはご不便をおかけして申し訳ありません。</p>
+    <p>ご協力ありがとうございます。</p>
+
+    <h2>なぜ縮退運転なのか？</h2>
+    <p>利用者数の増加を背景として、毎月のサービスの運用費用を支出することが難しくなってきたためです。</p>
+    <p>
+    </p>
+    <p>当初から、本サービスは余暇時間を利用したサイドプロジェクトとして、
+    サイトコンテンツの配信から計算処理のための API 利用、ログ収集に至るまで、
+    概ねパブリッククラウド（Google Cloud Platform, Amazon Web Services）が提供する無料利用枠の範囲内で運用してきました。</p>
+    <p>運用開始から3年近く経過しましたが、この間に少しずつではあるものの、サイトへのトラフィックおよびサービスの利用（xx分でいける範囲の計算）が増加してきました。
+    <canvas id="session-trend"></canvas>
+    </p>
+    <p>そして予期されていたことですが、これに伴って数ヶ月前から一部のクラウドサービスの使用について無視できない請求が発生するようになりました😱
+    <img src="/gcp-invoice.png" title="無視できない請求の例" />
+    </p>
+    <p>ここに至って広告の掲載やサービスの一部または全部の有料化の検討を開始しましたが、
+    いずれもただちに実現可能ではなかったため、当面の措置として縮退運転に踏み切ることにいたしました。</p>
+    <h2>縮退運転の期間</h2>
+    <p>運用費用回収の目処が立つまで無期限に縮退運転とする予定です。</p>
+    <h2>本件に関する問い合わせ先</h2>
+    <p>本件について、広告掲載に関するご相談・収益化に関するアドバイス・運用コスト削減方法のアドバイス・有料オプションに関する要望・有償でのサービス引き受けの申し出・苦情・激励等がありましたら <a href="/#!/message">問い合わせフォーム</a> または <a href="https://github.com/autologie/walk30m/issues/new">GitHub のイシュー</a> よりご連絡ください。</p>
+  </section>
+</body>
+<script>
+var range = (from, to) => from <= to ? [from].concat(range(from + 1, to)) : [];
+var canvas = document.getElementById('session-trend');
+var chart = new Chart(canvas, {
+  type: 'bar',
+  data: {
+    labels: range(12, 42).map(n => [Math.floor((n - 1) / 12) + 2014, '年', (n + 11) % 12 + 1, '月'].join('')),
+    datasets: [
+      {
+        label: '#session',
+        data: [
+          41,
+          100, 104, 67, 129, 164, 113, 156, 235, 188, 278, 162, 297,
+          98, 96, 70, 143, 241, 158, 192, 321, 477, 528, 674, 772,
+          1248, 1272, 1713, 1818, 2730, 2971,
+        ],
+      },
+    ],
+  },
+});
+</script>
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+ga('create', 'UA-58042188-1', 'auto');
+ga('send', 'pageview');
+</script>
+</html>

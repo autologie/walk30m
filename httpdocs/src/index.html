@@ -19,7 +19,12 @@
 <link rel="stylesheet" href="/css/main.css" />
 <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&language=ja&key=<%= process.env.GOOGLE_MAPS_API_KEY %>"></script>
 </head>
-<div id="fb-root"></div>
+<div class="notice-panel">
+  <div class="header">縮退運転中</div>
+  <p>時間帯によってはサービスをご利用いただけない場合があります。
+    <a href="/about-degraded-mode.html">詳細</a>
+  </p>
+</div>
 <div id="contents-wrap">
 	<div id="control">
 		<span class="glyphicon glyphicon-remove-circle" role="cancel" style="display: none"></span>
@@ -235,4 +240,5 @@
 <button role="goto-top" class="btn btn-default">
 	<span class="glyphicon glyphicon-chevron-up"></span>
 </button>
+<div id="fb-root"></div>
 </html>

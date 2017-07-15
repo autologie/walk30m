@@ -1,6 +1,8 @@
 body {
 	font-family: Meiryo, sans-serif;
 	color: #222;
+	margin: 0;
+	padding: 0;
 }
 h1,
 h2,
@@ -129,7 +131,7 @@ input[type=phone] {
 		margin: .2em .5em
 	}
 	#app-header {
-		padding: 28% 0 0 0;
+		padding: 14% 0 0 0;
 		margin-bottom: 1em;
 		background-size: 48%;
 		background-position: center top;
@@ -205,13 +207,12 @@ li {
 .screen-cover {
 	z-index: 30;
 	width: 100%;
-	height: 100%;
+	height: 100vh;
 	max-height: 700px;
 }
 #map-wrapper {
 	position: absolute;
 	z-index: 10;
-	padding-top: 50px;
 }
 #control {
 	position: absolute;
@@ -219,7 +220,7 @@ li {
 	left: 0;
 	top: 0;
 	width: 100%;
-	height: 100%;
+	height: 100vh;
 	max-height: 700px;
 	background-color: rgba(255, 255, 255, 0.5);
 	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&amp;1+0,0.9+30,0.5+90,0.2+100 */
@@ -534,5 +535,34 @@ section.glyphicon-bg h2 {
 	margin: 0 .4em .4em 0;
 	vertical-align: middle;
 	border: 2px solid hsl(60, 50%, 33%);
+}
+
+#contents-wrap {
+  position: relative;
+}
+
+.notice-panel {
+  width: 100%;
+  background: #055;
+  color: #fff;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 .5em;
+}
+
+.notice-panel .header {
+  background: #944;
+  border-radius: .1em;
+  padding: .2em .5em;
+  margin: 0 1em;
+  white-space: pre;
+}
+
+.notice-panel a {
+  color: #ccc;
+  text-decoration: underline;
 }
 

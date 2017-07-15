@@ -2,4 +2,7 @@
 *.zip
 node_modules/
 .envrc
-target
+**/target/**
+lambda/target/
+!httpdocs/target/about-degraded-mode.html
+!httpdocs/target/gcp-invoice.png
