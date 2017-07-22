@@ -33,6 +33,8 @@ class Application {
     this.advancedSettingsController = new SettingsCtrl($el.find('#advanced-settings'));
 
     $el.find('#extra').css({ top: `${Math.min($(window).height(), 700)}px` });
+    $el.find('#map-canvas').css({ height: `calc(100vh - ${$('.notice-panel').height()}px)` });
+
     this.initEvents();
 
     $.get(`${PUBLIC_API_URL_BASE}/client_location`).done((data) => {

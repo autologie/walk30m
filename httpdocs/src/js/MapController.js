@@ -37,6 +37,12 @@ class MapController {
       streetViewControlOptions: {
         position: google.maps.ControlPosition.RIGHT_CENTER,
       },
+      mapTypeControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER,
+      },
+      fullscreenControlOptions: {
+        position: google.maps.ControlPosition.RIGHT_CENTER,
+      },
     }));
 
     map.addListener('tileloaded', () => window.console.log('google map: tile loaded.'));
