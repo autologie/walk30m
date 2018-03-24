@@ -26,6 +26,7 @@ class Application {
     this.$cancelBtn = $el.find('#control span[role=cancel]');
     this.$sendMsgBtn = $el.find('.btn[role=send-message]');
     this.$goToAboutLink = $el.find('a[href=#about]');
+    this.$goToDonateLink = $el.find('a[href=#donate]');
     this.$message = $el.find('#message textarea');
     this.$goToAdvancedSettingsLink = $el.find('a[href=#advanced-settings]');
     this.calcService = new CalculationService();
@@ -131,6 +132,7 @@ class Application {
 
     this.$goToAboutLink.click(_.bind(this.onClickGoToAboutBtn, this));
     this.$goToAdvancedSettingsLink.click(_.bind(this.onClickGoToAdvancedSettingsBtn, this));
+    this.$goToDonateLink.click(_.bind(this.onClickGoToDonateBtn, this));
     this.$el.scroll(_.bind(this.onScroll, this));
     this.$gotoTopBtn.click(_.bind(this.moveTo, this, 'top'));
     this.$sendMsgBtn.click(_.bind(this.onClickSendMsgBtn, this));
@@ -221,6 +223,11 @@ class Application {
   onClickGoToAboutBtn(ev) {
     ev.preventDefault();
     this.moveTo('about');
+  }
+
+  onClickGoToDonateBtn(ev) {
+    ev.preventDefault();
+    this.moveTo('donate');
   }
 
   onClickSendMsgBtn() {
