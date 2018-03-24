@@ -26,230 +26,230 @@
   </p>
 </div>
 <div id="contents-wrap">
-	<div id="control">
-		<span class="glyphicon glyphicon-remove-circle" role="cancel" style="display: none"></span>
-		<div id="app-header" >
-			<h1>30分でどこまでいける？</h1>
-		</div>
-		<p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
-		<div class="control-search">
-			<input type="text" name="location" value="" data-latitude="" data-longitude="" placeholder="現在地, 地名, スポット..." />
-			<div role="progressbar"></div>
-			<ul class="select">
-				<li tabindex="-1" data-selmode="selmode-current">
-					<span class="glyphicon glyphicon-screenshot"></span>
-					<span>現在地</span>
-				</li>
-				<li tabindex="-1" data-selmode="selmode-map">
-					<span class="glyphicon glyphicon-map-marker"></span>
-					<span>地図上で場所を指定</span>
-				</li>
-				<li tabindex="-1" data-selmode="selmode-voice">
-					<img style="margin: -2px .3em -2px -4px; width: 1.8em;" src="/images/microphone.png">
-					<span>音声で入力</span>
-				</li>
-			</ul>
-			<label>から</label>
-		</div>
-		<div>
-			<input type="radio" name="travelMode" value="WALKING" id="travelMode_walking" checked/>
-			<label for="travelMode_walking">歩いて</label>
-			<input type="radio" name="travelMode" value="DRIVING" id="travelMode_driving" />
-			<label for="travelMode_driving">車で</label>
-			<!--
-			<input type="radio" name="travelMode" value="TRANSIT" id="travelMode_transit" />
-			<label for="travelMode_transit">電車・バスで</label>
-			-->
-		</div>
-		<div>
-			<!--
-			<input type="number" name="travelTime" value="30" />
-			-->
-			<select name="travelTime"></select>
-			<label>分圏内の範囲を</label>
-		</div>
-		<div>
-			<input class="btn" type="button" value="中止" style="display: none;" />
-		</div>
-		<button class="btn btn-primary" type="button" role="execute">
-			<span class="glyphicon glyphicon-search"></span>
-			<span>調べる</span>
-		</button>
-		<ul class="links">
-			<li><a href="#about">このサービスについて</a></li>
-			<li><a href="#advanced-settings">詳細設定</a></li>
-			<li><a href="#donate">ビットコインで寄付</a></li>
-		</ul>
-		<div class="social-buttons">
-			<a href="https://twitter.com/share" class="twitter-share-button" data-url="%APP_URL%">Tweet</a>
-			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
-			<div class="fb-like" 
-				data-href="%APP_URL%"
-				data-layout="button_count" 
-				data-colorscheme="dark"
-				data-action="like" 
-				data-show-faces="true">
-			</div>
-		</div>
-	</div>
-	<div id="extra">
-		<section id="about">
-			<h2>このサービスについて</h2>
-			<p>walk30mは、ある場所から指定した時間内に車や徒歩で移動できるエリアを調べることができるサービスです。</p>
-			<h3>つかいかた</h3>
-			<p>出発地点と移動時間を入力して調べるボタンを押すだけです。</p>
-			<p>ボタンを押すと地図が表示され、計算結果が地図に表示されていきます。数十秒〜1分程度で完了します。</p>
-			<p>完了後に表示されたエリアをクリックすると、結果の詳細が閲覧できます。</p>
-			<p>また、<a href="#advanced-settings">こちら</a>の画面から、計算についてのいくつかのより詳細な設定を行うことができます。</p>
-			<h3>つかいみち</h3>
-			<ul>
-				<li>散歩やドライブの行き先を考えるのに使います。</li>
-				<li>部屋探しの参考にします。</li>
-				<li>その他なんでも。</li>
-			</ul>
-			<h3>制約・既知の問題</h3>
-			<ul>
-				<li>海沿い、川沿い、山間部などで計算が完了しなかったり、時間がかかる場合があります。</li>
-				<!--<li>自転車、公共交通機関での所要時間は日本国内ではサポートしていません。</li>-->
-				<li>徒歩圏内は歩道を含まないルートにもとづいて計算されている場合があります。</li>
-				<li>現在のところ Internet Explorer 11 および Safari で KML, GeoJson のダウンロード機能をご利用いただくことはできません。</li>
-			</ul>
-			<h3>リリース履歴</h3>
-			<dl>
-				<dt>2017.7.22</dt>
-				<dd>Google Map のマップ種類の切り替えボタンがクリックできない問題を修正しました。またレイアウト崩れを修正しました。</dd>
-			</dl>
-			<dl>
-				<dt>2017.7.15</dt>
-				<dd>縮退運転を開始しました。詳細は <a href="/about-degraded-mode.html">こちら</a> を参照してください。</dd>
-			</dl>
-			<dl>
-				<dt>2017.1.6</dt>
+  <div id="control">
+    <span class="glyphicon glyphicon-remove-circle" role="cancel" style="display: none"></span>
+    <div id="app-header" >
+      <h1>30分でどこまでいける？</h1>
+    </div>
+    <p>指定した時間内に車や徒歩で移動できるエリアを調べます。</p>
+    <div class="control-search">
+      <input type="text" name="location" value="" data-latitude="" data-longitude="" placeholder="現在地, 地名, スポット..." />
+      <div role="progressbar"></div>
+      <ul class="select">
+        <li tabindex="-1" data-selmode="selmode-current">
+          <span class="glyphicon glyphicon-screenshot"></span>
+          <span>現在地</span>
+        </li>
+        <li tabindex="-1" data-selmode="selmode-map">
+          <span class="glyphicon glyphicon-map-marker"></span>
+          <span>地図上で場所を指定</span>
+        </li>
+        <li tabindex="-1" data-selmode="selmode-voice">
+          <img style="margin: -2px .3em -2px -4px; width: 1.8em;" src="/images/microphone.png">
+          <span>音声で入力</span>
+        </li>
+      </ul>
+      <label>から</label>
+    </div>
+    <div>
+      <input type="radio" name="travelMode" value="WALKING" id="travelMode_walking" checked/>
+      <label for="travelMode_walking">歩いて</label>
+      <input type="radio" name="travelMode" value="DRIVING" id="travelMode_driving" />
+      <label for="travelMode_driving">車で</label>
+      <!--
+      <input type="radio" name="travelMode" value="TRANSIT" id="travelMode_transit" />
+      <label for="travelMode_transit">電車・バスで</label>
+      -->
+    </div>
+    <div>
+      <!--
+      <input type="number" name="travelTime" value="30" />
+      -->
+      <select name="travelTime"></select>
+      <label>分圏内の範囲を</label>
+    </div>
+    <div>
+      <input class="btn" type="button" value="中止" style="display: none;" />
+    </div>
+    <button class="btn btn-primary" type="button" role="execute">
+      <span class="glyphicon glyphicon-search"></span>
+      <span>調べる</span>
+    </button>
+    <ul class="links">
+      <li><a href="#about">このサービスについて</a></li>
+      <li><a href="#advanced-settings">詳細設定</a></li>
+      <li><a href="#donate">ビットコインで寄付</a></li>
+    </ul>
+    <div class="social-buttons">
+      <a href="https://twitter.com/share" class="twitter-share-button" data-url="%APP_URL%">Tweet</a>
+      <script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
+      <div class="fb-like"
+        data-href="%APP_URL%"
+        data-layout="button_count"
+        data-colorscheme="dark"
+        data-action="like"
+        data-show-faces="true">
+      </div>
+    </div>
+  </div>
+  <div id="extra">
+    <section id="about">
+      <h2>このサービスについて</h2>
+      <p>walk30mは、ある場所から指定した時間内に車や徒歩で移動できるエリアを調べることができるサービスです。</p>
+      <h3>つかいかた</h3>
+      <p>出発地点と移動時間を入力して調べるボタンを押すだけです。</p>
+      <p>ボタンを押すと地図が表示され、計算結果が地図に表示されていきます。数十秒〜1分程度で完了します。</p>
+      <p>完了後に表示されたエリアをクリックすると、結果の詳細が閲覧できます。</p>
+      <p>また、<a href="#advanced-settings">こちら</a>の画面から、計算についてのいくつかのより詳細な設定を行うことができます。</p>
+      <h3>つかいみち</h3>
+      <ul>
+        <li>散歩やドライブの行き先を考えるのに使います。</li>
+        <li>部屋探しの参考にします。</li>
+        <li>その他なんでも。</li>
+      </ul>
+      <h3>制約・既知の問題</h3>
+      <ul>
+        <li>海沿い、川沿い、山間部などで計算が完了しなかったり、時間がかかる場合があります。</li>
+        <!--<li>自転車、公共交通機関での所要時間は日本国内ではサポートしていません。</li>-->
+        <li>徒歩圏内は歩道を含まないルートにもとづいて計算されている場合があります。</li>
+        <li>現在のところ Internet Explorer 11 および Safari で KML, GeoJson のダウンロード機能をご利用いただくことはできません。</li>
+      </ul>
+      <h3>リリース履歴</h3>
+      <dl>
+        <dt>2017.7.22</dt>
+        <dd>Google Map のマップ種類の切り替えボタンがクリックできない問題を修正しました。またレイアウト崩れを修正しました。</dd>
+      </dl>
+      <dl>
+        <dt>2017.7.15</dt>
+        <dd>縮退運転を開始しました。詳細は <a href="/about-degraded-mode.html">こちら</a> を参照してください。</dd>
+      </dl>
+      <dl>
+        <dt>2017.1.6</dt>
         <dd>計算アルゴリズムを微修正しました。また Google Map のサインイン機能を廃止しました（API の非推奨化への対応）。</dd>
-			</dl>
-			<dl>
-				<dt>2016.12.18</dt>
+      </dl>
+      <dl>
+        <dt>2016.12.18</dt>
         <dd>iOS 10 で Google Map を操作できない問題が発生しているため、一時的な回避措置として Google Map のサインイン機能を無効化しました。</dd>
-			</dl>
-			<dl>
-				<dt>2016.9.25</dt>
+      </dl>
+      <dl>
+        <dt>2016.9.25</dt>
         <dd>KML, GeoJSONファイルのダウンロード機能を追加しました。計算結果のバルーンに表示されるリンクよりダウンロードできます。<a href="https://www.google.com/maps/d/u/0/" target="_blank">Google My Maps</a>等にインポートして使うことができます。</dd>
-			</dl>
-			<dl>
-				<dt>2016.8.28</dt>
-				<dd>デザインを改善しました。</dd>
-			</dl>
-			<dl>
-				<dt>2015.12.5</dt>
-				<dd>試験的に音声入力に対応。現在のところGoogle Chromeからのみ利用できます。</dd>
-			</dl>
-			<dl>
-				<dt>2015.11.5</dt>
-				<dd>デザインと操作性を一新しました。</dd>
-			</dl>
-			<dl>
-				<dt>2015.1.2</dt>
-				<dd>計算にかかる時間を短縮しました。飲食店表示機能を追加しました。設定画面で店舗の種類を選択可能です。</dd>
-			</dl>
-			<dl>
-				<dt>2014.12.31</dt>
-				<dd>計算結果のポリゴン図形描画に用いるアルゴリズムを変更し、結果表示の正確さを改善。あと足がアニメーションするようになりました。</dd>
-			</dl>
-			<dl>
-				<dt>2014.12.29</dt>
-				<dd>ルート詳細の表示機能を追加。再計算の不具合を修正。「ぐるなび」のapiを利用した店舗情報の表示機能を試験的に追加（開発モード:onで表示）。</dd>
-			</dl>
-			<dl>
-				<dt>2014.12.23</dt>
-				<dd>β版リリース</dd>
-			</dl>
-			<h3>データ・素材など</h3>
-			<p>お世話になっております。</p>
-			<ul>
-				<li>ルート計算 <a href="https://developers.google.com/maps/documentation/javascript/directions" target="_blank">google maps javascript api v3 directions service</a></li>
-				<li>ポリゴンのスプライン補間 <a href="http://numericjs.com/" target="_blank">numeric javascript</a> by sébastien loisel</li>
-			</ul>
-		</section>
-		<section id="advanced-settings">
-			<h2>詳細設定</h2>
-			<h3>優先項目</h3>
-			<ul class="inline-controls">
-				<li>
-					<input type="radio" name="preference" value="SPEED" id="preference_SPEED" />
-					<label for="preference_SPEED">計算の速さを優先</label>
-				</li>
-				<li>
-					<input type="radio" name="preference" value="BALANCE" id="preference_BALANCE" checked/>
-					<label for="preference_BALANCE">バランス（既定値）</label>
-				</li>
-				<li>
-					<input type="radio" name="preference" value="PRECISION" id="preference_PRECISION" />
-					<label for="preference_PRECISION">正確さを優先</label>
-				</li>
-			</ul>
-			<h3>ルート検索設定</h3>
-			<ul>
-				<li>
-					<input type="checkbox" name="option_highways"  id="option_highways" checked/>
-					<label for="option_highways">車での移動で有料道路を使用する</label>
-				</li>
-				<li>
-					<input type="checkbox" name="option_tolls"  id="option_tolls" checked/>
-					<label for="option_tolls">車での移動で高速道路を使用する</label>
-				</li>
-				<li>
-					<input type="checkbox" name="option_ferries"  id="option_ferries" />
-					<label for="option_ferries">車や徒歩での移動でフェリーを含む区間を利用する</label>
-				</li>
-			</ul>
-			<button type="button" class="btn btn-default" role="initialize">
-				<span class="glyphicon glyphicon-file"></span>
-				<span>初期値に戻す</span>
-			</button>
-			<button type="button" class="btn btn-primary" role="execute">
-				<span class="glyphicon glyphicon-ok"></span>
-				<span>この設定で調べる</span>
-			</button>
-		</section>
-		<section id="donate">
-			<h2>ビットコインで寄付</h2>
+      </dl>
+      <dl>
+        <dt>2016.8.28</dt>
+        <dd>デザインを改善しました。</dd>
+      </dl>
+      <dl>
+        <dt>2015.12.5</dt>
+        <dd>試験的に音声入力に対応。現在のところGoogle Chromeからのみ利用できます。</dd>
+      </dl>
+      <dl>
+        <dt>2015.11.5</dt>
+        <dd>デザインと操作性を一新しました。</dd>
+      </dl>
+      <dl>
+        <dt>2015.1.2</dt>
+        <dd>計算にかかる時間を短縮しました。飲食店表示機能を追加しました。設定画面で店舗の種類を選択可能です。</dd>
+      </dl>
+      <dl>
+        <dt>2014.12.31</dt>
+        <dd>計算結果のポリゴン図形描画に用いるアルゴリズムを変更し、結果表示の正確さを改善。あと足がアニメーションするようになりました。</dd>
+      </dl>
+      <dl>
+        <dt>2014.12.29</dt>
+        <dd>ルート詳細の表示機能を追加。再計算の不具合を修正。「ぐるなび」のapiを利用した店舗情報の表示機能を試験的に追加（開発モード:onで表示）。</dd>
+      </dl>
+      <dl>
+        <dt>2014.12.23</dt>
+        <dd>β版リリース</dd>
+      </dl>
+      <h3>データ・素材など</h3>
+      <p>お世話になっております。</p>
+      <ul>
+        <li>ルート計算 <a href="https://developers.google.com/maps/documentation/javascript/directions" target="_blank">google maps javascript api v3 directions service</a></li>
+        <li>ポリゴンのスプライン補間 <a href="http://numericjs.com/" target="_blank">numeric javascript</a> by sébastien loisel</li>
+      </ul>
+    </section>
+    <section id="advanced-settings">
+      <h2>詳細設定</h2>
+      <h3>優先項目</h3>
+      <ul class="inline-controls">
+        <li>
+          <input type="radio" name="preference" value="SPEED" id="preference_SPEED" />
+          <label for="preference_SPEED">計算の速さを優先</label>
+        </li>
+        <li>
+          <input type="radio" name="preference" value="BALANCE" id="preference_BALANCE" checked/>
+          <label for="preference_BALANCE">バランス（既定値）</label>
+        </li>
+        <li>
+          <input type="radio" name="preference" value="PRECISION" id="preference_PRECISION" />
+          <label for="preference_PRECISION">正確さを優先</label>
+        </li>
+      </ul>
+      <h3>ルート検索設定</h3>
+      <ul>
+        <li>
+          <input type="checkbox" name="option_highways"  id="option_highways" checked/>
+          <label for="option_highways">車での移動で有料道路を使用する</label>
+        </li>
+        <li>
+          <input type="checkbox" name="option_tolls"  id="option_tolls" checked/>
+          <label for="option_tolls">車での移動で高速道路を使用する</label>
+        </li>
+        <li>
+          <input type="checkbox" name="option_ferries"  id="option_ferries" />
+          <label for="option_ferries">車や徒歩での移動でフェリーを含む区間を利用する</label>
+        </li>
+      </ul>
+      <button type="button" class="btn btn-default" role="initialize">
+        <span class="glyphicon glyphicon-file"></span>
+        <span>初期値に戻す</span>
+      </button>
+      <button type="button" class="btn btn-primary" role="execute">
+        <span class="glyphicon glyphicon-ok"></span>
+        <span>この設定で調べる</span>
+      </button>
+    </section>
+    <section id="donate">
+      <h2>ビットコインで寄付</h2>
       <p>ビットコインでの寄付を試験的に受け付けています。<br/>
       便利に感じていただけた方は応援いただけると嬉しいですｍ(_ _)ｍ
       </p>
       <p><img src="/images/bitcoin_address.png" /></p>
       <a href="bitcoin:1BG7Pj2JFGoBEFQvzJC6NmH4pDPNbsjYPS">bitcoin:1BG7Pj2JFGoBEFQvzJC6NmH4pDPNbsjYPS</a>
-		</section>
-		<section id="message">
-			<h2>お問い合わせフォーム</h2>
-			<input type="hidden" name="uuid" />
-			<textarea rows="4"></textarea>
-			<p>ご意見・ご感想などがあればお願いしますｍ(_ _)ｍ<br>
-				返信が必要な方は本文中にメールアドレスを記載してください</p>
-			<button type="button" class="btn btn-default" role="send-message">
-				<span>送信する</span>
-			</button>
-		</section>
-	</div>
-	<div id="map-wrapper" class="screen-cover">
-		<div class="center-marker over-map"></div>
-		<div class="message over-map"></div>
-		<div class="btn-wrapper over-map">
-			<button class="btn btn-default" type="button" role="cancel">キャンセル</button>
-			<button type="button" class="btn btn-primary" role="retry">
-				<span class="glyphicon glyphicon-cog"></span>
-				<span>条件を変えて調べる</span>
-			</button>
-			<button type="button" class="btn btn-primary" role="determine-location">
-				<span class="glyphicon glyphicon-ok"></span>
-				<span>決定</span>
-			</button>
-		</div>
-		<div id="map-canvas" class="screen-cover"></div>
-	</div>
-	<div id="progressbar" role="progressbar"></div>
+    </section>
+    <section id="message">
+      <h2>お問い合わせフォーム</h2>
+      <input type="hidden" name="uuid" />
+      <textarea rows="4"></textarea>
+      <p>ご意見・ご感想などがあればお願いしますｍ(_ _)ｍ<br>
+        返信が必要な方は本文中にメールアドレスを記載してください</p>
+      <button type="button" class="btn btn-default" role="send-message">
+        <span>送信する</span>
+      </button>
+    </section>
+  </div>
+  <div id="map-wrapper" class="screen-cover">
+    <div class="center-marker over-map"></div>
+    <div class="message over-map"></div>
+    <div class="btn-wrapper over-map">
+      <button class="btn btn-default" type="button" role="cancel">キャンセル</button>
+      <button type="button" class="btn btn-primary" role="retry">
+        <span class="glyphicon glyphicon-cog"></span>
+        <span>条件を変えて調べる</span>
+      </button>
+      <button type="button" class="btn btn-primary" role="determine-location">
+        <span class="glyphicon glyphicon-ok"></span>
+        <span>決定</span>
+      </button>
+    </div>
+    <div id="map-canvas" class="screen-cover"></div>
+  </div>
+  <div id="progressbar" role="progressbar"></div>
 </div>
 <button role="goto-top" class="btn btn-default">
-	<span class="glyphicon glyphicon-chevron-up"></span>
+  <span class="glyphicon glyphicon-chevron-up"></span>
 </button>
 <div id="fb-root"></div>
 </html>
