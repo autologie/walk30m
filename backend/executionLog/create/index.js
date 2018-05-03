@@ -1,19 +1,19 @@
-const uuidv4 = require('uuid/v4');
-const camelcaseKeys = require('camelcase-keys');
-const Datastore = require('@google-cloud/datastore');
+const uuidv4 = require("uuid/v4");
+const camelcaseKeys = require("camelcase-keys");
+const Datastore = require("@google-cloud/datastore");
 const datastore = new Datastore();
 
 function withCors(res) {
   return res
-    .set('Access-Control-Allow-Origin', '*')
-    .set('Access-Control-Allow-Methods', 'POST');
+    .set("Access-Control-Allow-Origin", "*")
+    .set("Access-Control-Allow-Methods", "POST");
 }
 
 exports.createExecutionLog = (req, res) => {
-  if (typeof req.body !== 'object') {
+  if (typeof req.body !== "object") {
     console.warn(
-      'Invalid request. request body is missing or insane.',
-      JSON.stringify(req.body),
+      "Invalid request. request body is missing or insane.",
+      JSON.stringify(req.body)
     );
     res.status(400).end();
     return;
@@ -24,7 +24,7 @@ exports.createExecutionLog = (req, res) => {
   const data = Object.assign({}, body, {
     test: true,
     startDateTime: new Date(body.startDatetime),
-    userAgent: req.get('User-Agent'),
+    userAgent: req.get("User-Agent"),
     clientIp: req.ip,
     origin: undefined,
     isInitial: undefined,
@@ -33,26 +33,26 @@ exports.createExecutionLog = (req, res) => {
     originAddress: body.origin.address,
     originCoordinate: datastore.geoPoint({
       latitude: body.origin.lat,
-      longitude: body.origin.lng,
+      longitude: body.origin.lng
     }),
     viewportWidth: body.viewport.width,
-    viewportHeight: body.viewport.height,
+    viewportHeight: body.viewport.height
   });
 
   datastore.save(
     {
       key: datastore.key({
-        namespace: 'develop',
-        path: ['ExecutionLog', id],
+        namespace: "develop",
+        path: ["ExecutionLog", id]
       }),
-      data,
+      data
     },
-    (err) => {
+    err => {
       if (err) {
         console.error(
-          'Failed to create a datastore entity.',
+          "Failed to create a datastore entity.",
           JSON.stringify(err),
-          JSON.stringify(data),
+          JSON.stringify(data)
         );
         withCors(res)
           .status(500)
@@ -62,6 +62,6 @@ exports.createExecutionLog = (req, res) => {
           .status(201)
           .end(JSON.stringify({ uuid: id }));
       }
-    },
+    }
   );
 };

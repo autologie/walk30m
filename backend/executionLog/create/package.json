@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "prettier": "prettier --write --single-quote --trailing-comma=all --arrow-parens=always ./index.js"
+    "prettier": "prettier --write '{,!(node_modules)/**/}*.js'"
   },
   "author": "",
   "license": "ISC",
