@@ -25,10 +25,10 @@ class Application {
     this.$execBtn = $el.find('.btn[role=execute]');
     this.$cancelBtn = $el.find('#control span[role=cancel]');
     this.$sendMsgBtn = $el.find('.btn[role=send-message]');
-    this.$goToAboutLink = $el.find('a[href=#about]');
-    this.$goToDonateLink = $el.find('a[href=#donate]');
+    this.$goToAboutLink = $el.find('a[href="#about"]');
+    this.$goToDonateLink = $el.find('a[href="#donate"]');
     this.$message = $el.find('#message textarea');
-    this.$goToAdvancedSettingsLink = $el.find('a[href=#advanced-settings]');
+    this.$goToAdvancedSettingsLink = $el.find('a[href="#advanced-settings"]');
     this.calcService = new CalculationService();
     this.logger = new Logger(this.calcService);
     this.advancedSettingsController = new SettingsCtrl($el.find('#advanced-settings'));
