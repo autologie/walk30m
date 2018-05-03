@@ -32,7 +32,6 @@ function handleCreate(req, res) {
   const body = camelcaseKeys(req.body);
   const id = uuidv4();
   const data = Object.assign({}, body, {
-    test: true,
     startDateTime: new Date(body.startDatetime),
     userAgent: req.get("User-Agent"),
     clientIp: req.ip,
