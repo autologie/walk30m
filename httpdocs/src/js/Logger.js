@@ -1,9 +1,9 @@
 import window from 'window';
 import _ from 'lodash';
 import $ from 'jquery';
-import { PUBLIC_API_URL_BASE } from './config';
+import { EXECUTION_LOG_API_URL } from './config';
 
-const endPoint = `${PUBLIC_API_URL_BASE}/execution_log/`;
+const endPoint = EXECUTION_LOG_API_URL;
 
 export default class Logger {
 
@@ -49,7 +49,7 @@ export default class Logger {
     }, this.executions[taskId]);
 
     $.ajax({
-      url: endPoint + taskId,
+      url: endPoint + '/' + taskId,
       type: 'PUT',
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',

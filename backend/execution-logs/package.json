@@ -1,5 +1,5 @@
 {
-  "name": "create_execution_log",
+  "name": "execution-logs",
   "version": "1.0.0",
   "main": "index.js",
   "license": "ISC",

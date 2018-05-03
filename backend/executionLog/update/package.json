@@ -1,9 +1,0 @@
-{
-  "name": "update_execution_log",
-  "version": "1.0.0",
-  "main": "index.js",
-  "license": "ISC",
-  "dependencies": {
-    "@google-cloud/datastore": "^1.4.0"
-  }
-}
