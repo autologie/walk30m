@@ -1,6 +1,6 @@
 #! /usr/bin/env bash
 
-echo 1/4 ipInfo...
+echo 1/2 ipInfo...
 rm -rf ./target && \
     mkdir target && \
 	cp -r ./ipInfo ./target/ && \
@@ -12,21 +12,7 @@ rm -rf ./target && \
 	rm -rf ./target && \
 	cd ../
 
-echo 2/4 createExecutionLog...
-cd ./executionLog && \
-	zip -q -r deployment.zip ./create/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=createExecutionLog --zip-file=fileb://${cdir}/deployment.zip > /dev/null && \
-	cd ../
-
-echo 3/4 updateExecutionLog...
-cd ./executionLog && \
-	zip -q -r deployment.zip ./update/* && \
-	cdir=`pwd` && \
-	aws lambda update-function-code --profile=walk30m --function-name=updateExecutionLog --zip-file=fileb://${cdir}/deployment.zip > /dev/null && \
-	cd ../
-
-echo 4/4 createMessage...
+echo 2/2 createMessage...
 rm -rf target && \
     mkdir target && \
     cp -r ./messages/create ./target/ && \
