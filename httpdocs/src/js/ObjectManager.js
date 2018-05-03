@@ -1,22 +1,22 @@
-import _ from 'lodash';
-import google from 'google';
+import _ from "lodash";
+import google from "google";
 
 function OM(map) {
   const me = this;
 
   google.maps.MVCArray.constructor.call(me);
   me.map = map;
-  me.addListener('remove_at', function (idx, elem) {
+  me.addListener("remove_at", (idx, elem) => {
     if (elem[0].setMap) {
       elem[0].setMap(null);
     } else if (elem.close) {
       elem[0].close();
     } else {
-      throw new Error('cannot destroy item', elem);
+      throw new Error("cannot destroy item", elem);
     }
   });
 
-  me.addListener('insert_at', function (idx) {
+  me.addListener("insert_at", (idx) => {
     let elem = me.getArray()[idx],
       obj = elem[0];
 
@@ -34,14 +34,14 @@ function OM(map) {
 
 OM.prototype = new google.maps.MVCArray();
 
-OM.prototype.clearObject = function (id) {
+OM.prototype.clearObject = function(id) {
   const me = this;
 
   if (!id) {
     return;
   }
 
-  me.forEach(function (elem, idx) {
+  me.forEach((elem, idx) => {
     if (elem && elem[2] === id) {
       me.removeAt(idx);
       return false;
@@ -49,13 +49,13 @@ OM.prototype.clearObject = function (id) {
   });
 };
 
-OM.prototype.clearObjects = function (taggedAs) {
+OM.prototype.clearObjects = function(taggedAs) {
   const me = this;
 
-  me.forEach(function (elem, idx) {
+  me.forEach((elem, idx) => {
     if (elem && (taggedAs === undefined || elem[1] === taggedAs)) {
       me.removeAt(idx);
-      _.defer(function () {
+      _.defer(() => {
         me.clearObjects(taggedAs);
       });
       return false;
@@ -63,15 +63,16 @@ OM.prototype.clearObjects = function (taggedAs) {
   });
 };
 
-OM.prototype.findObject = function (id) {
+OM.prototype.findObject = function(id) {
   const me = this;
 
-  return me.getArray().filter(function (elem) {
-    return elem[2] === id;
-  }).pop();
+  return me
+    .getArray()
+    .filter((elem) => elem[2] === id)
+    .pop();
 };
 
-OM.prototype.showObject = function (obj, cls, id, options) {
+OM.prototype.showObject = function(obj, cls, id, options) {
   const me = this;
 
   me.clearObject(id);

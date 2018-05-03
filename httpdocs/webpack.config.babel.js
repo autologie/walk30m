@@ -9,19 +9,19 @@ module.exports = {
   entry: "./js/bootstrap.js",
   output: {
     path: path.join(__dirname, "/target"),
-    filename: "js/app.js",
+    filename: "js/app.js"
   },
   externals: {
-    google: "google",
+    google: "google"
   },
   module: {
     rules: [
       {
         test: /\.js$/,
         exclude: /node_modules/,
-        loader: "babel-loader",
-      },
-    ],
+        loader: "babel-loader"
+      }
+    ]
   },
   plugins: [
     new InlineEnviromentVariablesPlugin(),
@@ -29,19 +29,19 @@ module.exports = {
       inject: "head",
       favicon: "favicon.ico",
       template: "index.html",
-      minify: {},
+      minify: {}
     }),
     new CopyWebpackPlugin([
       { from: "images", to: "images" },
-      { from: "css", to: "css" },
-    ]),
+      { from: "css", to: "css" }
+    ])
   ],
   optimization: {
-    minimize: true,
+    minimize: true
   },
   devServer: {
     contentBase: "target/",
     inline: true,
-    port: 8080,
-  },
+    port: 8080
+  }
 };

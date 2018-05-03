@@ -1,14 +1,16 @@
-import $ from 'jquery';
-import _ from 'lodash';
-import google from 'google';
-import GeoUtil from './GeoUtil';
-import ProgressBar from './ProgressBar';
+import $ from "jquery";
+import _ from "lodash";
+import google from "google";
+import GeoUtil from "./GeoUtil";
+import ProgressBar from "./ProgressBar";
 
-const minuteArray = _.range(1, 61).concat(_.map(_.range(1, 19), function (n) {
-  return 60 + n * 10;
-})).concat(_.map(_.range(1, 7), function (n) {
-  return 240 + n * 60;
-}));
+const minuteArray = _.range(1, 61)
+  .concat(
+    _.map(_.range(1, 19), (n) => 60 + n * 10)
+  )
+  .concat(
+    _.map(_.range(1, 7), (n) => 240 + n * 60)
+  );
 
 function initializeScroll() {
   // correct unnecessary scroll offset caused by software keyboard of iPhone.
@@ -16,17 +18,18 @@ function initializeScroll() {
 }
 
 class InputController {
-
   constructor(application, $el, mapController) {
     const me = this;
-    const optionTpl = _.template('<option value="<%= num %>" <%= selected %>><%= num %></option>');
+    const optionTpl = _.template(
+      '<option value="<%= num %>" <%= selected %>><%= num %></option>'
+    );
 
     this.selMode = {
-      TEXT: 'selmode-text',
-      MAP: 'selmode-map',
-      CURRENT: 'selmode-current',
-      GEOCODE: 'selmode-geocode',
-      SPEECH: 'selmode-voice',
+      TEXT: "selmode-text",
+      MAP: "selmode-map",
+      CURRENT: "selmode-current",
+      GEOCODE: "selmode-geocode",
+      SPEECH: "selmode-voice"
     };
 
     me.isSpeechAvailable = undefined !== window.webkitSpeechRecognition;
@@ -35,23 +38,30 @@ class InputController {
     me.getLocationWatchId = null;
 
     me.$el = $el;
-    me.$selModeList = $el.find('.select');
-    me.$location = $el.find('input[name=location]');
-    me.$time = $el.find('[name=travelTime]');
-    me.$execBtn = $el.find('.btn[role=execute]');
-    me.$cancelBtn = $el.find('.glyphicon[role=cancel]');
-    me.$time.append(_.map(minuteArray, function (n) {
-      return optionTpl({ num: n, selected: n === 30 ? 'selected' : '' });
-    }).join(''));
+    me.$selModeList = $el.find(".select");
+    me.$location = $el.find("input[name=location]");
+    me.$time = $el.find("[name=travelTime]");
+    me.$execBtn = $el.find(".btn[role=execute]");
+    me.$cancelBtn = $el.find(".glyphicon[role=cancel]");
+    me.$time.append(
+      _.map(minuteArray, (n) => optionTpl({ num: n, selected: n === 30 ? "selected" : "" })).join("")
+    );
 
-    me.defaultPlaceholder = me.$location.attr('placeholder');
-    this.updateLocationCombo = _.debounce(() => this.doUpdateLocationCombo(), 200);
+    me.defaultPlaceholder = me.$location.attr("placeholder");
+    this.updateLocationCombo = _.debounce(
+      () => this.doUpdateLocationCombo(),
+      200
+    );
 
     if (!me.isSpeechAvailable) {
-      me.$selModeList.find('[data-selmode=' + me.selMode.SPEECH + ']').addClass('disabled');
+      me.$selModeList
+        .find(`[data-selmode=${  me.selMode.SPEECH  }]`)
+        .addClass("disabled");
     }
     if (!window.navigator.geolocation) {
-      me.$selModeList.find('[data-selmode=' + me.selMode.CURRENT + ']').addClass('disabled');
+      me.$selModeList
+        .find(`[data-selmode=${  me.selMode.CURRENT  }]`)
+        .addClass("disabled");
     }
 
     me.initEvents();
@@ -60,25 +70,29 @@ class InputController {
   initEvents() {
     const me = this;
 
-    me.$selModeList.find('li[data-selmode]:not(.disabled)').click(function (ev) {
-      let $target = $(ev.target),
-        $li = $target.is('li')
-          ? $target
-          : $target.parents('li');
+    me.$selModeList
+      .find("li[data-selmode]:not(.disabled)")
+      .click((ev) => {
+        let $target = $(ev.target),
+          $li = $target.is("li") ? $target : $target.parents("li");
 
-      $li.blur(); // bug fix -> https://www.pivotaltracker.com/story/show/109711984
-      me.onSelModeChoosed($li.attr('data-selmode'));
-    }).keydown(_.bind(me.onKeyDownSelModeListItem, me))
+        $li.blur(); // bug fix -> https://www.pivotaltracker.com/story/show/109711984
+        me.onSelModeChoosed($li.attr("data-selmode"));
+      })
+      .keydown(_.bind(me.onKeyDownSelModeListItem, me))
       .blur(_.bind(me.onBlurSelModeListItem, me));
 
-    me.$location.focus(function () {
+    me.$location.focus(() => {
       me.toggleSelModeList(true);
 
-      if (window.matchMedia('(orientation: portrait)').matches) {
-        _.delay(function () {
-          me.application.$page.animate({
-            scrollTop: Math.round(me.$location.offset().top - 10) + 'px',
-          }, 100);
+      if (window.matchMedia("(orientation: portrait)").matches) {
+        _.delay(() => {
+          me.application.$page.animate(
+            {
+              scrollTop: `${Math.round(me.$location.offset().top - 10)  }px`
+            },
+            100
+          );
         }, 500);
       }
     });
@@ -91,16 +105,16 @@ class InputController {
   resetLatLng() {
     const me = this;
 
-    me.$location.removeAttr('data-latitude');
-    me.$location.removeAttr('data-longitude');
+    me.$location.removeAttr("data-latitude");
+    me.$location.removeAttr("data-longitude");
   }
 
   onBlurSelModeListItem() {
     const me = this;
 
-    _.defer(function () {
+    _.defer(() => {
       initializeScroll();
-      if (!me.$el.find(':focus').is('li')) {
+      if (!me.$el.find(":focus").is("li")) {
         me.toggleSelModeList(false);
       }
     });
@@ -115,7 +129,7 @@ class InputController {
       me.$location.blur();
     } else if (ev.keyCode === 38 || ev.keyCode === 40) {
       // up or down
-      $items = me.$selModeList.find('li');
+      $items = me.$selModeList.find("li");
 
       me.$location.blur();
       $items.eq(ev.keyCode === 38 ? $items.length - 1 : 0).focus();
@@ -129,15 +143,18 @@ class InputController {
     let me = this,
       $target = $(ev.target),
       $items,
-      $li = $target.is('li')
-        ? $target
-        : $target.parents('li');
+      $li = $target.is("li") ? $target : $target.parents("li");
 
     if (ev.keyCode === 13) {
-      me.onSelModeChoosed($li.attr('data-selmode'), me.extractSelModeListItemData($li));
+      me.onSelModeChoosed(
+        $li.attr("data-selmode"),
+        me.extractSelModeListItemData($li)
+      );
     } else if (ev.keyCode === 38 || ev.keyCode === 40) {
-      $items = me.$selModeList.find('li');
-      $items.eq(($li.index() + (ev.keyCode === 38 ? -1 : 1)) % $items.length).focus();
+      $items = me.$selModeList.find("li");
+      $items
+        .eq(($li.index() + (ev.keyCode === 38 ? -1 : 1)) % $items.length)
+        .focus();
       ev.preventDefault();
     }
   }
@@ -145,18 +162,20 @@ class InputController {
   extractSelModeListItemData($item) {
     return {
       position: {
-        lat: +$item.attr('data-latitude'),
-        lng: +$item.attr('data-longitude'),
+        lat: +$item.attr("data-latitude"),
+        lng: +$item.attr("data-longitude")
       },
-      address: $item.text(),
+      address: $item.text()
     };
   }
 
   doUpdateLocationCombo() {
     let me = this,
       val = me.$location.val(),
-      selector = 'li[data-selmode=selmode-geocode]',
-      tpl = _.template('<li tabindex="-1" data-selmode="selmode-geocode" data-latitude="<%= lat %>" data-longitude="<%= lng %>"><%= address %></li>');
+      selector = "li[data-selmode=selmode-geocode]",
+      tpl = _.template(
+        '<li tabindex="-1" data-selmode="selmode-geocode" data-latitude="<%= lat %>" data-longitude="<%= lng %>"><%= address %></li>'
+      );
 
     me.$selModeList.find(selector).remove();
 
@@ -164,26 +183,38 @@ class InputController {
       return;
     }
 
-    new google.maps.Geocoder().geocode({
-      address: val,
-    }, function (results, status) {
-      if (status === google.maps.GeocoderStatus.OK) {
-        me.$selModeList.prepend(results.slice(0, 3).map(function (result) {
-          return tpl({
-            lat: result.geometry.location.lat(),
-            lng: result.geometry.location.lng(),
-            address: GeoUtil.trimGeocoderAddress(result.formatted_address),
-          });
-        }).join(''));
+    new google.maps.Geocoder().geocode(
+      {
+        address: val
+      },
+      (results, status) => {
+        if (status === google.maps.GeocoderStatus.OK) {
+          me.$selModeList.prepend(
+            results
+              .slice(0, 3)
+              .map((result) => tpl({
+                  lat: result.geometry.location.lat(),
+                  lng: result.geometry.location.lng(),
+                  address: GeoUtil.trimGeocoderAddress(result.formatted_address)
+                }))
+              .join("")
+          );
 
-        me.$selModeList.find(selector).click(function (ev) {
-          const $choosed = $(ev.target);
+          me.$selModeList
+            .find(selector)
+            .click((ev) => {
+              const $choosed = $(ev.target);
 
-          me.onSelModeChoosed(me.selMode.GEOCODE, me.extractSelModeListItemData($choosed));
-        }).keydown(_.bind(me.onKeyDownSelModeListItem, me))
-          .blur(_.bind(me.onBlurSelModeListItem, me));
+              me.onSelModeChoosed(
+                me.selMode.GEOCODE,
+                me.extractSelModeListItemData($choosed)
+              );
+            })
+            .keydown(_.bind(me.onKeyDownSelModeListItem, me))
+            .blur(_.bind(me.onBlurSelModeListItem, me));
+        }
       }
-    });
+    );
   }
 
   appendElementToLocationInput($el, fix) {
@@ -193,31 +224,36 @@ class InputController {
     fix = _.defaults(fix || {}, { top: 0, left: 0, width: 0 });
 
     $el.css({
-      top: (fix.top + $loc.outerHeight()) + 'px',
-      left: (fix.left + Math.round($loc.offset().left - ($loc.outerWidth() - $loc.width()) / 2)) + 'px',
-      width: (fix.width + $loc.outerWidth()) + 'px',
+      top: `${fix.top + $loc.outerHeight()  }px`,
+      left:
+        `${fix.left +
+        Math.round(
+          $loc.offset().left - ($loc.outerWidth() - $loc.width()) / 2
+        ) 
+        }px`,
+      width: `${fix.width + $loc.outerWidth()  }px`
     });
   }
 
   toggleSelModeList(show) {
     let me = this,
-      isVisible = me.$selModeList.is(':visible'),
+      isVisible = me.$selModeList.is(":visible"),
       doShow = !isVisible && (show !== false || show === true),
       doHide = isVisible && (show === false || show !== true),
       deferred = new $.Deferred();
 
-    window.console.log('InputController: toggleSelModeList', doShow, doHide);
+    window.console.log("InputController: toggleSelModeList", doShow, doHide);
 
     if (doShow) {
       me.appendElementToLocationInput(me.$selModeList, { left: -3 });
-      me.$selModeList.fadeIn(undefined, function () {
+      me.$selModeList.fadeIn(undefined, () => {
         deferred.resolve();
       });
-      _.delay(function () {
-        me.$el.one('click', me.__bgClickHandler);
+      _.delay(() => {
+        me.$el.one("click", me.__bgClickHandler);
       }, 100);
     } else if (doHide) {
-      me.$selModeList.fadeOut(undefined, function () {
+      me.$selModeList.fadeOut(undefined, () => {
         deferred.resolve();
       });
     }
@@ -229,7 +265,7 @@ class InputController {
     const me = this;
 
     me.togglePanel(false);
-    me.mapController.specifyLocation(function (loc) {
+    me.mapController.specifyLocation((loc) => {
       me.togglePanel(true);
       if (loc) {
         me.setLatLng(loc);
@@ -256,57 +292,65 @@ class InputController {
       __ = _.bind(me.application.getMessage, me.application);
 
     if (me.lastGeoLocationResult.code === 1) {
-      window.alert(__('geolocationForbidden'));
+      window.alert(__("geolocationForbidden"));
     } else if (me.lastGeoLocationResult.code === 2) {
-      window.alert(__('geolocationUnavailable'));
+      window.alert(__("geolocationUnavailable"));
     } else if (me.lastGeoLocationResult.code === 3) {
-      window.alert(__('geolocationFailure'));
+      window.alert(__("geolocationFailure"));
     } else if (me.lastGeoLocationResult.coords) {
       crd = me.lastGeoLocationResult.coords;
       latLng = new google.maps.LatLng(crd.latitude, crd.longitude);
-      me.setLatLng(latLng).then(function () {
+      me.setLatLng(latLng).then(() => {
         me.mapController.map.panTo(latLng);
-        me.$location.attr('placeholder', me.defaultPlaceholder);
+        me.$location.attr("placeholder", me.defaultPlaceholder);
       });
     } else {
-      window.alert(__('geolocationError'));
+      window.alert(__("geolocationError"));
     }
   }
 
   initGeoLocationAPI(progressBar) {
     const me = this;
 
-    me.geoLocationWatchId = window.navigator.geolocation.watchPosition(function (pos) {
-      // on success
-      me.lastGeoLocationResult = pos;
-      progressBar.finalize();
-    }, function (err) {
-      // on error
-      me.lastGeoLocationResult = err;
-      progressBar.finalize();
-    }, {
-      enableHighAccuracy: true,
-      maximumAge: 0,
-      timeout: 5000,
-    });
+    me.geoLocationWatchId = window.navigator.geolocation.watchPosition(
+      (pos) => {
+        // on success
+        me.lastGeoLocationResult = pos;
+        progressBar.finalize();
+      },
+      (err) => {
+        // on error
+        me.lastGeoLocationResult = err;
+        progressBar.finalize();
+      },
+      {
+        enableHighAccuracy: true,
+        maximumAge: 0,
+        timeout: 5000
+      }
+    );
 
     me.selectLocationByGeoLocation();
   }
 
   selectLocationByGeoLocation() {
     let me = this,
-      bar, $bar;
+      bar,
+      $bar;
 
     if (me.lastGeoLocationResult) {
       me.applyGeoLocationResult(me.lastGeoLocationResult);
     } else if (me.geoLocationWatchId) {
       _.delay(_.bind(me.selectLocationByGeoLocation, me), 100);
     } else {
-      $bar = me.$location.parent().find('div[role=progressbar]');
+      $bar = me.$location.parent().find("div[role=progressbar]");
       bar = new ProgressBar($bar);
       me.appendElementToLocationInput($bar, { top: 8, left: 7 });
       bar.update(99.9);
-      me.$location.attr('placeholder', me.application.getMessage('geolocationDetecting'));
+      me.$location.attr(
+        "placeholder",
+        me.application.getMessage("geolocationDetecting")
+      );
 
       _.delay(_.bind(me.initGeoLocationAPI, me, bar), 1000);
     }
@@ -316,30 +360,38 @@ class InputController {
     let me = this,
       deferred = new $.Deferred();
 
-    new google.maps.Geocoder().geocode({
-      location: loc,
-    }, function (results, status) {
-      let filteredResults = results && results.filter(function (r) {
-            // exclude road name
-          return !_.includes(r.types, 'route');
-        }),
-        addr;
+    new google.maps.Geocoder().geocode(
+      {
+        location: loc
+      },
+      (results, status) => {
+        let filteredResults =
+            results &&
+            results.filter((r) => 
+              // exclude road name
+               !_.includes(r.types, "route")
+            ),
+          addr;
 
-      if (status !== google.maps.GeocoderStatus.OK) {
-        window.alert(status);
-        deferred.reject(status);
-      } else {
-        addr = filteredResults.length === 0
-          ? '不明な住所'
-          : GeoUtil.trimGeocoderAddress(filteredResults[0].formatted_address);
+        if (status !== google.maps.GeocoderStatus.OK) {
+          window.alert(status);
+          deferred.reject(status);
+        } else {
+          addr =
+            filteredResults.length === 0
+              ? "不明な住所"
+              : GeoUtil.trimGeocoderAddress(
+                  filteredResults[0].formatted_address
+                );
 
-        me.$location.val(addr);
-        me.$location.attr('data-latitude', loc.lat());
-        me.$location.attr('data-longitude', loc.lng());
-        me.$location.blur();
-        deferred.resolve();
+          me.$location.val(addr);
+          me.$location.attr("data-latitude", loc.lat());
+          me.$location.attr("data-longitude", loc.lng());
+          me.$location.blur();
+          deferred.resolve();
+        }
       }
-    });
+    );
 
     return deferred.promise();
   }
@@ -347,7 +399,7 @@ class InputController {
   onSelModeChoosed(mode, data) {
     const me = this;
 
-    window.console.log('InputController: onSelModeChoosed', mode, data);
+    window.console.log("InputController: onSelModeChoosed", mode, data);
     me.toggleSelModeList(false);
 
     if (mode === me.selMode.MAP) {
@@ -369,25 +421,25 @@ class InputController {
       accepted,
       __ = _.bind(me.application.getMessage, me.application);
 
-    recognizer.onresult = function (ev) {
+    recognizer.onresult = function(ev) {
       const result = ev.results.length > 0 ? ev.results[0] : null;
 
       if (result && result[0]) {
-        me.$location.attr('placeholder', me.defaultPlaceholder);
+        me.$location.attr("placeholder", me.defaultPlaceholder);
         me.selectLocationByText(result[0].transcript);
         accepted = result[0];
       }
     };
 
-    recognizer.onend = function () {
+    recognizer.onend = function() {
       if (!accepted) {
-        window.alert(__('cannotRecognizeSpeech'));
-        me.$location.attr('placeholder', me.defaultPlaceholder);
+        window.alert(__("cannotRecognizeSpeech"));
+        me.$location.attr("placeholder", me.defaultPlaceholder);
       }
     };
 
-    me.$location.val('');
-    me.$location.attr('placeholder', __('pleaseSpeak'));
+    me.$location.val("");
+    me.$location.attr("placeholder", __("pleaseSpeak"));
     recognizer.lang = window.navigator.language;
     recognizer.start();
   }
@@ -396,26 +448,28 @@ class InputController {
     const me = this;
 
     me.$location.val(data.address);
-    me.$location.attr('data-latitude', data.position.lat);
-    me.$location.attr('data-longitude', data.position.lng);
+    me.$location.attr("data-latitude", data.position.lat);
+    me.$location.attr("data-longitude", data.position.lng);
     me.$execBtn.focus();
-    me.application.mapController.map.setCenter(new google.maps.LatLng(data.position.lat, data.position.lng));
+    me.application.mapController.map.setCenter(
+      new google.maps.LatLng(data.position.lat, data.position.lng)
+    );
   }
 
   togglePanel(show) {
     let me = this,
-      $header = me.$el.find('#app-header'),
+      $header = me.$el.find("#app-header"),
       // isVisible = me.$el.is(':visible'),
-      isVisible = me.$el.css('height') !== '50px',
-      doShow = !isVisible && (show !== false),
-      doHide = isVisible && (show !== true);
+      isVisible = me.$el.css("height") !== "50px",
+      doShow = !isVisible && show !== false,
+      doHide = isVisible && show !== true;
 
     if (doShow) {
       // me.$el.fadeIn();
-      me.$el.removeClass('shrink');
+      me.$el.removeClass("shrink");
     } else if (doHide) {
       // me.$el.fadeOut();
-      me.$el.addClass('shrink');
+      me.$el.addClass("shrink");
     }
   }
 
@@ -423,8 +477,8 @@ class InputController {
     let me = this,
       retVal = false;
 
-    me.mapController.map.data.forEach(function (feature) {
-      if (feature.getProperty('isResult') === true) {
+    me.mapController.map.data.forEach((feature) => {
+      if (feature.getProperty("isResult") === true) {
         retVal = true;
         return false;
       }
@@ -435,32 +489,31 @@ class InputController {
 
   applyValues(values) {
     let me = this,
-      $modes = me.$el.find('input[name=travelMode]'),
+      $modes = me.$el.find("input[name=travelMode]"),
       deferred = new $.Deferred();
 
-    me.setLatLng(values.origin).then(function () {
+    me.setLatLng(values.origin).then(() => {
       me.$location.val(values.address);
       deferred.resolve();
     });
     me.$time.val(Math.round(values.time / 60));
-    $modes.prop('checked', false);
-    $modes.filter('[value=' + values.mode + ']').prop('checked', true);
+    $modes.prop("checked", false);
+    $modes.filter(`[value=${  values.mode  }]`).prop("checked", true);
 
     return deferred.promise();
   }
 
   getValues() {
     let me = this,
-      latVal = +me.$location.attr('data-latitude'),
-      lngVal = +me.$location.attr('data-longitude');
+      latVal = +me.$location.attr("data-latitude"),
+      lngVal = +me.$location.attr("data-longitude");
 
     return {
       address: me.$location.val(),
-      origin: latVal && lngVal
-        ? new google.maps.LatLng(latVal, lngVal)
-        : undefined,
+      origin:
+        latVal && lngVal ? new google.maps.LatLng(latVal, lngVal) : undefined,
       time: +me.$time.val() * 60,
-      mode: me.$el.find('input[name=travelMode]:checked').val(),
+      mode: me.$el.find("input[name=travelMode]:checked").val()
     };
   }
 }
