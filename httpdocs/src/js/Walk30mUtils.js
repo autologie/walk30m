@@ -1,4 +1,3 @@
-import window from 'window';
 import _ from 'lodash';
 import { APP_URL } from './config';
 

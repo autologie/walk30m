@@ -1,4 +1,3 @@
-import window from 'window';
 import _ from 'lodash';
 import $ from 'jquery';
 import { EXECUTION_LOG_API_URL } from './config';

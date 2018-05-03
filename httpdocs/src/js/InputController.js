@@ -1,4 +1,3 @@
-import window from 'window';
 import $ from 'jquery';
 import _ from 'lodash';
 import google from 'google';

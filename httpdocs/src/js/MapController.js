@@ -1,4 +1,3 @@
-import window from 'window';
 import _ from 'lodash';
 import google from 'google';
 import GeoUtils from './GeoUtil.js';

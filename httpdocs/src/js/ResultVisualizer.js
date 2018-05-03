@@ -1,5 +1,4 @@
 import toKML from 'tokml';
-import window from 'window';
 import google from 'google';
 import $ from 'jquery';
 import _ from 'lodash';

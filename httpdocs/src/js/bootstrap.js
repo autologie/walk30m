@@ -1,6 +1,5 @@
 /* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
 import './fb';
-import window from 'window';
 import $ from 'jquery';
 import Application from './Application';
 

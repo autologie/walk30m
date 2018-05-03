@@ -1,4 +1,3 @@
-import window from 'window';
 import google from 'google';
 import _ from 'lodash';
 import Calculation from './Calculation';
