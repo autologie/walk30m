@@ -1,16 +1,8 @@
 {
   "name": "create_execution_log",
   "version": "1.0.0",
-  "description": "",
   "main": "index.js",
-  "scripts": {
-    "prettier": "prettier --write '{,!(node_modules)/**/}*.js'"
-  },
-  "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "prettier": "^1.12.1"
-  },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.0",
     "camelcase-keys": "^4.2.0",

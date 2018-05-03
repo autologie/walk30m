@@ -1,6 +1,7 @@
 const uuidv4 = require("uuid/v4");
 const camelcaseKeys = require("camelcase-keys");
 const Datastore = require("@google-cloud/datastore");
+
 const datastore = new Datastore();
 
 function withCors(res) {
@@ -22,7 +23,6 @@ exports.createExecutionLog = (req, res) => {
   const body = camelcaseKeys(req.body);
   const id = uuidv4();
   const data = Object.assign({}, body, {
-    test: true,
     startDateTime: new Date(body.startDatetime),
     userAgent: req.get("User-Agent"),
     clientIp: req.ip,
@@ -42,7 +42,6 @@ exports.createExecutionLog = (req, res) => {
   datastore.save(
     {
       key: datastore.key({
-        namespace: "develop",
         path: ["ExecutionLog", id]
       }),
       data

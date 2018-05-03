@@ -1,0 +1,12 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "main": "",
+  "license": "ISC",
+  "scripts": {
+    "prettier": "prettier --write '{,!(node_modules),!(target)/**/}*.js'"
+  },
+  "devDependencies": {
+    "prettier": "^1.12.1"
+  }
+}
