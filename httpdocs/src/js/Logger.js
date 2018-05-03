@@ -5,6 +5,21 @@ import { EXECUTION_LOG_API_URL } from './config';
 
 const endPoint = EXECUTION_LOG_API_URL;
 
+const withRetries = (maxAttempt, process) => {
+  const processWithRetries = attemptCount => {
+    process().catch(() => {
+      if (attemptCount < maxAttempt) {
+        console.log('Failed to send execution log. Will retry again.');
+        setTimeout(() => processWithRetries(attemptCount + 1), 500 * Math.pow(2, attemptCount));
+      } else {
+        console.log('Failed to send execution log. Given up after several retries.');
+      }
+    });
+  };
+
+  processWithRetries(0);
+};
+
 export default class Logger {
 
   constructor(calcService) {
@@ -37,6 +52,9 @@ export default class Logger {
 
   onComplete(vertices, task) {
     const taskId = task.taskId;
+
+    if (!taskId) return;
+
     const now = new Date();
     const took = +now - +new Date(this.executions[taskId].start_datetime);
     const data = _.defaults({
@@ -48,13 +66,14 @@ export default class Logger {
       api_call_stats: task.apiCallStats,
     }, this.executions[taskId]);
 
-    $.ajax({
+    withReteies(5, () => $.ajax({
       url: endPoint + '/' + taskId,
       type: 'PUT',
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify(data),
-    });
+    }));
+
     this.sendGA('complete', data, took);
   }
 
@@ -80,17 +99,18 @@ export default class Logger {
       lng: val.lng(),
     } : val)), this.collectClientInfo()), (value, key) => _.snakeCase(key));
 
-    $.ajax({
+    withRetries(5, () => $.ajax({
       url: endPoint,
       type: 'POST',
       dataType: 'json',
       contentType: 'application/json; charset=utf-8',
       data: JSON.stringify(data),
-    }).done((res) => {
+    }).then((res) => {
       this.executions[res.uuid] = data;
 
       task.taskId = res.uuid;
-    });
+    }));
+
     this.sendGA('start', data);
   }
 }
