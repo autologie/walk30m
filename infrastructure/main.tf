@@ -21,7 +21,7 @@ module "create_execution_log_api" {
 
   bucket_name   = "${google_storage_bucket.backend_deploy_bucket.name}"
   function_name = "createExecutionLog"
-  source_dir    = "../backend/src/create-execution-log"
+  source_dir    = "../backend/executionLog/create"
 }
 
 module "update_execution_log_api" {
@@ -29,5 +29,5 @@ module "update_execution_log_api" {
 
   bucket_name   = "${google_storage_bucket.backend_deploy_bucket.name}"
   function_name = "updateExecutionLog"
-  source_dir    = "../backend/src/update-execution-log"
+  source_dir    = "../backend/executionLog/update"
 }
