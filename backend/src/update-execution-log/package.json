@@ -1,0 +1,9 @@
+{
+  "name": "update-execution-log",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@google-cloud/datastore": "^1.4.0"
+  }
+}
