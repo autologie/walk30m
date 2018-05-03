@@ -4,12 +4,16 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prettier": "prettier --write --single-quote --trailing-comma=all --arrow-parens=always ./index.js"
   },
   "author": "",
   "license": "ISC",
-  "devDependencies": {},
+  "devDependencies": {
+    "prettier": "^1.12.1"
+  },
   "dependencies": {
-    "@google-cloud/datastore": "^1.4.0"
+    "@google-cloud/datastore": "^1.4.0",
+    "camelcase-keys": "^4.2.0",
+    "uuid": "^3.2.1"
   }
 }
