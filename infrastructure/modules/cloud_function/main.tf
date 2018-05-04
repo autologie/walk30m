@@ -23,6 +23,7 @@ resource google_storage_bucket_object "function_assets" {
 }
 
 resource google_cloudfunctions_function "http_function" {
+  depends_on            = ["google_storage_bucket_object.function_assets"]
   name                  = "${var.function_name}"
   region                = "us-central1"
   source_archive_bucket = "${var.bucket_name}"

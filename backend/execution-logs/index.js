@@ -3,6 +3,7 @@ const camelcaseKeys = require("camelcase-keys");
 const Datastore = require("@google-cloud/datastore");
 
 const datastore = new Datastore();
+const kind = "ExecutionLog";
 
 function withCors(res) {
   return res
@@ -13,23 +14,17 @@ function withCors(res) {
 
 function handleNotFound(req, res) {
   console.warn("Requested resource not found.", req.path);
-  return withCors(res)
-    .status(404)
-    .end();
+  withCors(res).sendStatus(404);
 }
 
 function handleBadRequest(req, res, message) {
   console.warn("Invalid request.", message);
-  return withCors(res)
-    .status(400)
-    .end();
+  withCors(res).sendStatus(400);
 }
 
 function handleError(req, res, e) {
   console.error("An error occurred in handling request.", e);
-  return withCors(res)
-    .status(500)
-    .end();
+  if (!res.headersSent) withCors(res).sendStatus(500);
 }
 
 function handleCreate(req, res) {
@@ -41,7 +36,7 @@ function handleCreate(req, res) {
 
   datastore
     .save({
-      key: datastore.key(["ExecutionLog", id]),
+      key: datastore.key([kind, id]),
       data: Object.assign({}, body, {
         startDateTime: new Date(body.startDatetime),
         userAgent: req.get("User-Agent"),
@@ -77,7 +72,7 @@ function handleUpdate(req, res) {
   if (typeof req.body !== "object")
     return handleBadRequest("Request body is empty or insane.");
 
-  const datastoreKey = datastore.key(["ExecutionLog", id]);
+  const datastoreKey = datastore.key([kind, id]);
 
   datastore
     .get(datastoreKey)
@@ -91,36 +86,30 @@ function handleUpdate(req, res) {
           "Attempted to update an entity which has been completed."
         );
 
-      return datastore.save({
-        key: datastoreKey,
-        data: Object.assign({}, entity, {
-          completeDateTime: new Date(req.body.complete_datetime),
-          path: (req.body.result_path || []).map(coord =>
-            datastore.geoPoint({
-              latitude: coord.lat,
-              longitude: coord.lng
-            })
-          )
+      return datastore
+        .save({
+          key: datastoreKey,
+          data: Object.assign({}, entity, {
+            completeDateTime: new Date(req.body.complete_datetime),
+            path: (req.body.result_path || []).map(coord =>
+              datastore.geoPoint({
+                latitude: coord.lat,
+                longitude: coord.lng
+              })
+            )
+          })
         })
-      });
+        .then(() => withCors(res).sendStatus(200));
     })
-    .then(() =>
-      withCors(res)
-        .status(200)
-        .end()
-    )
     .catch(err => handleError(req, res, err));
 }
 
 exports.executionLogs = (req, res) => {
   try {
-    if (req.method === "OPTIONS")
-      return withCors(res)
-        .status(200)
-        .end();
-    if (req.method === "POST") return handleCreate(req, res);
-    if (req.method === "PUT") return handleUpdate(req, res);
-    return handleNotFound(req, res);
+    if (req.method === "OPTIONS") withCors(res).sendStatus(200);
+    else if (req.method === "POST") handleCreate(req, res);
+    else if (req.method === "PUT") handleUpdate(req, res);
+    else handleNotFound(req, res);
   } catch (e) {
     handleError(req, res, e);
   }
