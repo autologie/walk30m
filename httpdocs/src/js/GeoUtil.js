@@ -1,5 +1,4 @@
 import _ from "lodash";
-import google from "google";
 import numeric from "numeric";
 
 const GeoUtil = {};
@@ -9,11 +8,14 @@ GeoUtil.trimGeocoderAddress = function(raw) {
 };
 
 GeoUtil.spline = function(path) {
-  let coords = _.map(path.concat(path[0]), (s) => [s.lat(), s.lng()]),
+  let coords = _.map(path.concat(path[0]), s => [s.lat(), s.lng()]),
     points = _.range(0, path.length),
     samples = _.range(0, path.length, 0.1);
 
-  return _.map(numeric.spline(points, coords).at(samples), (s) => new google.maps.LatLng(s[0], s[1]));
+  return _.map(
+    numeric.spline(points, coords).at(samples),
+    s => new google.maps.LatLng(s[0], s[1])
+  );
 };
 
 GeoUtil.lngToMeter = function(lng, lat) {
@@ -53,9 +55,8 @@ GeoUtil.getInclusionBounds = function(path) {
           pos,
           new google.maps.LatLng(pos.lat() + delta, pos.lng() + delta)
         );
-      } 
-        return passed.extend(pos);
-      
+      }
+      return passed.extend(pos);
     },
     null
   );
@@ -65,22 +66,17 @@ GeoUtil.getGravityCenter = function(path) {
   const len = path.length;
 
   return new google.maps.LatLng(
-    _.reduce(
-      path,
-      (passed, val) => passed + val.lat(),
-      0
-    ) / len,
-    _.reduce(
-      path,
-      (passed, val) => passed + val.lng(),
-      0
-    ) / len
+    _.reduce(path, (passed, val) => passed + val.lat(), 0) / len,
+    _.reduce(path, (passed, val) => passed + val.lng(), 0) / len
   );
 };
 
 GeoUtil.isContained = function(point, path) {
-  let vertices = _.map(path, (pos, idx) => [pos, path[(idx + 1) % path.length]]),
-    crossingVertices = _.filter(vertices, (vertex) => {
+  let vertices = _.map(path, (pos, idx) => [
+      pos,
+      path[(idx + 1) % path.length]
+    ]),
+    crossingVertices = _.filter(vertices, vertex => {
       let r =
           (vertex[0].lng() - point.lng()) / (vertex[0].lng() - vertex[1].lng()),
         crossPtLat = r * vertex[1].lat() + (1 - r) * vertex[0].lat();

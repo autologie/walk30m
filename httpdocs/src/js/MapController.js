@@ -1,9 +1,8 @@
 import _ from "lodash";
-import google from "google";
-import GeoUtils from "./GeoUtil.js";
-import Footprint from "./Footprint.js";
-import ObjectManager from "./ObjectManager.js";
-import ResultVisualizer from "./ResultVisualizer.js";
+import GeoUtils from "./GeoUtil";
+import Footprint from "./Footprint";
+import ObjectManager from "./ObjectManager";
+import ResultVisualizer from "./ResultVisualizer";
 
 class MapController {
   constructor(application, $el, mapOptions) {

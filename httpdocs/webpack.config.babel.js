@@ -1,4 +1,3 @@
-import webpack from "webpack";
 import path from "path";
 import InlineEnviromentVariablesPlugin from "inline-environment-variables-webpack-plugin";
 import HtmlWebpackPlugin from "html-webpack-plugin";
@@ -10,9 +9,6 @@ module.exports = {
   output: {
     path: path.join(__dirname, "/target"),
     filename: "js/app.js"
-  },
-  externals: {
-    google: "google"
   },
   module: {
     rules: [

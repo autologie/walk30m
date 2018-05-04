@@ -73,7 +73,7 @@ export default class Logger {
 
     withRetries(5, () =>
       $.ajax({
-        url: `${endPoint  }/${  taskId}`,
+        url: `${endPoint}/${taskId}`,
         type: "PUT",
         dataType: "json",
         contentType: "application/json; charset=utf-8",

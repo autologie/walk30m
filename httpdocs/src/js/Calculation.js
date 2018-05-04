@@ -1,9 +1,7 @@
-import google from "google";
 import _ from "lodash";
 import GeoUtil from "./GeoUtil";
 
-let twicePI = 2 * Math.PI,
-  halfPI = Math.PI / 2;
+let twicePI = 2 * Math.PI;
 
 function Calculation(request) {
   const me = this;
@@ -13,7 +11,7 @@ function Calculation(request) {
   me.pauseTime = 0;
   me.vertices = new google.maps.MVCArray();
 
-  me.vertices.addListener("insert_at", (n) => {
+  me.vertices.addListener("insert_at", n => {
     const added = me.vertices.getAt(n);
 
     google.maps.event.trigger(
@@ -63,20 +61,18 @@ Calculation.prototype.hasVisited = function(location) {
 
 Calculation.prototype.accumulateAngles = function(vertices) {
   let me = this,
-    checked = 0,
     diff,
-    angles = _.map(vertices, (v) => GeoUtil.calcAngle(me.config.origin, v));
+    angles = _.map(vertices, v => GeoUtil.calcAngle(me.config.origin, v));
 
   return _.reduce(
     angles,
-    (passed, angle, idx, arr) => (
-        passed +
-        (idx > 0
-          ? (diff = angle - arr[idx - 1]) < -1 * Math.PI
-            ? diff + twicePI
-            : diff
-          : 0)
-      ),
+    (passed, angle, idx, arr) => {
+      if (idx <= 0) return passed;
+
+      diff = angle - arr[idx - 1];
+
+      return passed + (diff < -1 * Math.PI ? diff + twicePI : diff);
+    },
     0
   );
 };

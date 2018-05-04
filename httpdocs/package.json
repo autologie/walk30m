@@ -4,11 +4,12 @@
   "description": "",
   "main": "webpack.config.js",
   "scripts": {
-    "lint": "eslint ./src/js/ --fix",
+    "test": "npm run lint",
+    "lint": "eslint '{./src/js/**/*.js,.eslintrc.js,webpack.config.babel.js}' --fix",
     "build": "webpack --mode=production",
     "dev": "webpack-dev-server --mode=development",
     "analyze": "webpack --mode=production --json | webpack-bundle-size-analyzer",
-    "prettier": "prettier --write {./src/js/**/*.js,webpack.config.babel.js}"
+    "prettier": "prettier --write {./src/js/**/*.js,.eslintrc.js,webpack.config.babel.js}"
   },
   "author": "",
   "license": "ISC",

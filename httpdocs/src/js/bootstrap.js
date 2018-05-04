@@ -1,7 +1,8 @@
-/* eslint-disable import/no-extraneous-dependencies,import/no-unresolved */
-import "./fb";
 import $ from "jquery";
+import "./fb";
 import Application from "./Application";
+
+let a = 3;
 
 if (window.location.origin === process.env.APP_URL) require("./ga");
 

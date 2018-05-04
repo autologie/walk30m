@@ -1,10 +1,9 @@
 import toKML from "tokml";
-import google from "google";
 import $ from "jquery";
 import _ from "lodash";
-import GeoUtil from "./GeoUtil.js";
-import Walk30mUtils from "./Walk30mUtils.js";
-import Footprint from "./Footprint.js";
+import GeoUtil from "./GeoUtil";
+import Walk30mUtils from "./Walk30mUtils";
+import Footprint from "./Footprint";
 
 function ResultVisualizer(application, map, objectManager) {
   let me = this,
@@ -37,7 +36,7 @@ function ResultVisualizer(application, map, objectManager) {
 
   me.map.data.addListener("click", _.bind(me.onClickResult, me));
 
-  me.map.data.setStyle((feature) => {
+  me.map.data.setStyle(feature => {
     let color;
 
     if (feature.getProperty("isResult") === true) {
@@ -49,13 +48,12 @@ function ResultVisualizer(application, map, objectManager) {
         strokeWeight: 2,
         fillOpacity: 0.3
       };
-    } 
-      return _.isObject(defaultStyler)
-        ? defaultStyler
-        : _.isFunction(defaultStyler)
-          ? defaultStyler(feature)
-          : {};
-    
+    }
+    return _.isObject(defaultStyler)
+      ? defaultStyler
+      : _.isFunction(defaultStyler)
+        ? defaultStyler(feature)
+        : {};
   });
 }
 
@@ -98,12 +96,11 @@ ResultVisualizer.prototype.clearResultDetail = function() {
 ResultVisualizer.prototype.onClickRoute = function(
   feature,
   route,
-  directionResult,
-  event
+  directionResult
 ) {
   let me = this,
     iw = new google.maps.InfoWindow({
-      position: _.max(route.slice(route.length / 4), (latLng) => latLng.lat()),
+      position: _.max(route.slice(route.length / 4), latLng => latLng.lat()),
       content: me.createDetailedBalloonContent(directionResult),
       maxWidth: Math.min(0.6 * $(window).width(), 320)
     }),
@@ -209,7 +206,7 @@ ResultVisualizer.prototype.drawRoute = function(
 ResultVisualizer.prototype.showResultDetail = function(feature) {
   const me = this;
 
-  feature.getProperty("vertices").forEach((vertex) => {
+  feature.getProperty("vertices").forEach(vertex => {
     me.drawRoute(
       feature,
       vertex.directionResult.routes[0].overview_path,
@@ -266,7 +263,7 @@ ResultVisualizer.prototype.bindSummaryBalloonEvents = function(feature) {
   $balloon.find("a[role=erase-result]").click(() => {
     me.map.data.remove(feature);
     me.objectManager.clearObject("summaryBalloon");
-    me.objectManager.clearObject(`origin-${  feature.getId()}`);
+    me.objectManager.clearObject(`origin-${feature.getId()}`);
   });
   $balloon.find("a[role=show-routes]").click(() => {
     me.objectManager.clearObject("summaryBalloon");
@@ -299,7 +296,7 @@ ResultVisualizer.prototype.showSummaryBalloon = function(feature) {
     iw,
     null,
     "summaryBalloon",
-    (me.objectManager.findObject(`origin-${  feature.getId()}`) || {})[0]
+    (me.objectManager.findObject(`origin-${feature.getId()}`) || {})[0]
   );
 };
 
@@ -379,7 +376,7 @@ ResultVisualizer.prototype.addResult = function(result) {
       }
     }),
     null,
-    `origin-${  result.taskId}`
+    `origin-${result.taskId}`
   );
 
   originMarker.addListener(

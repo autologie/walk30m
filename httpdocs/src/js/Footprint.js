@@ -1,5 +1,4 @@
 import _ from "lodash";
-import google from "google";
 
 function createIconOption(stop, options, stepCount, angle) {
   return _.defaults((options || {}).icon || {}, {

@@ -26,7 +26,7 @@ ProgressBar.prototype.update = _.throttle(function(percent) {
       return;
     }
 
-    $el.find(".progress").animate({ width: `${percent  }%` }, 1000, () => {
+    $el.find(".progress").animate({ width: `${percent}%` }, 1000, () => {
       if (percent === 100) {
         me.finalize();
       }

@@ -1,4 +1,3 @@
-import google from "google";
 import _ from "lodash";
 import Calculation from "./Calculation";
 import GeoUtil from "./GeoUtil";
@@ -186,7 +185,8 @@ CalculationService.prototype.walkToFillSecondsAlong = function(sec, wayPoints) {
       limited_length =
         _.reduce(
           step.lat_lngs,
-          (passed, v, idx, arr) => idx === arr.length - 1
+          (passed, v, idx, arr) =>
+            idx === arr.length - 1
               ? passed
               : passed + GeoUtil.distance(v, arr[idx + 1]),
           0
@@ -198,9 +198,9 @@ CalculationService.prototype.walkToFillSecondsAlong = function(sec, wayPoints) {
         (len += GeoUtil.distance(pos, arr[idx - 1])) <= limited_length
       ) {
         lat_lngs.push(pos);
-      } else {
-        return false;
+        return true;
       }
+      return false;
     });
     return lat_lngs;
   }
@@ -212,22 +212,21 @@ CalculationService.prototype.walkToFillSecondsAlong = function(sec, wayPoints) {
 
       if (passed && passed.end_flag) {
         return passed;
-      } 
-        next_accum = (passed ? passed.accum : 0) + step.duration.value;
-        if (next_accum > sec) {
-          step.lat_lngs = getPartial(
-            step,
-            1 - (next_accum - sec) / step.duration.value
-          );
-        }
-
-        step.accum = next_accum;
-        step.end_flag = next_accum > sec;
-        step.concat_path = ((passed && passed.concat_path) || []).concat(
-          step.lat_lngs
+      }
+      next_accum = (passed ? passed.accum : 0) + step.duration.value;
+      if (next_accum > sec) {
+        step.lat_lngs = getPartial(
+          step,
+          1 - (next_accum - sec) / step.duration.value
         );
-        return step;
-      
+      }
+
+      step.accum = next_accum;
+      step.end_flag = next_accum > sec;
+      step.concat_path = ((passed && passed.concat_path) || []).concat(
+        step.lat_lngs
+      );
+      return step;
     },
     null
   );
