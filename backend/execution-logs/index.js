@@ -39,8 +39,8 @@ function handleCreate(req, res) {
   const body = camelcaseKeys(req.body);
   const id = uuidv4();
 
-  datastore.save(
-    {
+  datastore
+    .save({
       key: datastore.key(["ExecutionLog", id]),
       data: Object.assign({}, body, {
         startDateTime: new Date(body.startDatetime),
@@ -58,15 +58,13 @@ function handleCreate(req, res) {
         viewportWidth: body.viewport.width,
         viewportHeight: body.viewport.height
       })
-    },
-    err => {
-      if (err) return handleError(req, res, err);
-
+    })
+    .then(() =>
       withCors(res)
         .status(201)
-        .end(JSON.stringify({ uuid: id }));
-    }
-  );
+        .end(JSON.stringify({ uuid: id }))
+    )
+    .catch(err => handleError(req, res, err));
 }
 
 function handleUpdate(req, res) {
@@ -81,47 +79,45 @@ function handleUpdate(req, res) {
 
   const datastoreKey = datastore.key(["ExecutionLog", id]);
 
-  datastore.get(datastoreKey, (err, entity) => {
-    if (err) return handleError(req, res, err);
+  datastore
+    .get(datastoreKey)
+    .then(([entity]) => {
+      if (entity === undefined) return handleNotFound(req, res);
 
-    if (entity === undefined) return handleNotFound(req, res);
+      if (entity.completeDateTime)
+        return handleBadRequest(
+          req,
+          res,
+          "Attempted to update an entity which has been completed."
+        );
 
-    if (entity.completeDateTime)
-      return handleBadRequest(
-        req,
-        res,
-        "Attempted to update an entity which has been completed."
-      );
-
-    const body = camelcaseKeys(req.body);
-
-    datastore.save(
-      {
+      return datastore.save({
         key: datastoreKey,
         data: Object.assign({}, entity, {
-          completeDateTime: new Date(body.completeDatetime),
-          path: (body.resultPath || []).map(coord =>
+          completeDateTime: new Date(req.body.complete_datetime),
+          path: (req.body.result_path || []).map(coord =>
             datastore.geoPoint({
               latitude: coord.lat,
               longitude: coord.lng
             })
           )
         })
-      },
-      err => {
-        if (err) return handleError(req, res, err);
-
-        withCors(res)
-          .status(200)
-          .end();
-      }
-    );
-  });
+      });
+    })
+    .then(() =>
+      withCors(res)
+        .status(200)
+        .end()
+    )
+    .catch(err => handleError(req, res, err));
 }
 
 exports.executionLogs = (req, res) => {
   try {
-    if (req.method === "OPTIONS") return withCors(res).status(200).end();
+    if (req.method === "OPTIONS")
+      return withCors(res)
+        .status(200)
+        .end();
     if (req.method === "POST") return handleCreate(req, res);
     if (req.method === "PUT") return handleUpdate(req, res);
     return handleNotFound(req, res);
