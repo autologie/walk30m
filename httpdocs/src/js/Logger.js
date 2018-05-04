@@ -71,7 +71,7 @@ export default class Logger {
       this.executions[taskId]
     );
 
-    withReteies(5, () =>
+    withRetries(5, () =>
       $.ajax({
         url: `${endPoint  }/${  taskId}`,
         type: "PUT",
