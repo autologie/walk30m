@@ -1,6 +1,5 @@
 import $ from "jquery";
 import _ from "lodash";
-import google from "google";
 import CalculationService from "./CalculationService";
 import Logger from "./Logger";
 import GeoUtil from "./GeoUtil";

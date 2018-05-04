@@ -1,5 +1,4 @@
 import _ from "lodash";
-import google from "google";
 
 function OM(map) {
   const me = this;
@@ -16,7 +15,7 @@ function OM(map) {
     }
   });
 
-  me.addListener("insert_at", (idx) => {
+  me.addListener("insert_at", idx => {
     let elem = me.getArray()[idx],
       obj = elem[0];
 
@@ -46,6 +45,7 @@ OM.prototype.clearObject = function(id) {
       me.removeAt(idx);
       return false;
     }
+    return true;
   });
 };
 
@@ -60,6 +60,7 @@ OM.prototype.clearObjects = function(taggedAs) {
       });
       return false;
     }
+    return true;
   });
 };
 
@@ -68,7 +69,7 @@ OM.prototype.findObject = function(id) {
 
   return me
     .getArray()
-    .filter((elem) => elem[2] === id)
+    .filter(elem => elem[2] === id)
     .pop();
 };
 

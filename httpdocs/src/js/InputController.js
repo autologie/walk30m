@@ -1,16 +1,11 @@
 import $ from "jquery";
 import _ from "lodash";
-import google from "google";
 import GeoUtil from "./GeoUtil";
 import ProgressBar from "./ProgressBar";
 
 const minuteArray = _.range(1, 61)
-  .concat(
-    _.map(_.range(1, 19), (n) => 60 + n * 10)
-  )
-  .concat(
-    _.map(_.range(1, 7), (n) => 240 + n * 60)
-  );
+  .concat(_.map(_.range(1, 19), n => 60 + n * 10))
+  .concat(_.map(_.range(1, 7), n => 240 + n * 60));
 
 function initializeScroll() {
   // correct unnecessary scroll offset caused by software keyboard of iPhone.
@@ -44,7 +39,9 @@ class InputController {
     me.$execBtn = $el.find(".btn[role=execute]");
     me.$cancelBtn = $el.find(".glyphicon[role=cancel]");
     me.$time.append(
-      _.map(minuteArray, (n) => optionTpl({ num: n, selected: n === 30 ? "selected" : "" })).join("")
+      _.map(minuteArray, n =>
+        optionTpl({ num: n, selected: n === 30 ? "selected" : "" })
+      ).join("")
     );
 
     me.defaultPlaceholder = me.$location.attr("placeholder");
@@ -55,12 +52,12 @@ class InputController {
 
     if (!me.isSpeechAvailable) {
       me.$selModeList
-        .find(`[data-selmode=${  me.selMode.SPEECH  }]`)
+        .find(`[data-selmode=${me.selMode.SPEECH}]`)
         .addClass("disabled");
     }
     if (!window.navigator.geolocation) {
       me.$selModeList
-        .find(`[data-selmode=${  me.selMode.CURRENT  }]`)
+        .find(`[data-selmode=${me.selMode.CURRENT}]`)
         .addClass("disabled");
     }
 
@@ -72,7 +69,7 @@ class InputController {
 
     me.$selModeList
       .find("li[data-selmode]:not(.disabled)")
-      .click((ev) => {
+      .click(ev => {
         let $target = $(ev.target),
           $li = $target.is("li") ? $target : $target.parents("li");
 
@@ -89,7 +86,7 @@ class InputController {
         _.delay(() => {
           me.application.$page.animate(
             {
-              scrollTop: `${Math.round(me.$location.offset().top - 10)  }px`
+              scrollTop: `${Math.round(me.$location.offset().top - 10)}px`
             },
             100
           );
@@ -192,17 +189,19 @@ class InputController {
           me.$selModeList.prepend(
             results
               .slice(0, 3)
-              .map((result) => tpl({
+              .map(result =>
+                tpl({
                   lat: result.geometry.location.lat(),
                   lng: result.geometry.location.lng(),
                   address: GeoUtil.trimGeocoderAddress(result.formatted_address)
-                }))
+                })
+              )
               .join("")
           );
 
           me.$selModeList
             .find(selector)
-            .click((ev) => {
+            .click(ev => {
               const $choosed = $(ev.target);
 
               me.onSelModeChoosed(
@@ -224,14 +223,12 @@ class InputController {
     fix = _.defaults(fix || {}, { top: 0, left: 0, width: 0 });
 
     $el.css({
-      top: `${fix.top + $loc.outerHeight()  }px`,
-      left:
-        `${fix.left +
+      top: `${fix.top + $loc.outerHeight()}px`,
+      left: `${fix.left +
         Math.round(
           $loc.offset().left - ($loc.outerWidth() - $loc.width()) / 2
-        ) 
-        }px`,
-      width: `${fix.width + $loc.outerWidth()  }px`
+        )}px`,
+      width: `${fix.width + $loc.outerWidth()}px`
     });
   }
 
@@ -265,7 +262,7 @@ class InputController {
     const me = this;
 
     me.togglePanel(false);
-    me.mapController.specifyLocation((loc) => {
+    me.mapController.specifyLocation(loc => {
       me.togglePanel(true);
       if (loc) {
         me.setLatLng(loc);
@@ -313,12 +310,12 @@ class InputController {
     const me = this;
 
     me.geoLocationWatchId = window.navigator.geolocation.watchPosition(
-      (pos) => {
+      pos => {
         // on success
         me.lastGeoLocationResult = pos;
         progressBar.finalize();
       },
-      (err) => {
+      err => {
         // on error
         me.lastGeoLocationResult = err;
         progressBar.finalize();
@@ -367,9 +364,10 @@ class InputController {
       (results, status) => {
         let filteredResults =
             results &&
-            results.filter((r) => 
-              // exclude road name
-               !_.includes(r.types, "route")
+            results.filter(
+              r =>
+                // exclude road name
+                !_.includes(r.types, "route")
             ),
           addr;
 
@@ -417,7 +415,7 @@ class InputController {
 
   selectLocationBySpeech() {
     let me = this,
-      recognizer = new window.webkitSpeechRecognition(),
+      recognizer = new window.webkitSpeechRecognition(), // eslint-disable-line new-cap
       accepted,
       __ = _.bind(me.application.getMessage, me.application);
 
@@ -458,8 +456,6 @@ class InputController {
 
   togglePanel(show) {
     let me = this,
-      $header = me.$el.find("#app-header"),
-      // isVisible = me.$el.is(':visible'),
       isVisible = me.$el.css("height") !== "50px",
       doShow = !isVisible && show !== false,
       doHide = isVisible && show !== true;
@@ -477,11 +473,12 @@ class InputController {
     let me = this,
       retVal = false;
 
-    me.mapController.map.data.forEach((feature) => {
+    me.mapController.map.data.forEach(feature => {
       if (feature.getProperty("isResult") === true) {
         retVal = true;
         return false;
       }
+      return true;
     });
 
     return retVal;
@@ -498,7 +495,7 @@ class InputController {
     });
     me.$time.val(Math.round(values.time / 60));
     $modes.prop("checked", false);
-    $modes.filter(`[value=${  values.mode  }]`).prop("checked", true);
+    $modes.filter(`[value=${values.mode}]`).prop("checked", true);
 
     return deferred.promise();
   }

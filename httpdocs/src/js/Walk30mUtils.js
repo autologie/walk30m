@@ -35,13 +35,13 @@ class Walk30mUtils {
       .join(",")
       .replace(/,/g, " ")
       .replace(/\s/g, "+")
-      .replace(/\+\-/g, "-");
+      .replace(/\+-/g, "-");
   }
 
   static decodeResult(str) {
     const charSeq = str
       .replace(/\+/g, " ")
-      .replace(/\-/g, " -")
+      .replace(/-/g, " -")
       .split(" ")
       .reduce(
         (passed, elem) => [
