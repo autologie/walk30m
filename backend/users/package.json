@@ -3,11 +3,11 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "resolutions": {
-    "google-function-authorizer/**/bcrypt": "1.0.3"
-  },
   "dependencies": {
     "@google-cloud/datastore": "^1.4.0",
     "google-function-authorizer": "^0.1.0"
+  },
+  "resolutions": {
+    "google-function-authorizer/**/node-pre-gyp": "0.10.0"
   }
 }

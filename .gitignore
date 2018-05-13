@@ -94,3 +94,4 @@ tags
 lambda/target/
 !httpdocs/target/about-degraded-mode.html
 !httpdocs/target/gcp-invoice.png
+staging

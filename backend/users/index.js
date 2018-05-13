@@ -20,15 +20,14 @@ function withUsers(callback) {
           kind: 'User',
           namespace: undefined,
         },
-        rules: {
-          create: false,
-        },
       });
 
       callback(users);
     });
 }
 
-exports.users = (req, res) =>
+exports.users = (req, res) => {
+  console.log(req.params);
   withUsers(users => users.handle(req, res))
     .catch(err => handleError(req, res, err));
+};

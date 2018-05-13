@@ -10,16 +10,20 @@ variable "source_dir" {
   type = "string"
 }
 
-data archive_file "function_source" {
-  type        = "zip"
-  source_dir  = "${var.source_dir}"
-  output_path = "./staging/${var.function_name}.zip"
+resource null_resource "function_source" {
+  triggers = {
+    run = "${uuid()}"
+  }
+  provisioner "local-exec" {
+    command = "./modules/cloud_function/create_archive.sh ${var.source_dir} ./staging/${var.function_name}.zip"
+  }
 }
 
 resource google_storage_bucket_object "function_assets" {
-  name   = "function_assets/${var.function_name}.zip"
-  source = "${data.archive_file.function_source.output_path}"
-  bucket = "${var.bucket_name}"
+  depends_on = ["null_resource.function_source"]
+  name       = "function_assets/${var.function_name}.zip"
+  source     = "./staging/${var.function_name}.zip"
+  bucket     = "${var.bucket_name}"
 }
 
 resource google_cloudfunctions_function "http_function" {
