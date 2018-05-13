@@ -12,8 +12,9 @@ variable "source_dir" {
 
 resource null_resource "function_source" {
   triggers = {
-    run = "${uuid()}"
+    always_run = "${uuid()}"
   }
+
   provisioner "local-exec" {
     command = "./modules/cloud_function/create_archive.sh ${var.source_dir} ./staging/${var.function_name}.zip"
   }

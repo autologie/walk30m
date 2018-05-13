@@ -6,6 +6,7 @@
   "dependencies": {
     "@google-cloud/datastore": "^1.4.0",
     "camelcase-keys": "^4.2.0",
+    "google-function-authorizer": "^0.1.0",
     "uuid": "^3.2.1"
   }
 }

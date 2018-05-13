@@ -1,9 +1,55 @@
 const uuidv4 = require("uuid/v4");
 const camelcaseKeys = require("camelcase-keys");
 const Datastore = require("@google-cloud/datastore");
+const Users = require("google-function-authorizer");
 
 const datastore = new Datastore();
 const kind = "ExecutionLog";
+const timeZoneOffset = -9;
+
+function hasName(name) {
+  return entity => entity[datastore.KEY].path[1] === name;
+}
+
+function withUsers(callback) {
+  return datastore
+    .get([
+      datastore.key(["Miscellaneous", "secret"]),
+      datastore.key(["Miscellaneous", "allowedOrigins"])
+    ])
+    .then(([entities]) => {
+      const secret = entities.filter(hasName("secret"))[0];
+      const allowedOrigins = entities.filter(hasName("allowedOrigins"))[0];
+
+      if (!secret) {
+        throw new Error("Invalid configuration. secret is missing.");
+      }
+
+      if (!allowedOrigins) {
+        throw new Error("Invalid configuration. allowedOrigins is missing.");
+      }
+
+      callback(
+        Users({
+          session: {
+            secret: secret.value
+          },
+          cors: {
+            "Access-Control-Allow-Origin": allowedOrigins.values.join(","),
+            "Access-Control-Allow-Credentials": "true",
+            "Access-Control-Allow-Headers": "Content-Type"
+          },
+          datastore: {
+            kind: "User",
+            namespace: undefined
+          },
+          rules: {
+            create: false
+          }
+        })
+      );
+    });
+}
 
 function withCors(res) {
   return res
@@ -34,7 +80,7 @@ function handleCreate(req, res) {
   const body = camelcaseKeys(req.body);
   const id = uuidv4();
 
-  datastore
+  return datastore
     .save({
       key: datastore.key([kind, id]),
       data: Object.assign({}, body, {
@@ -74,7 +120,7 @@ function handleUpdate(req, res) {
 
   const datastoreKey = datastore.key([kind, id]);
 
-  datastore
+  return datastore
     .get(datastoreKey)
     .then(([entity]) => {
       if (entity === undefined) return handleNotFound(req, res);
@@ -104,11 +150,48 @@ function handleUpdate(req, res) {
     .catch(err => handleError(req, res, err));
 }
 
+function handleQuery(req, res) {
+  const year = parseInt(req.query.year, 10);
+  const month = parseInt(req.query.month, 10);
+  const day = parseInt(req.query.day, 10);
+
+  if (!year || !month || !day) {
+    handleBadRequest(req, res, "year, month and day is required.");
+  } else {
+    const query = datastore.createQuery(kind);
+
+    query.filter(
+      "startDateTime",
+      ">=",
+      new Date(year, month - 1, day, timeZoneOffset)
+    );
+    query.filter(
+      "startDateTime",
+      "<",
+      new Date(year, month - 1, day + 1, timeZoneOffset)
+    );
+
+    datastore
+      .runQuery(query)
+      .then(entities =>
+        entities.map(entity =>
+          Object.assign({}, entity, {
+            id: entity[datastore.KEY].path[1]
+          })
+        )
+      )
+      .then(body => withCors(res).send(JSON.stringify(body)))
+      .catch(e => handleError(req, res, e));
+  }
+}
+
 exports.executionLogs = (req, res) => {
   try {
     if (req.method === "OPTIONS") withCors(res).sendStatus(200);
     else if (req.method === "POST") handleCreate(req, res);
     else if (req.method === "PUT") handleUpdate(req, res);
+    else if (req.method === "GET")
+      withUsers(users => users.authorize(req, res, handleQuery));
     else handleNotFound(req, res);
   } catch (e) {
     handleError(req, res, e);
