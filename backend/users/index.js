@@ -11,23 +11,17 @@ function handleError(req, res, e) {
 function withUsers(callback) {
   return datastore
     .get(datastore.key(['Miscellaneous', 'secret']))
-    .then(([secret]) => {
-      const users = Users({
-        session: {
-          secret: secret.value,
-        },
-        datastore: {
-          kind: 'User',
-          namespace: undefined,
-        },
-      });
-
-      callback(users);
-    });
+    .then(([secret]) => callback(Users({
+      session: {
+        secret: secret.value,
+      },
+      datastore: {
+        kind: 'User',
+        namespace: undefined,
+      },
+    })));
 }
 
-exports.users = (req, res) => {
-  console.log(req.params);
+exports.users = (req, res) =>
   withUsers(users => users.handle(req, res))
     .catch(err => handleError(req, res, err));
-};
