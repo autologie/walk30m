@@ -3,31 +3,25 @@ const Users = require("google-function-authorizer");
 
 const datastore = new Datastore();
 
-function handleError(req, res, e) {
-  console.error("An error occurred in handling request.", e);
-  if (!res.headersSent) res.sendStatus(500);
-}
-
 function hasName(name) {
   return entity => entity[datastore.KEY].path[1] === name;
 }
 
-function withUsers(callback) {
+function withCors(req, res) {
+  return res
+    .set("Access-Control-Allow-Origin", req.get("Origin"))
+    .set("Access-Control-Allow-Headers", "Content-Type,User-Agent")
+    .set("Access-Control-Allow-Methods", "GET,PUT,POST");
+}
+
+function withUsers(req, callback) {
   return datastore
-    .get([
-      datastore.key(["Miscellaneous", "secret"]),
-      datastore.key(["Miscellaneous", "allowedOrigins"])
-    ])
-    .then(([entities]) => {
+    .get(datastore.key(["Miscellaneous", "secret"]))
+    .then(entities => {
       const secret = entities.filter(hasName("secret"))[0];
-      const allowedOrigins = entities.filter(hasName("allowedOrigins"))[0];
 
       if (!secret) {
         throw new Error("Invalid configuration. secret is missing.");
-      }
-
-      if (!allowedOrigins) {
-        throw new Error("Invalid configuration. allowedOrigins is missing.");
       }
 
       callback(
@@ -36,9 +30,10 @@ function withUsers(callback) {
             secret: secret.value
           },
           cors: {
-            "Access-Control-Allow-Origin": allowedOrigins.values.join(","),
+            "Access-Control-Allow-Origin": req.get("Origin"),
             "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Allow-Headers": "Content-Type"
+            "Access-Control-Allow-Headers": "Content-Type,User-Agent",
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE"
           },
           datastore: {
             kind: "User",
@@ -52,7 +47,21 @@ function withUsers(callback) {
     });
 }
 
+function handleError(req, res, e) {
+  console.error("An error occurred in handling request.", e);
+  if (!res.headersSent) res.sendStatus(500);
+}
+
+function handleSelf(req, res, user) {
+  withCors(req, res).json({
+    code: "OK",
+    user,
+  });
+}
+
 exports.users = (req, res) =>
-  withUsers(users => users.handle(req, res)).catch(err =>
-    handleError(req, res, err)
-  );
+  withUsers(req, users => {
+    if (req.path === "/self" && req.method === "GET")
+      users.authorize(req, res, handleSelf);
+    else users.handle(req, res);
+  }).catch(err => handleError(req, res, err));

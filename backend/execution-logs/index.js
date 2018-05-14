@@ -11,22 +11,14 @@ function hasName(name) {
   return entity => entity[datastore.KEY].path[1] === name;
 }
 
-function withUsers(callback) {
+function withUsers(req, callback) {
   return datastore
-    .get([
-      datastore.key(["Miscellaneous", "secret"]),
-      datastore.key(["Miscellaneous", "allowedOrigins"])
-    ])
-    .then(([entities]) => {
+    .get(datastore.key(["Miscellaneous", "secret"]))
+    .then(entities => {
       const secret = entities.filter(hasName("secret"))[0];
-      const allowedOrigins = entities.filter(hasName("allowedOrigins"))[0];
 
       if (!secret) {
         throw new Error("Invalid configuration. secret is missing.");
-      }
-
-      if (!allowedOrigins) {
-        throw new Error("Invalid configuration. allowedOrigins is missing.");
       }
 
       callback(
@@ -35,9 +27,10 @@ function withUsers(callback) {
             secret: secret.value
           },
           cors: {
-            "Access-Control-Allow-Origin": allowedOrigins.values.join(","),
+            "Access-Control-Allow-Origin": req.get("Origin"),
             "Access-Control-Allow-Credentials": "true",
-            "Access-Control-Allow-Headers": "Content-Type"
+            "Access-Control-Allow-Headers": "Content-Type,User-Agent",
+            "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE"
           },
           datastore: {
             kind: "User",
@@ -51,26 +44,26 @@ function withUsers(callback) {
     });
 }
 
-function withCors(res) {
+function withCors(req, res) {
   return res
-    .set("Access-Control-Allow-Origin", "*")
+    .set("Access-Control-Allow-Origin", req.get("Origin"))
     .set("Access-Control-Allow-Headers", "Content-Type,User-Agent")
     .set("Access-Control-Allow-Methods", "GET,PUT,POST");
 }
 
 function handleNotFound(req, res) {
   console.warn("Requested resource not found.", req.path);
-  withCors(res).sendStatus(404);
+  withCors(req, res).sendStatus(404);
 }
 
 function handleBadRequest(req, res, message) {
   console.warn("Invalid request.", message);
-  withCors(res).sendStatus(400);
+  withCors(req, res).sendStatus(400);
 }
 
 function handleError(req, res, e) {
   console.error("An error occurred in handling request.", e);
-  if (!res.headersSent) withCors(res).sendStatus(500);
+  if (!res.headersSent) withCors(req, res).sendStatus(500);
 }
 
 function handleCreate(req, res) {
@@ -101,9 +94,9 @@ function handleCreate(req, res) {
       })
     })
     .then(() =>
-      withCors(res)
+      withCors(req, res)
         .status(201)
-        .end(JSON.stringify({ uuid: id }))
+        .json({ uuid: id })
     )
     .catch(err => handleError(req, res, err));
 }
@@ -145,7 +138,7 @@ function handleUpdate(req, res) {
             )
           })
         })
-        .then(() => withCors(res).sendStatus(200));
+        .then(() => withCors(req, res).sendStatus(200));
     })
     .catch(err => handleError(req, res, err));
 }
@@ -173,25 +166,25 @@ function handleQuery(req, res) {
 
     datastore
       .runQuery(query)
-      .then(entities =>
+      .then(([entities]) =>
         entities.map(entity =>
           Object.assign({}, entity, {
             id: entity[datastore.KEY].path[1]
           })
         )
       )
-      .then(body => withCors(res).send(JSON.stringify(body)))
+      .then(body => withCors(req, res).json(body))
       .catch(e => handleError(req, res, e));
   }
 }
 
 exports.executionLogs = (req, res) => {
   try {
-    if (req.method === "OPTIONS") withCors(res).sendStatus(200);
+    if (req.method === "OPTIONS") withCors(req, res).sendStatus(200);
     else if (req.method === "POST") handleCreate(req, res);
     else if (req.method === "PUT") handleUpdate(req, res);
     else if (req.method === "GET")
-      withUsers(users => users.authorize(req, res, handleQuery));
+      withUsers(req, users => users.authorize(req, res, handleQuery));
     else handleNotFound(req, res);
   } catch (e) {
     handleError(req, res, e);
