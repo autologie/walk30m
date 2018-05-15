@@ -6,6 +6,7 @@ const Users = require("google-function-authorizer");
 const datastore = new Datastore();
 const kind = "ExecutionLog";
 const timeZoneOffset = -9;
+const excludeFromIndexes = ["encodedRequest", "path"];
 
 function hasName(name) {
   return entity => entity[datastore.KEY].path[1] === name;
@@ -76,6 +77,7 @@ function handleCreate(req, res) {
   return datastore
     .save({
       key: datastore.key([kind, id]),
+      excludeFromIndexes,
       data: Object.assign({}, body, {
         startDateTime: new Date(body.startDatetime),
         userAgent: req.get("User-Agent"),
@@ -128,6 +130,7 @@ function handleUpdate(req, res) {
       return datastore
         .save({
           key: datastoreKey,
+          excludeFromIndexes,
           data: Object.assign({}, entity, {
             completeDateTime: new Date(req.body.complete_datetime),
             path: (req.body.result_path || []).map(coord =>

@@ -55,7 +55,7 @@ function handleError(req, res, e) {
 function handleSelf(req, res, user) {
   withCors(req, res).json({
     code: "OK",
-    user,
+    user
   });
 }
 
