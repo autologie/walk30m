@@ -6,7 +6,7 @@ const Users = require("google-function-authorizer");
 const datastore = new Datastore();
 const kind = "ExecutionLog";
 const timeZoneOffset = -9;
-const excludeFromIndexes = ["encodedRequest", "path"];
+const excludeFromIndexes = ["encodedRequest", "path[]"];
 
 function hasName(name) {
   return entity => entity[datastore.KEY].path[1] === name;
