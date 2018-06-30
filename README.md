@@ -9,7 +9,8 @@ https://www.walk30m.com
 ### Requirements
 
 * node 4.2.6
-* AWS CLI 1.10+ - uses configured profile named `walk30m`
+* AWS CLI 1.10+
+  * uses configured profile named `walk30m`
 
 ### Environment Variables
 
