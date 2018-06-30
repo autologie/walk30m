@@ -577,36 +577,16 @@ section.glyphicon-bg h2 {
   text-decoration: underline;
 }
 
-.feature-suggest {
-  display: inline-block;
-  background: #333;
-  padding: 0.7em 1.4em;
-  font-size: 0.8em;
-  border-radius: 0.3em;
-  color: #fff;
-  position: relative;
+.select li.feature-suggest {
+  display: flex;
+  align-items: center;
 }
 
-.feature-suggest:before {
-  content: "";
-  display: block;
-  position: absolute;
-  left: 50%;
-  top: -4px;
-  width: 8px;
-  height: 8px;
-  background: #333;
-  transform: rotate(45deg);
-}
-
-.feature-suggest .label {
-  display: inline-block;
-  margin: 0 0.5em 0 0;
-  background: red;
+.select li.feature-suggest .label {
+  margin: 0 1em 0 0;
+  background: #055;
   border-radius: 0.3em;
   padding: 0.1em 0.5em;
-}
-
-.feature-suggest a {
   color: #fff;
+  font-size: 0.8em;
 }
