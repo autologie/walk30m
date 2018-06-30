@@ -71,5 +71,5 @@ window.messages = {
   cannotRecognizeSpeech: "Sorry, could not recognize.",
   pleaseCheckConditions:
     "An error occured during the calculation. If this happens repeatedly, please check the condition you input. Chances are that there is no route around the specified location.",
-  resolveLocationFailed: "場所の特定に失敗しました。"
+  resolveLocationFailed: "Failed to resolve an address."
 };
