@@ -1,540 +1,551 @@
 body {
-	font-family: Meiryo, sans-serif;
-	color: #222;
-	margin: 0;
-	padding: 0;
+  font-family: Meiryo, sans-serif;
+  color: #222;
+  margin: 0;
+  padding: 0;
 }
 h1,
 h2,
 h3 {
-	font-weight: 200;
+  font-weight: 200;
 }
 h1 {
-	font-size: 2.8em;
+  font-size: 2.8em;
 }
 #app-header h1 {
-	margin: 0;
+  margin: 0;
 }
 h2 {
-	font-size: 2em;
-	margin-top: 2em;
-	margin-bottom: 2em;
+  font-size: 2em;
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
 h3 {
-	font-size: 1.6em;
-	margin-top: 2em;
-	margin-bottom: 2em;
+  font-size: 1.6em;
+  margin-top: 2em;
+  margin-bottom: 2em;
 }
 a {
-	color: #268;
-	text-decoration: none;
+  color: #268;
+  text-decoration: none;
 }
 dd {
-	margin-left: 0;
+  margin-left: 0;
 }
 button,
 select,
 input {
-	font-size: 20px;
-	padding: .5em 1.2em;
-	margin: .5em;
-	line-height: 1.5em!important;
-	border-radius: 2px;
-	border: none;
-	color: #fff;
+  font-size: 20px;
+  padding: 0.5em 1.2em;
+  margin: 0.5em;
+  line-height: 1.5em !important;
+  border-radius: 2px;
+  border: none;
+  color: #fff;
 }
-input[type=checkbox],
-input[type=radio] {
-	background-color: transparent;
-}
-select,
-input[type=number],
-input[type=phone],
-input[type=text] {
-	width: calc(100% - 64px);
-	max-width: 400px;
-	background-color: #fff;
-	color: inherit;
+input[type="checkbox"],
+input[type="radio"] {
+  background-color: transparent;
 }
 select,
-input[type=number],
-input[type=phone] {
-	width: 5em;
-	text-align: right;
+input[type="number"],
+input[type="phone"],
+input[type="text"] {
+  width: calc(100% - 64px);
+  max-width: 400px;
+  background-color: #fff;
+  color: inherit;
+}
+select,
+input[type="number"],
+input[type="phone"] {
+  width: 5em;
+  text-align: right;
 }
 #advanced-settings ul.inline-controls {
-	max-width: none;
+  max-width: none;
 }
 #advanced-settings ul.inline-controls li {
-	display: inline-block;
+  display: inline-block;
 }
 .btn.btn-primary {
-	background-color: #2b8;
+  background-color: #2b8;
 }
 .btn.btn-primary:hover {
-	background-color: #3c9;
-	box-shadow: 0px 0px 8px rgba(0, 0, 0, .2);
+  background-color: #3c9;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
 }
 .btn.btn-default {
-	background-color: #ddd;
-	color: #555;
+  background-color: #ddd;
+  color: #555;
 }
 .btn.btn-default:hover {
-	background-color: #eee;
-	box-shadow: 0px 0px 8px rgba(0, 0, 0, .2);
+  background-color: #eee;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.2);
 }
 #app-header {
-	padding: 1.6em 0;
-	/* background-image: url(/images/walking4.png); */
-	/* background-repeat: no-repeat; */
-	/* background-size: contain; */
-	/* background-position-x: calc(50% - 300px); */
-	/* background-position-y: 0; */
-	/* padding-left: 120px; */
+  padding: 1.6em 0;
+  /* background-image: url(/images/walking4.png); */
+  /* background-repeat: no-repeat; */
+  /* background-size: contain; */
+  /* background-position-x: calc(50% - 300px); */
+  /* background-position-y: 0; */
+  /* padding-left: 120px; */
 }
 
 #control.shrink {
-	overflow: hidden;
-	height: 50px;
-	animation-name: toggle-input-panel;
-	animation-duration: .2s;
-	animation-fill-mode: forwards;
+  overflow: hidden;
+  height: 50px;
+  animation-name: toggle-input-panel;
+  animation-duration: 0.2s;
+  animation-fill-mode: forwards;
 }
 
-#control.shrink .glyphicon[role=cancel] {
-	display: none;
+#control.shrink .glyphicon[role="cancel"] {
+  display: none;
 }
 #control.shrink #app-header {
-	padding: .7em 0 0 60px;
-	background-position: calc(50% - 150px);
+  padding: 0.7em 0 0 60px;
+  background-position: calc(50% - 150px);
 }
 #control.shrink #app-header h1 {
-	margin-top: 0;
-	font-size: 22px;
-	padding-left: 0;
+  margin-top: 0;
+  font-size: 22px;
+  padding-left: 0;
 }
 
 .btn.btn-default,
 .btn.btn-primary {
-	width: 360px;
+  width: 360px;
 }
 
-@media
-	(max-width: 414px),
-	(orientation: portrait) {
+@media (max-width: 414px), (orientation: portrait) {
+  h3 {
+    margin-top: 1em;
+    margin-bottom: 1em;
+  }
+  #advanced-settings li {
+    margin: 0.2em 0.5em;
+  }
+  #app-header {
+    padding: 14% 0 0 0;
+    margin-bottom: 1em;
+    background-size: 48%;
+    background-position: center top;
+  }
+  #control.shrink #app-header {
+    padding: 1em 0;
+    background-size: contain;
+    background-position: 10px;
+  }
+  #control.shrink #app-header h1 {
+    font-size: 18px;
+  }
+  #app-header h1 {
+    font-size: 1.6em;
+    padding-left: 0;
+  }
 
-	h3 {
-		margin-top: 1em;
-		margin-bottom: 1em;
-	}
-	#advanced-settings li {
-		margin: .2em .5em
-	}
-	#app-header {
-		padding: 14% 0 0 0;
-		margin-bottom: 1em;
-		background-size: 48%;
-		background-position: center top;
-	}
-	#control.shrink #app-header {
-		padding: 1em 0;
-		background-size: contain;
-		background-position: 10px;
-	}
-	#control.shrink #app-header h1 {
-		font-size: 18px;
-	}
-	#app-header h1 {
-		font-size: 1.6em;
-		padding-left: 0;
-	}
-
-	.btn.btn-default,
-	.btn.btn-primary {
-		width: 70%;
-	}
-	#control ul.links li {
-		display: inline-block;
-	}
-	#control ul.links li:not(:first-child) {
-		margin-left: 0;
-	}
-	#control ul.links li:not(:first-child):before {
-		content: '-';
-		margin-right: 0.5em;
-	}
-	#map-wrapper .btn {
-		width: 40%;
-		white-space: nowrap;
-	}
-	#map-wrapper .btn[role=retry] {
-		width: 70%;
-	}
-	#about h2,
-	#advanced-settings h2 {
-		margin-top: 1em;
-		margin-bottom: 3em;
-	}
-	#about h2 + h3,
-	#advanced-settings h2 + h3 {
-		margin-top: -2em;
-	}
-	#about:before,
-	#advanced-settings:before {
-		font-size: 15em!important;
-	}
-	#advanced-settings ul.inline-controls li {
-		display: block;
-	}
+  .btn.btn-default,
+  .btn.btn-primary {
+    width: 70%;
+  }
+  #control ul.links li {
+    display: inline-block;
+  }
+  #control ul.links li:not(:first-child) {
+    margin-left: 0;
+  }
+  #control ul.links li:not(:first-child):before {
+    content: "-";
+    margin-right: 0.5em;
+  }
+  #map-wrapper .btn {
+    width: 40%;
+    white-space: nowrap;
+  }
+  #map-wrapper .btn[role="retry"] {
+    width: 70%;
+  }
+  #about h2,
+  #advanced-settings h2 {
+    margin-top: 1em;
+    margin-bottom: 3em;
+  }
+  #about h2 + h3,
+  #advanced-settings h2 + h3 {
+    margin-top: -2em;
+  }
+  #about:before,
+  #advanced-settings:before {
+    font-size: 15em !important;
+  }
+  #advanced-settings ul.inline-controls li {
+    display: block;
+  }
 }
-@media
-	(max-width: 414px) and (min-width: 500px),
-	(orientation: portrait) and (min-width: 500px) {
-
-	#app-header {
-		padding: 120px 0 0 0;
-		background-size: 200px;
-	}
+@media (max-width: 414px) and (min-width: 500px),
+  (orientation: portrait) and (min-width: 500px) {
+  #app-header {
+    padding: 120px 0 0 0;
+    background-size: 200px;
+  }
 }
 
 ul {
-	list-style-type: none;
-	padding: 0;
-	margin: 0;
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
 }
 li {
-	margin: 0.5em;
+  margin: 0.5em;
 }
 .screen-cover {
-	z-index: 30;
-	width: 100%;
-	max-height: 700px;
+  z-index: 30;
+  width: 100%;
+  max-height: 700px;
 }
 #map-wrapper {
-	position: absolute;
-	z-index: 10;
+  position: absolute;
+  z-index: 10;
 }
 #control {
-	position: absolute;
-	z-index: 30;
-	left: 0;
-	top: 0;
-	width: 100%;
-	height: 100vh;
-	max-height: 700px;
-	background-color: rgba(255, 255, 255, 0.5);
-	/* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&amp;1+0,0.9+30,0.5+90,0.2+100 */
-	background: -moz-linear-gradient(top,  rgba(255,255,255,1) 0%, rgba(255,255,255,0.9) 30%, rgba(255,255,255,0.5) 90%, rgba(255,255,255,0.2) 100%); /* FF3.6-15 */
-	background: -webkit-linear-gradient(top,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.9) 30%,rgba(255,255,255,0.5) 90%,rgba(255,255,255,0.2) 100%); /* Chrome10-25,Safari5.1-6 */
-	background: linear-gradient(to bottom,  rgba(255,255,255,1) 0%,rgba(255,255,255,0.9) 30%,rgba(255,255,255,0.5) 90%,rgba(255,255,255,0.2) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#33ffffff',GradientType=0 ); /* IE6-9 */
-	text-align: center;
-	font-size: 120%;
-	padding-right: 1em;
-	padding-left: 1em;
-	/* box-sizing: content-box; */
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100vh;
+  max-height: 700px;
+  background-color: rgba(255, 255, 255, 0.5);
+  /* Permalink - use to edit and share this gradient: http://colorzilla.com/gradient-editor/#ffffff+0,ffffff+100&amp;1+0,0.9+30,0.5+90,0.2+100 */
+  background: -moz-linear-gradient(
+    top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 30%,
+    rgba(255, 255, 255, 0.5) 90%,
+    rgba(255, 255, 255, 0.2) 100%
+  ); /* FF3.6-15 */
+  background: -webkit-linear-gradient(
+    top,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 30%,
+    rgba(255, 255, 255, 0.5) 90%,
+    rgba(255, 255, 255, 0.2) 100%
+  ); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 1) 0%,
+    rgba(255, 255, 255, 0.9) 30%,
+    rgba(255, 255, 255, 0.5) 90%,
+    rgba(255, 255, 255, 0.2) 100%
+  ); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffffff', endColorstr='#33ffffff',GradientType=0 ); /* IE6-9 */
+  text-align: center;
+  font-size: 120%;
+  padding-right: 1em;
+  padding-left: 1em;
+  /* box-sizing: content-box; */
 }
 #control .control-search {
-	position: relative;
+  position: relative;
 }
-#control span[role=cancel] {
-	display: inline-block;
-	color: #aaa;
-	position: absolute;
-	top: 0;
-	right: 0;
-	margin: .4em .2em;
-	font-size: 2em;
-	cursor: pointer;
+#control span[role="cancel"] {
+  display: inline-block;
+  color: #aaa;
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 0.4em 0.2em;
+  font-size: 2em;
+  cursor: pointer;
 }
-#control span[role=cancel]:hover {
-	color: #ccc;
+#control span[role="cancel"]:hover {
+  color: #ccc;
 }
 
-#extra{
-	position: absolute;
-	z-index: 30;
-	left: 0;
-	width: 100%;
-	top: 100%;
-	text-align: center;
+#extra {
+  position: absolute;
+  z-index: 30;
+  left: 0;
+  width: 100%;
+  top: 100%;
+  text-align: center;
 }
 .select {
-	background-color: #fff;
-	position: absolute;
-	margin: 0px;
-	box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
-	display: none;
-	margin: 10px 0px 0px 10px;
-	z-index: 10000;
+  background-color: #fff;
+  position: absolute;
+  margin: 0px;
+  box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.1);
+  display: none;
+  margin: 10px 0px 0px 10px;
+  z-index: 10000;
 }
 .select li {
-	padding: 1em 1em;
-	text-align: left;
-	margin: 0px;
-	display: block;
-	cursor: pointer;
-	text-shadow: none;
+  padding: 1em 1em;
+  text-align: left;
+  margin: 0px;
+  display: block;
+  cursor: pointer;
+  text-shadow: none;
 }
 .select li:not(:last-child) {
-	border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
 }
 .select li:hover {
-	background-color: #f8f8f8;
+  background-color: #f8f8f8;
 }
 .select li .glyphicon {
-	margin-right: .3em;
-	font-size: 130%;
+  margin-right: 0.3em;
+  font-size: 130%;
 }
 .select li.disabled {
-	opacity: .3;
-	cursor: default;
+  opacity: 0.3;
+  cursor: default;
 }
 #map-wrapper .center-marker {
-	left: 50%;
-	top: calc(50% + 25px);
-	background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi_hdpi.png);
-	background-repeat: no-repeat;
-	margin-top: -40px;
-	width: 22px;
-	height: 40px;
-	margin-left: -11px;
-	background-size: contain;
-	display: none;
-	pointer-events: none;
+  left: 50%;
+  top: calc(50% + 25px);
+  background-image: url(https://maps.gstatic.com/mapfiles/api-3/images/spotlight-poi_hdpi.png);
+  background-repeat: no-repeat;
+  margin-top: -40px;
+  width: 22px;
+  height: 40px;
+  margin-left: -11px;
+  background-size: contain;
+  display: none;
+  pointer-events: none;
 }
 #map-wrapper .btn {
-	display: none;
-	box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
+  display: none;
+  box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.3);
 }
 #map-wrapper a[role]:not(:first-child):before {
-	content: '|';
-	margin: 0 1em;
-	color: #222;
+  content: "|";
+  margin: 0 1em;
+  color: #222;
 }
 #map-wrapper a[role]:not(:first-child):hover:before {
-	text-decoration: none;
+  text-decoration: none;
 }
 
 #map-wrapper .over-map {
-	z-index: 100;
-	position: absolute;
+  z-index: 100;
+  position: absolute;
 }
 #map-wrapper .btn-wrapper {
-	width: 100%;
-	text-align: center;
-	bottom: 0px;
-	margin-bottom: 1em;
+  width: 100%;
+  text-align: center;
+  bottom: 0px;
+  margin-bottom: 1em;
 }
 #map-wrapper .message {
-	background-color: rgba(0, 0, 0, 0.5);
-	color: #eee;
-	left: 10%;
-	top: 50px;
-	display: none;
-	margin: 1em 0em;
-	padding: 1em 0.5em;
-	text-align: center;
-	width: 80%;
-	border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #eee;
+  left: 10%;
+  top: 50px;
+  display: none;
+  margin: 1em 0em;
+  padding: 1em 0.5em;
+  text-align: center;
+  width: 80%;
+  border-radius: 4px;
 }
-div[role=progressbar] {
-	position: absolute;
-	width: 100%;
-	height: 5px;
-	background-color: rgba(255, 255, 255, 0.5);
-	z-index: 20;
-	display: none;
-	top: 0
+div[role="progressbar"] {
+  position: absolute;
+  width: 100%;
+  height: 5px;
+  background-color: rgba(255, 255, 255, 0.5);
+  z-index: 20;
+  display: none;
+  top: 0;
 }
 #progressbar {
-	z-index: 100;
+  z-index: 100;
 }
 
-div[role=progressbar] .progress {
-	width: 0px;
-	height: 100%;
-	position: relative;
-	background-color: rgba(0, 128, 0, 0.5);
-	overflow: hidden;
+div[role="progressbar"] .progress {
+  width: 0px;
+  height: 100%;
+  position: relative;
+  background-color: rgba(0, 128, 0, 0.5);
+  overflow: hidden;
 }
-div[role=progressbar] .progress .inner {
-	position: absolute;
-	background-color: rgba(0, 128, 0, 0.5);
-	height: 100%;
-	width: 500px;
-	left: -500pxe;
-	left: 0;
-	animation-duration: 3s;
-	animation-name: slide;
-	animation-iteration-count: infinite;
+div[role="progressbar"] .progress .inner {
+  position: absolute;
+  background-color: rgba(0, 128, 0, 0.5);
+  height: 100%;
+  width: 500px;
+  left: -500pxe;
+  left: 0;
+  animation-duration: 3s;
+  animation-name: slide;
+  animation-iteration-count: infinite;
 }
 
 @keyframes slide {
-	from {
-		left: -500px;
-	}
-	to {
-		left: calc(100% + 100px);
-	}
+  from {
+    left: -500px;
+  }
+  to {
+    left: calc(100% + 100px);
+  }
 }
 
 @keyframes toggle-input-panel {
-	from {
-	}
-	to {
-		height: 50px;
-	}
+  from {
+  }
+  to {
+    height: 50px;
+  }
 }
 
-
-
-.btn[role=goto-top]:hover {
-	background-color: inherit;
+.btn[role="goto-top"]:hover {
+  background-color: inherit;
 }
-.btn[role=goto-top] > span {
-	margin: -1em;
+.btn[role="goto-top"] > span {
+  margin: -1em;
 }
-.btn[role=goto-top] {
-	position: fixed;
-	right: 0px;
-	bottom: 0px;
-	margin: 1em;
-	display: none;
-	z-index: 30000;
-	width: 64px;
-	height: 64px;
-	border-radius: 50%;
-	background-color: #fff;
-	color: #2b8;
-	border: 2px solid #2b8;
+.btn[role="goto-top"] {
+  position: fixed;
+  right: 0px;
+  bottom: 0px;
+  margin: 1em;
+  display: none;
+  z-index: 30000;
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background-color: #fff;
+  color: #2b8;
+  border: 2px solid #2b8;
 }
-.btn[role=goto-top] .glyphicon:before {
-	margin-right:	0;
-	line-height: 32px;
+.btn[role="goto-top"] .glyphicon:before {
+  margin-right: 0;
+  line-height: 32px;
 }
 
-input[type=checkbox]:checked:before,
-input[type=radio]:checked:before {
-	background-color: #2b8;
-	color: #fff;
+input[type="checkbox"]:checked:before,
+input[type="radio"]:checked:before {
+  background-color: #2b8;
+  color: #fff;
 }
-input[type=checkbox]:before,
-input[type=radio]:before {
-	content: "\e013";
-	font-size: 80%;
-	background-color: #eee;
-	font-family: 'Glyphicons Halflings';
-	width: 24px;
-	height: 24px;
-	display: block;
-	color: #999;
-	text-align: center;
-	border-radius: 4px;
-	line-height: 24px;
-}
-
-input[type=checkbox],
-input[type=radio] {
-	width: 24px;
-	height: 24px;
-	vertical-align: middle;
-	margin-right: 0px;
-	border-radius: 1em;
+input[type="checkbox"]:before,
+input[type="radio"]:before {
+  content: "\e013";
+  font-size: 80%;
+  background-color: #eee;
+  font-family: "Glyphicons Halflings";
+  width: 24px;
+  height: 24px;
+  display: block;
+  color: #999;
+  text-align: center;
+  border-radius: 4px;
+  line-height: 24px;
 }
 
-input[type=checkbox] ~ label,
-input[type=radio] ~ label {
-	vertical-align: middle;
-	padding-left: .5em;
+input[type="checkbox"],
+input[type="radio"] {
+  width: 24px;
+  height: 24px;
+  vertical-align: middle;
+  margin-right: 0px;
+  border-radius: 1em;
+}
+
+input[type="checkbox"] ~ label,
+input[type="radio"] ~ label {
+  vertical-align: middle;
+  padding-left: 0.5em;
 }
 #message {
-	text-align: center;
-	background-color: #eee;
+  text-align: center;
+  background-color: #eee;
 }
 #message textarea {
-	border: none;
-	font-size: 120%;
-	display: block;
-	width: 90%;
-	max-width: 640px;
-	margin: 0 auto;
+  border: none;
+  font-size: 120%;
+  display: block;
+  width: 90%;
+  max-width: 640px;
+  margin: 0 auto;
 }
 #message .btn {
-	width: 160px;
-	margin-bottom: 5em;
+  width: 160px;
+  margin-bottom: 5em;
 }
 #extra section {
-	width: 100%;
-	padding: 2em 0;
+  width: 100%;
+  padding: 2em 0;
 }
 #advanced-settings {
-	background-color: #246;
-	color: #eee;
+  background-color: #246;
+  color: #eee;
 }
 #advanced-settings ul {
-	margin: 0 auto;
-	max-width: 520px;
-	margin-bottom: 2em;
+  margin: 0 auto;
+  max-width: 520px;
+  margin-bottom: 2em;
 }
 #advanced-settings li {
-	text-align: left;
+  text-align: left;
 }
 #message > *,
 #about > * {
-	max-width: 640px;
-	margin-left: auto;
-	margin-right: auto;
+  max-width: 640px;
+  margin-left: auto;
+  margin-right: auto;
 }
 section.glyphicon-bg {
-	overflow: hidden;
+  overflow: hidden;
 }
 section.glyphicon-bg:before {
-	font-family: 'Glyphicons Halflings';
-	font-size: 20em;
-	color: rgba(200, 200, 200, 0.3);
-	line-height: 0px;
-	margin-left: -1em;
+  font-family: "Glyphicons Halflings";
+  font-size: 20em;
+  color: rgba(200, 200, 200, 0.3);
+  line-height: 0px;
+  margin-left: -1em;
 }
 
 section.glyphicon-bg h2 {
-	display: inline-block;
-	vertical-align: bottom;
+  display: inline-block;
+  vertical-align: bottom;
 }
 
-#advanced-settings input[type=checkbox] ~ label,
-#advanced-settings input[type=radio] ~ label {
-	margin-right: 2em;
+#advanced-settings input[type="checkbox"] ~ label,
+#advanced-settings input[type="radio"] ~ label {
+  margin-right: 2em;
 }
 
 .glyphicon:before {
-	margin-right: .2em;
+  margin-right: 0.2em;
 }
 #map-canvas {
-	background-color: #ddd;
+  background-color: #ddd;
 }
 #about dt {
-	font-weight: bold;
-	margin: .5em 0em;
+  font-weight: bold;
+  margin: 0.5em 0em;
 }
 .btn.disabled {
-	opacity: 0.7;
-	pointer-events: none;
+  opacity: 0.7;
+  pointer-events: none;
 }
 #control .social-buttons {
-	margin: .5em;
+  margin: 0.5em;
 }
 #control .social-buttons > * {
-	vertical-align: bottom;
+  vertical-align: bottom;
 }
 .gm-style-iw h4 div.result-identifier-color {
-	display: inline-block;
-	height: 24px;
-	width: 24px;
-	background-color: hsla(60, 50%, 33%, .5);
-	margin: 0 .4em .4em 0;
-	vertical-align: middle;
-	border: 2px solid hsl(60, 50%, 33%);
+  display: inline-block;
+  height: 24px;
+  width: 24px;
+  background-color: hsla(60, 50%, 33%, 0.5);
+  margin: 0 0.4em 0.4em 0;
+  vertical-align: middle;
+  border: 2px solid hsl(60, 50%, 33%);
 }
 
 #contents-wrap {
@@ -550,13 +561,13 @@ section.glyphicon-bg h2 {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 0 .5em;
+  padding: 0 0.5em;
 }
 
 .notice-panel .header {
   background: #944;
-  border-radius: .1em;
-  padding: .2em .5em;
+  border-radius: 0.1em;
+  padding: 0.2em 0.5em;
   margin: 0 1em;
   white-space: pre;
 }
@@ -566,3 +577,16 @@ section.glyphicon-bg h2 {
   text-decoration: underline;
 }
 
+.select li.feature-suggest {
+  display: flex;
+  align-items: center;
+}
+
+.select li.feature-suggest .label {
+  margin: 0 1em 0 0;
+  background: #055;
+  border-radius: 0.3em;
+  padding: 0.1em 0.5em;
+  color: #fff;
+  font-size: 0.8em;
+}

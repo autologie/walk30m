@@ -166,6 +166,62 @@ class InputController {
     };
   }
 
+  resolveLocationByWhat3words(words) {
+    return new Promise((resolve, reject) => {
+      const apiKey = process.env.WHAT3WORDS_API_KEY;
+
+      if (!/^([^.]+)\.([^.]+)\.([^.]+)$/.test(words)) return resolve([]);
+
+      return $.ajax({
+        url: `https://api.what3words.com/v2/autosuggest?key=${apiKey}&addr=${words}&lang=en`,
+        type: "GET"
+      })
+        .then(data => {
+          const format = result => ({
+            lat: result.geometry.lat,
+            lng: result.geometry.lng,
+            address: `///${result.words}`
+          });
+
+          if (
+            data.status.status !== 200 ||
+            typeof data.status.code !== "undefined"
+          )
+            return reject(new Error(data.status.message));
+
+          return resolve(data.suggestions.map(format));
+        })
+        .catch(reject);
+    });
+  }
+
+  resolveLocationByGoogleMapsGeocoder(address) {
+    return new Promise((resolve, reject) => {
+      new google.maps.Geocoder().geocode({ address }, (results, status) => {
+        if (status === google.maps.GeocoderStatus.ZERO_RESULTS)
+          return resolve([]);
+
+        if (status === google.maps.GeocoderStatus.OK)
+          return resolve(
+            results.slice(0, 3).map(result => ({
+              lat: result.geometry.location.lat(),
+              lng: result.geometry.location.lng(),
+              address: GeoUtil.trimGeocoderAddress(result.formatted_address)
+            }))
+          );
+
+        return reject(status);
+      });
+    });
+  }
+
+  resolveLocation(inputValue) {
+    if (/^\/\/\//.test(inputValue))
+      return this.resolveLocationByWhat3words(inputValue.slice(3));
+
+    return this.resolveLocationByGoogleMapsGeocoder(inputValue);
+  }
+
   doUpdateLocationCombo() {
     let me = this,
       val = me.$location.val(),
@@ -180,40 +236,34 @@ class InputController {
       return;
     }
 
-    new google.maps.Geocoder().geocode(
-      {
-        address: val
-      },
-      (results, status) => {
-        if (status === google.maps.GeocoderStatus.OK) {
-          me.$selModeList.prepend(
-            results
-              .slice(0, 3)
-              .map(result =>
-                tpl({
-                  lat: result.geometry.location.lat(),
-                  lng: result.geometry.location.lng(),
-                  address: GeoUtil.trimGeocoderAddress(result.formatted_address)
-                })
-              )
-              .join("")
-          );
+    me
+      .resolveLocation(val)
+      .then(results => {
+        me.$selModeList.prepend(
+          results
+            .slice(0, 3)
+            .map(tpl)
+            .join("")
+        );
 
-          me.$selModeList
-            .find(selector)
-            .click(ev => {
-              const $choosed = $(ev.target);
+        me.$selModeList
+          .find(selector)
+          .click(ev => {
+            const $choosed = $(ev.target);
 
-              me.onSelModeChoosed(
-                me.selMode.GEOCODE,
-                me.extractSelModeListItemData($choosed)
-              );
-            })
-            .keydown(_.bind(me.onKeyDownSelModeListItem, me))
-            .blur(_.bind(me.onBlurSelModeListItem, me));
-        }
-      }
-    );
+            me.onSelModeChoosed(
+              me.selMode.GEOCODE,
+              me.extractSelModeListItemData($choosed)
+            );
+          })
+          .keydown(_.bind(me.onKeyDownSelModeListItem, me))
+          .blur(_.bind(me.onBlurSelModeListItem, me));
+      })
+      .catch(e => {
+        const message = me.application.getMessage("resolveLocationFailed");
+
+        window.alert([message, (e && e.message) || e].join("\n\n"));
+      });
   }
 
   appendElementToLocationInput($el, fix) {

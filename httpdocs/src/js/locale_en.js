@@ -70,5 +70,6 @@ window.messages = {
   pleaseSpeak: "Please speak...",
   cannotRecognizeSpeech: "Sorry, could not recognize.",
   pleaseCheckConditions:
-    "An error occured during the calculation. If this happens repeatedly, please check the condition you input. Chances are that there is no route around the specified location."
+    "An error occured during the calculation. If this happens repeatedly, please check the condition you input. Chances are that there is no route around the specified location.",
+  resolveLocationFailed: "Failed to resolve an address."
 };
