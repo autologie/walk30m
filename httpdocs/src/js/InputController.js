@@ -1,5 +1,4 @@
 import $ from "jquery";
-
 import _ from "lodash";
 import GeoUtil from "./GeoUtil";
 import ProgressBar from "./ProgressBar";
