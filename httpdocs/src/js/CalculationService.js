@@ -156,7 +156,9 @@ CalculationService.prototype.startMonitorVelocity = function(
 CalculationService.prototype.start = function(request) {
   let me = this,
     task = new Calculation(request),
-    origin = request.origin;
+    origin = request.origin,
+    travelVelocity = request.mode === google.maps.TravelMode.DRIVING ? 50 : 4,
+    guessedDistance = travelVelocity * 1000 * (request.time / 60 / 60);
 
   task.addListener("progress", (progress, added, goals) => {
     google.maps.event.trigger(me, "progress", progress, added, goals);
@@ -170,7 +172,7 @@ CalculationService.prototype.start = function(request) {
   me.calcNext(
     new google.maps.LatLng(
       origin.lat(),
-      origin.lng() + GeoUtil.meterToLng(100, origin.lat())
+      origin.lng() + GeoUtil.meterToLng(guessedDistance, origin.lat())
     )
   );
 
