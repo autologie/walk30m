@@ -1,15 +1,21 @@
 box: node
 build:
   steps:
-    - npm-install:
+    - script:
+      name: install
       cwd: httpdocs/
-    - npm-test:
+      code: |
+        yarn install
+    - script:
+      name: test
       cwd: httpdocs/
+      code: |
+        yarn run test
     - script:
       name: webpack-build
       cwd: httpdocs/
       code: |
-        npm run build
+        yarn run build
 deploy:
   steps:
     - s3sync:
