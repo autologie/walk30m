@@ -36,7 +36,7 @@
   },
   "dependencies": {
     "jquery": "3.3.1",
-    "lodash": "^4.15.0",
+    "lodash": "4.15.0",
     "numeric": "1.2.6",
     "tokml": "0.4.0"
   }
