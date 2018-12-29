@@ -1,0 +1,8 @@
+{
+  "name": "walk30m",
+  "version": "3.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/autologie/walk30m.git",
+  "author": "autologie <autologie@icloud.com>",
+  "license": "MIT"
+}
