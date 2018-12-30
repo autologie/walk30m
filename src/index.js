@@ -96,6 +96,16 @@ function onLoadScript() {
       );
 
       map.data.setStyle(p => p.getProperty("style"));
+
+      const marker = new google.maps.Marker({
+        position: mapOptions.center,
+        draggable: true
+      });
+
+      marker.addListener("dragend", () =>
+        app.ports.markerPositionChanged.send(marker.getPosition().toJSON())
+      );
+      marker.setMap(map);
     })
   );
 

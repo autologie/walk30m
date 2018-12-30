@@ -1,13 +1,16 @@
 port module Main exposing (main)
 
 import Browser
+import Data.LatLng as LatLng exposing (LatLng)
 import Data.MapOptions as MapOptions exposing (MapOptions)
 import Data.Progress as Progress exposing (Progress)
-import Data.Request as Request exposing (Preference(..), Request, TravelMode(..))
+import Data.Request as Request exposing (Request)
 import Data.Session as Session exposing (Session(..))
-import Html exposing (button, div, h1, p, section, text)
-import Html.Attributes exposing (attribute, class, id, style)
-import Html.Events exposing (onClick)
+import Data.TravelMode as TravelMode exposing (TravelMode(..))
+import Data.Preference as Preference exposing (Preference(..))
+import Html exposing (button, div, h1, input, label, option, p, section, select, span, text)
+import Html.Attributes exposing (attribute, checked, class, id, selected, style, type_, value)
+import Html.Events exposing (onClick, onInput)
 import Http exposing (Error)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -37,6 +40,9 @@ port signedOut : (() -> msg) -> Sub msg
 port executionProgress : (Encode.Value -> msg) -> Sub msg
 
 
+port markerPositionChanged : (Encode.Value -> msg) -> Sub msg
+
+
 type Msg
     = ReceiveIdToken String
     | ReceiveSessionCreateResponse (Result Error Session)
@@ -46,6 +52,8 @@ type Msg
     | CreateExecution
     | CloseModal
     | Execute
+    | RequestChanged (Request -> Request)
+    | NoOp
 
 
 type ModalContent
@@ -76,7 +84,7 @@ initialModel =
         , smoothGeometry = True
         , dissolveGeometry = True
         , avoidFerries = False
-        , avoidHighways = False
+        , avoidHighways = True
         , avoidTolls = False
         }
     , progress = Nothing
@@ -98,6 +106,15 @@ main =
                     [ receiveIdToken ReceiveIdToken
                     , signedOut SignedOut
                     , executionProgress (Decode.decodeValue Progress.decode >> ExecutionProgress)
+                    , markerPositionChanged
+                        (Decode.decodeValue LatLng.decode
+                            >> (\originOrErr request ->
+                                    originOrErr
+                                        |> Result.map (\origin -> { request | origin = origin })
+                                        |> Result.withDefault request
+                               )
+                            >> RequestChanged
+                        )
                     ]
         , update = update
         , view = view
@@ -144,6 +161,9 @@ update msg model =
         ExecutionProgress (Ok progress) ->
             ( { model | progress = Just progress }, Cmd.batch [ replaceData (Progress.encode progress) ] )
 
+        RequestChanged updateRequest ->
+            ( { model | request = updateRequest model.request }, Cmd.none )
+
         other ->
             let
                 _ =
@@ -159,22 +179,11 @@ view model =
             [ h1 [] [ text "walk30m.com" ]
             , p [] [ text "A handy and delightful isochronous solution" ]
             , model.session
-                |> Maybe.map
-                    (\(Session _ { displayName }) ->
-                        p []
-                            [ text displayName
-                            , button [ onClick SignOut ] [ text "Sign Out" ]
-                            ]
-                    )
+                |> Maybe.map sessionView
                 |> Maybe.withDefault (p [] [])
             ]
-        , div
-            [ id "google-maps"
-            , style "width" "800px"
-            , style "height" "600px"
-            , style "background" "#ddd"
-            ]
-            []
+        , mapView model
+        , controlView model
         , div []
             [ button [ onClick CreateExecution ] [ text "Start" ]
             , model.progress
@@ -192,6 +201,80 @@ view model =
             ]
             []
         , modalView model
+        ]
+
+
+sessionView (Session _ { displayName }) =
+    div
+        [ style "position" "absolute"
+        , style "right" "0"
+        , style "top" "0"
+        , style "pdding" "1em"
+        ]
+        [ text displayName
+        , button [ onClick SignOut ] [ text "Sign Out" ]
+        ]
+
+
+mapView model =
+    div
+        [ id "google-maps"
+        , style "width" "800px"
+        , style "height" "400px"
+        , style "background" "#ddd"
+        ]
+        []
+
+
+controlView model =
+    div
+        [ style "display" "flex"
+        , style "flex-direction" "column"
+        ]
+        [ label []
+            [ span [] [ text "Origin" ]
+            , select []
+                [ option [] [ text "Current location" ]
+                , option [] [ text "Specify on the Map" ]
+                ]
+            ]
+        , label []
+            [ span [] [ text "Time(min)" ]
+            , input
+                [ type_ "number"
+                , onInput
+                    (String.toInt
+                        >> Maybe.map (\time -> RequestChanged (\req -> { req | time = time * 60 }))
+                        >> Maybe.withDefault NoOp
+                    )
+                , value (String.fromInt (model.request.time // 60))
+                ]
+                []
+            ]
+        , label []
+            [ span [] [ text "Method" ]
+            , select
+                [ onInput
+                    (TravelMode.parse
+                        >> Result.map (\mode -> RequestChanged (\req -> { req | travelMode = mode }))
+                        >> Result.withDefault NoOp
+                    )
+                ]
+                [ option [ value "WALKING", selected (model.request.travelMode == Walking) ] [ text "Walking" ]
+                , option [ value "DRIVING", selected (model.request.travelMode == Driving) ] [ text "Driving" ]
+                ]
+            ]
+        , label []
+            [ span [] [ text "Preference" ]
+            , select []
+                [ option [ selected (model.request.preference == Speed) ] [ text "Speed" ]
+                , option [ selected (model.request.preference == Balance) ] [ text "Balance" ]
+                , option [ selected (model.request.preference == Precision) ] [ text "Precision" ]
+                ]
+            ]
+        , label [] [ input [ type_ "checkbox", checked model.request.avoidFerries ] [], span [] [ text "Avoid Ferries" ] ]
+        , label [] [ input [ type_ "checkbox", checked model.request.avoidHighways ] [], span [] [ text "Avoid Highways" ] ]
+        , label [] [ input [ type_ "checkbox", checked model.request.avoidTolls ] [], span [] [ text "Avoid Tolls" ] ]
         ]
 
 

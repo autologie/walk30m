@@ -1,6 +1,7 @@
 module Data.MapOptions exposing (MapOptions, encode)
 
 import Data.LatLng as LatLng exposing (LatLng)
+import Data.TravelMode as TravelMode exposing (TravelMode(..))
 import Json.Encode as Encode
 
 

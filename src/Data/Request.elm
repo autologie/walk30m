@@ -1,19 +1,10 @@
-module Data.Request exposing (Preference(..), Request, TravelMode(..), encode)
+module Data.Request exposing (Request, encode)
 
 import Data.LatLng as LatLng exposing (LatLng)
+import Data.Preference as Preference exposing (Preference(..))
+import Data.TravelMode as TravelMode exposing (TravelMode(..))
 import Json.Decode as Decode
 import Json.Encode as Encode
-
-
-type TravelMode
-    = Driving
-    | Walking
-
-
-type Preference
-    = Speed
-    | Balance
-    | Precision
 
 
 type alias Request =
@@ -32,31 +23,10 @@ type alias Request =
 encode : Request -> Encode.Value
 encode request =
     Encode.object
-        [ ( "travelMode"
-          , Encode.string
-                (case request.travelMode of
-                    Driving ->
-                        "DRIVING"
-
-                    Walking ->
-                        "WALKING"
-                )
-          )
+        [ ( "travelMode", TravelMode.encode request.travelMode )
         , ( "time", Encode.int request.time )
         , ( "origin", LatLng.encode request.origin )
-        , ( "preference"
-          , Encode.string
-                (case request.preference of
-                    Speed ->
-                        "SPEED"
-
-                    Balance ->
-                        "BALANCE"
-
-                    Precision ->
-                        "PRECISION"
-                )
-          )
+        , ( "preference", Preference.encode request.preference )
         , ( "smoothGeometry", Encode.bool request.smoothGeometry )
         , ( "dissolveGeometry", Encode.bool request.dissolveGeometry )
         , ( "avoidFerries", Encode.bool request.avoidFerries )
