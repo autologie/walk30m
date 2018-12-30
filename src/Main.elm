@@ -3,17 +3,19 @@ port module Main exposing (main)
 import Browser
 import Data.LatLng as LatLng exposing (LatLng)
 import Data.MapOptions as MapOptions exposing (MapOptions)
+import Data.Preference as Preference exposing (Preference(..))
 import Data.Progress as Progress exposing (Progress)
 import Data.Request as Request exposing (Request)
 import Data.Session as Session exposing (Session(..))
 import Data.TravelMode as TravelMode exposing (TravelMode(..))
-import Data.Preference as Preference exposing (Preference(..))
 import Html exposing (button, div, h1, input, label, option, p, section, select, span, text)
 import Html.Attributes exposing (attribute, checked, class, id, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (Error)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import View.Control
+import View.Facebook
 
 
 port renderGoogleSignInButton : () -> Cmd msg
@@ -100,25 +102,27 @@ main =
                 ( initialModel
                 , Cmd.batch [ renderGoogleMaps (MapOptions.encode initialModel.mapOptions) ]
                 )
-        , subscriptions =
-            \_ ->
-                Sub.batch
-                    [ receiveIdToken ReceiveIdToken
-                    , signedOut SignedOut
-                    , executionProgress (Decode.decodeValue Progress.decode >> ExecutionProgress)
-                    , markerPositionChanged
-                        (Decode.decodeValue LatLng.decode
-                            >> (\originOrErr request ->
-                                    originOrErr
-                                        |> Result.map (\origin -> { request | origin = origin })
-                                        |> Result.withDefault request
-                               )
-                            >> RequestChanged
-                        )
-                    ]
+        , subscriptions = subscriptions
         , update = update
         , view = view
         }
+
+
+subscriptions _ =
+    Sub.batch
+        [ receiveIdToken ReceiveIdToken
+        , signedOut SignedOut
+        , executionProgress (Decode.decodeValue Progress.decode >> ExecutionProgress)
+        , markerPositionChanged
+            (Decode.decodeValue LatLng.decode
+                >> (\originOrErr request ->
+                        originOrErr
+                            |> Result.map (\origin -> { request | origin = origin })
+                            |> Result.withDefault request
+                   )
+                >> RequestChanged
+            )
+        ]
 
 
 update msg model =
@@ -183,23 +187,14 @@ view model =
                 |> Maybe.withDefault (p [] [])
             ]
         , mapView model
-        , controlView model
+        , View.Control.view RequestChanged NoOp model.request
         , div []
             [ button [ onClick CreateExecution ] [ text "Start" ]
             , model.progress
                 |> Maybe.map (\{ progress } -> p [] [ text (String.fromFloat (progress * 100) ++ "% Done") ])
                 |> Maybe.withDefault (p [] [])
             ]
-        , div
-            [ class "fb-like"
-            , attribute "data-action" "like"
-            , attribute "data-href" "https://developers.facebook.com/docs/plugins/"
-            , attribute "data-layout" "standard"
-            , attribute "data-share" "true"
-            , attribute "data-show-faces" "true"
-            , attribute "data-size" "small"
-            ]
-            []
+        , View.Facebook.view
         , modalView model
         ]
 
@@ -224,58 +219,6 @@ mapView model =
         , style "background" "#ddd"
         ]
         []
-
-
-controlView model =
-    div
-        [ style "display" "flex"
-        , style "flex-direction" "column"
-        ]
-        [ label []
-            [ span [] [ text "Origin" ]
-            , select []
-                [ option [] [ text "Current location" ]
-                , option [] [ text "Specify on the Map" ]
-                ]
-            ]
-        , label []
-            [ span [] [ text "Time(min)" ]
-            , input
-                [ type_ "number"
-                , onInput
-                    (String.toInt
-                        >> Maybe.map (\time -> RequestChanged (\req -> { req | time = time * 60 }))
-                        >> Maybe.withDefault NoOp
-                    )
-                , value (String.fromInt (model.request.time // 60))
-                ]
-                []
-            ]
-        , label []
-            [ span [] [ text "Method" ]
-            , select
-                [ onInput
-                    (TravelMode.parse
-                        >> Result.map (\mode -> RequestChanged (\req -> { req | travelMode = mode }))
-                        >> Result.withDefault NoOp
-                    )
-                ]
-                [ option [ value "WALKING", selected (model.request.travelMode == Walking) ] [ text "Walking" ]
-                , option [ value "DRIVING", selected (model.request.travelMode == Driving) ] [ text "Driving" ]
-                ]
-            ]
-        , label []
-            [ span [] [ text "Preference" ]
-            , select []
-                [ option [ selected (model.request.preference == Speed) ] [ text "Speed" ]
-                , option [ selected (model.request.preference == Balance) ] [ text "Balance" ]
-                , option [ selected (model.request.preference == Precision) ] [ text "Precision" ]
-                ]
-            ]
-        , label [] [ input [ type_ "checkbox", checked model.request.avoidFerries ] [], span [] [ text "Avoid Ferries" ] ]
-        , label [] [ input [ type_ "checkbox", checked model.request.avoidHighways ] [], span [] [ text "Avoid Highways" ] ]
-        , label [] [ input [ type_ "checkbox", checked model.request.avoidTolls ] [], span [] [ text "Avoid Tolls" ] ]
-        ]
 
 
 modalView model =
