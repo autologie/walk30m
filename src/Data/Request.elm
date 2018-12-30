@@ -23,6 +23,9 @@ type alias Request =
     , preference : Preference
     , smoothGeometry : Bool
     , dissolveGeometry : Bool
+    , avoidFerries : Bool
+    , avoidHighways : Bool
+    , avoidTolls : Bool
     }
 
 
@@ -56,4 +59,7 @@ encode request =
           )
         , ( "smoothGeometry", Encode.bool request.smoothGeometry )
         , ( "dissolveGeometry", Encode.bool request.dissolveGeometry )
+        , ( "avoidFerries", Encode.bool request.avoidFerries )
+        , ( "avoidHighways", Encode.bool request.avoidHighways )
+        , ( "avoidTolls", Encode.bool request.avoidTolls )
         ]

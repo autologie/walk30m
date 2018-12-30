@@ -67,23 +67,26 @@ function onLoadScript() {
     flags: []
   });
 
-  app.ports.execute.subscribe(req => {
-    const service = new google.maps.DistanceMatrixService();
+  app.ports.execute.subscribe(
+    ({ origin, time, travelMode, avoidFerries, avoidHighways, avoidTolls }) => {
+      const service = new google.maps.DistanceMatrixService();
 
-    execute(
-      req,
-      10,
-      cachedMatrixFactory(service, destinations => ({
-        origins: [req.origin],
-        destinations,
-        travelMode: req.travelMode,
-        avoidFerries: true,
-        avoidHighways: true
-      })),
-      (result, visiting, progress) =>
-        app.ports.executionProgress.send({ result, visiting, progress })
-    );
-  });
+      execute(
+        { origin, time, travelMode },
+        10,
+        cachedMatrixFactory(service, destinations => ({
+          origins: [origin],
+          destinations,
+          travelMode,
+          avoidFerries,
+          avoidHighways,
+          avoidTolls
+        })),
+        (result, visiting, progress) =>
+          app.ports.executionProgress.send({ result, visiting, progress })
+      );
+    }
+  );
 
   app.ports.renderGoogleMaps.subscribe(mapOptions =>
     requestAnimationFrame(() => {

@@ -56,6 +56,7 @@ type alias Model =
     { session : Maybe Session
     , modalContent : Maybe ModalContent
     , request : Request
+    , progress : Maybe Progress
     , mapOptions : MapOptions
     }
 
@@ -69,13 +70,17 @@ initialModel =
     , modalContent = Nothing
     , request =
         { travelMode = Driving
-        , time = 30 * 60
+        , time = 90 * 60
         , origin = center
         , preference = Balance
         , smoothGeometry = True
         , dissolveGeometry = True
+        , avoidFerries = False
+        , avoidHighways = False
+        , avoidTolls = False
         }
-    , mapOptions = { zoom = 11, center = center }
+    , progress = Nothing
+    , mapOptions = { zoom = 9, center = center }
     }
 
 
@@ -137,7 +142,7 @@ update msg model =
             ( { model | modalContent = Nothing }, Cmd.none )
 
         ExecutionProgress (Ok progress) ->
-            ( model, Cmd.batch [ replaceData (Progress.encode progress) ] )
+            ( { model | progress = Just progress }, Cmd.batch [ replaceData (Progress.encode progress) ] )
 
         other ->
             let
@@ -149,17 +154,7 @@ update msg model =
 
 view model =
     div [ style "position" "relative" ]
-        [ div
-            [ class "fb-like"
-            , attribute "data-action" "like"
-            , attribute "data-href" "https://developers.facebook.com/docs/plugins/"
-            , attribute "data-layout" "standard"
-            , attribute "data-share" "true"
-            , attribute "data-show-faces" "true"
-            , attribute "data-size" "small"
-            ]
-            []
-        , div [ id "fb-root" ] []
+        [ div [ id "fb-root" ] []
         , section []
             [ h1 [] [ text "walk30m.com" ]
             , p [] [ text "A handy and delightful isochronous solution" ]
@@ -180,7 +175,22 @@ view model =
             , style "background" "#ddd"
             ]
             []
-        , div [] [ button [ onClick CreateExecution ] [ text "Start" ] ]
+        , div []
+            [ button [ onClick CreateExecution ] [ text "Start" ]
+            , model.progress
+                |> Maybe.map (\{ progress } -> p [] [ text (String.fromFloat (progress * 100) ++ "% Done") ])
+                |> Maybe.withDefault (p [] [])
+            ]
+        , div
+            [ class "fb-like"
+            , attribute "data-action" "like"
+            , attribute "data-href" "https://developers.facebook.com/docs/plugins/"
+            , attribute "data-layout" "standard"
+            , attribute "data-share" "true"
+            , attribute "data-show-faces" "true"
+            , attribute "data-size" "small"
+            ]
+            []
         , modalView model
         ]
 
