@@ -1,9 +1,21 @@
 <!doctype html>
 <html>
-<head></head>
+<head>
+  <meta name="viewport" content="initial-scale=1.0">
+  <meta name="google-signin-client_id" content="{{ GOOGLE_CLIENT_ID }}">
+</head>
 <body>
   <div id="app"></div>
   <div id="fb-root"></div>
   <script src="./src/index.js"></script>
+  <script src="https://maps.googleapis.com/maps/api/js?key={{ GOOGLE_MAPS_API_KEY }}&callback=onGoogleMapsScriptLoaded" async defer></script>
+  <script src="https://apis.google.com/js/platform.js?onload=onGooglePlatformScriptLoaded" async defer></script>
+  <script>(function(d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = 'https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v3.2';
+    fjs.parentNode.insertBefore(js, fjs);
+  }(document, 'script', 'facebook-jssdk'));</script>
 </body>
 </html>

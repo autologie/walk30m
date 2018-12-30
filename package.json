@@ -12,7 +12,8 @@
   "devDependencies": {
     "elm-hot": "^1.0.1",
     "node-elm-compiler": "^5.0.1",
-    "parcel-bundler": "^1.11.0"
+    "parcel-bundler": "^1.11.0",
+    "posthtml-expressions": "^1.1.0"
   },
   "dependencies": {
     "@walk30m/core": "^0.2.0"
