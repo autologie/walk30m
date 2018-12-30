@@ -4,5 +4,17 @@
   "main": "index.js",
   "repository": "https://github.com/autologie/walk30m.git",
   "author": "autologie <autologie@icloud.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "scripts": {
+    "start": "parcel index.html -p 5000",
+    "build": "parcel build"
+  },
+  "devDependencies": {
+    "elm-hot": "^1.0.1",
+    "node-elm-compiler": "^5.0.1",
+    "parcel-bundler": "^1.11.0"
+  },
+  "dependencies": {
+    "@walk30m/core": "^0.2.0"
+  }
 }

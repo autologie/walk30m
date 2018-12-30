@@ -1,4 +1,11 @@
-# Created by https://www.gitignore.io/api/terraform,node,vim
+# Created by https://www.gitignore.io/api/node,elm,vim
+# Edit at https://www.gitignore.io/?templates=node,elm,vim
+
+### Elm ###
+# elm-package generated files
+elm-stuff
+# elm-repl generated files
+repl-temp-*
 
 ### Node ###
 # Logs
@@ -23,7 +30,7 @@ coverage
 # nyc test coverage
 .nyc_output
 
-# Grunt intermediate storage (http://gruntjs.com/creating-plugins#storing-task-files)
+# Grunt intermediate storage (https://gruntjs.com/creating-plugins#storing-task-files)
 .grunt
 
 # Bower dependency directory (https://bower.io/)
@@ -32,14 +39,14 @@ bower_components
 # node-waf configuration
 .lock-wscript
 
-# Compiled binary addons (http://nodejs.org/api/addons.html)
+# Compiled binary addons (https://nodejs.org/api/addons.html)
 build/Release
 
 # Dependency directories
 node_modules/
 jspm_packages/
 
-# Typescript v1 declaration files
+# TypeScript v1 declaration files
 typings/
 
 # Optional npm cache directory
@@ -59,39 +66,48 @@ typings/
 
 # dotenv environment variables file
 .env
+.env.test
 
+# parcel-bundler cache (https://parceljs.org/)
+.cache
 
-### Terraform ###
-# Compiled files
-*.tfstate
-*.tfstate.*
+# next.js build output
+.next
 
-# Module directory
-.terraform/
+# nuxt.js build output
+.nuxt
 
-# .tfvars files
-*.tfvars
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
 
 ### Vim ###
-# swap
-.sw[a-p]
-.*.sw[a-p]
-# session
+# Swap
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-rt-v][a-z]
+[._]ss[a-gi-z]
+[._]sw[a-p]
+
+# Session
 Session.vim
-# temporary
+
+# Temporary
 .netrwhist
 *~
-# auto-generated tag files
+# Auto-generated tag files
 tags
+# Persistent undo
+[._]*.un~
 
-
-# End of https://www.gitignore.io/api/terraform,node,vim
-
-*.pem
-*.zip
+# End of https://www.gitignore.io/api/node,elm,vim
 .envrc
-**/target/**
-lambda/target/
-!httpdocs/target/about-degraded-mode.html
-!httpdocs/target/gcp-invoice.png
-staging
+dist
