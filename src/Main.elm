@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Data.MapOptions as MapOptions exposing (MapOptions)
 import Data.Progress as Progress exposing (Progress)
 import Data.Request as Request exposing (Preference(..), Request, TravelMode(..))
 import Data.Session as Session exposing (Session(..))
@@ -15,13 +16,16 @@ import Json.Encode as Encode
 port renderGoogleSignInButton : () -> Cmd msg
 
 
-port renderGoogleMaps : () -> Cmd msg
+port renderGoogleMaps : Encode.Value -> Cmd msg
 
 
 port execute : Encode.Value -> Cmd msg
 
 
 port signOut : () -> Cmd msg
+
+
+port replaceData : Encode.Value -> Cmd msg
 
 
 port receiveIdToken : (String -> msg) -> Sub msg
@@ -52,7 +56,12 @@ type alias Model =
     { session : Maybe Session
     , modalContent : Maybe ModalContent
     , request : Request
+    , mapOptions : MapOptions
     }
+
+
+center =
+    { lat = 35.5, lng = 140.1 }
 
 
 initialModel =
@@ -61,11 +70,12 @@ initialModel =
     , request =
         { travelMode = Driving
         , time = 30 * 60
-        , origin = { lat = 35.5, lng = 140 }
+        , origin = center
         , preference = Balance
         , smoothGeometry = True
         , dissolveGeometry = True
         }
+    , mapOptions = { zoom = 11, center = center }
     }
 
 
@@ -75,7 +85,7 @@ main =
         { init =
             \() ->
                 ( initialModel
-                , Cmd.batch [ renderGoogleMaps () ]
+                , Cmd.batch [ renderGoogleMaps (MapOptions.encode initialModel.mapOptions) ]
                 )
         , subscriptions =
             \_ ->
@@ -84,55 +94,57 @@ main =
                     , signedOut SignedOut
                     , executionProgress (Decode.decodeValue Progress.decode >> ExecutionProgress)
                     ]
-        , update =
-            \msg model ->
-                case msg of
-                    ReceiveIdToken token ->
-                        ( model
-                        , Session.create token ReceiveSessionCreateResponse
-                        )
-
-                    ReceiveSessionCreateResponse (Ok session) ->
-                        ( { model
-                            | session = Just session
-                            , modalContent =
-                                case model.modalContent of
-                                    Just SignInRequired ->
-                                        Nothing
-
-                                    other ->
-                                        other
-                          }
-                        , Cmd.none
-                        )
-
-                    SignOut ->
-                        ( { model | session = Nothing }, signOut () )
-
-                    CreateExecution ->
-                        case model.session of
-                            Nothing ->
-                                ( { model | modalContent = Just SignInRequired }
-                                , Cmd.batch [ renderGoogleSignInButton () ]
-                                )
-
-                            Just _ ->
-                                ( model, Cmd.batch [ execute (Request.encode model.request) ] )
-
-                    CloseModal ->
-                        ( { model | modalContent = Nothing }, Cmd.none )
-
-                    ExecutionProgress progress ->
-                        ( model, Cmd.none )
-
-                    other ->
-                        let
-                            _ =
-                                Debug.log "unexpected Msg" other
-                        in
-                        ( model, Cmd.none )
+        , update = update
         , view = view
         }
+
+
+update msg model =
+    case msg of
+        ReceiveIdToken token ->
+            ( model
+            , Session.create token ReceiveSessionCreateResponse
+            )
+
+        ReceiveSessionCreateResponse (Ok session) ->
+            ( { model
+                | session = Just session
+                , modalContent =
+                    case model.modalContent of
+                        Just SignInRequired ->
+                            Nothing
+
+                        other ->
+                            other
+              }
+            , Cmd.none
+            )
+
+        SignOut ->
+            ( { model | session = Nothing }, signOut () )
+
+        CreateExecution ->
+            case model.session of
+                Nothing ->
+                    ( { model | modalContent = Just SignInRequired }
+                    , Cmd.batch [ renderGoogleSignInButton () ]
+                    )
+
+                Just _ ->
+                    ( model, Cmd.batch [ execute (Request.encode model.request) ] )
+
+        CloseModal ->
+            ( { model | modalContent = Nothing }, Cmd.none )
+
+        ExecutionProgress (Ok progress) ->
+            ( model, Cmd.batch [ replaceData (Progress.encode progress) ] )
+
+        other ->
+            let
+                _ =
+                    Debug.log "unexpected Msg" other
+            in
+            ( model, Cmd.none )
 
 
 view model =

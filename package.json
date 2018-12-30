@@ -16,6 +16,7 @@
     "posthtml-expressions": "^1.1.0"
   },
   "dependencies": {
-    "@walk30m/core": "^0.2.0"
+    "@walk30m/core": "^0.2.0",
+    "babel-polyfill": "^6.26.0"
   }
 }
