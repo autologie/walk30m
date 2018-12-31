@@ -1,38 +1,48 @@
-module Data.Execution exposing (Execution, create)
+module Data.Execution exposing (Execution, complete, create)
 
+import Api
 import Data.LatLng as LatLng
 import Data.Preference as Preference
 import Data.Request as Request exposing (Request)
 import Data.TravelMode as TravelMode
-import Http
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Task exposing (Task)
 
 
 type alias Execution =
-    { id : Maybe String, request : Request }
+    { id : Maybe String
+    , request : Request
+    , progress : Float
+    }
 
 
-create : String -> Execution -> Task String Execution
-create authToken execution =
-    Http.task
-        { method = "POST"
-        , body = Http.jsonBody (createBody execution)
-        , url = "http://localhost:8080/executions"
-        , headers = [ Http.header "Authorization" ("Bearer " ++ authToken) ]
-        , timeout = Nothing
-        , resolver =
-            Http.stringResolver
-                (\res ->
-                    case res of
-                        Http.GoodStatus_ _ body ->
-                            Decode.decodeString decodeCreateResponse body |> Result.mapError (\err -> "")
-
-                        _ ->
-                            Err ""
-                )
+create : Request -> Api.Settings -> Task String Execution
+create request =
+    Api.post
+        { body =
+            createBody
+                { id = Nothing
+                , progress = 0
+                , request = request
+                }
+        , path = "/executions"
+        , decodeResponse = decodeResponse
         }
+
+
+complete : Execution -> Api.Settings -> Task String Execution
+complete execution =
+    case execution.id of
+        Just id ->
+            Api.put
+                { body = createBody execution
+                , path = "/executions/" ++ id
+                , decodeResponse = decodeResponse
+                }
+
+        Nothing ->
+            \_ -> Task.fail "ID is not assigned."
 
 
 createBody { request } =
@@ -48,8 +58,8 @@ createBody { request } =
         ]
 
 
-decodeCreateResponse : Decode.Decoder Execution
-decodeCreateResponse =
+decodeResponse : Decode.Decoder Execution
+decodeResponse =
     Decode.map8
         (\id avoidFerries avoidHighways avoidTolls mode origin preference time ->
             let
@@ -68,6 +78,7 @@ decodeCreateResponse =
             in
             { id = Just id
             , request = request
+            , progress = 0
             }
         )
         (Decode.field "id" Decode.string)

@@ -9,7 +9,7 @@ import Data.Progress as Progress exposing (Progress)
 import Data.Request as Request exposing (Request)
 import Data.Session as Session exposing (Session(..))
 import Data.TravelMode as TravelMode exposing (TravelMode(..))
-import Html exposing (button, div, h1, input, label, option, p, section, select, span, text)
+import Html exposing (Html, button, div, h1, input, label, option, p, section, select, span, text)
 import Html.Attributes exposing (attribute, checked, class, id, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (Error)
@@ -53,6 +53,7 @@ type Msg
     | SignOut
     | SignedOut ()
     | ExecutionCreated (Result String Execution)
+    | ExecutionCompleted (Result String Execution)
     | ExecutionProgress (Result Decode.Error Progress)
     | CreateExecution
     | CloseModal
@@ -69,8 +70,10 @@ type alias Model =
     { session : Maybe Session
     , modalContent : Maybe ModalContent
     , request : Request
-    , progress : Maybe Progress
     , mapOptions : MapOptions
+    , error : Maybe String
+    , apiBaseUrl : String
+    , ongoingExecution : Maybe Execution
     }
 
 
@@ -92,8 +95,10 @@ initialModel =
         , avoidHighways = True
         , avoidTolls = False
         }
-    , progress = Nothing
     , mapOptions = { zoom = 9, center = center }
+    , error = Nothing
+    , apiBaseUrl = "http://localhost:8080"
+    , ongoingExecution = Nothing
     }
 
 
@@ -128,6 +133,7 @@ subscriptions _ =
         ]
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         ReceiveIdToken token ->
@@ -161,21 +167,39 @@ update msg model =
 
                 Just (Session token _) ->
                     ( model
-                    , Execution.create token
-                        { id = Nothing
-                        , request = model.request
-                        }
+                    , Execution.create
+                        model.request
+                        { authToken = token, baseUrl = model.apiBaseUrl }
                         |> Task.attempt ExecutionCreated
                     )
 
         ExecutionCreated (Ok execution) ->
-            ( model, execute (Request.encode execution.request) )
+            ( { model | ongoingExecution = Just execution }, execute (Request.encode execution.request) )
+
+        ExecutionCreated (Err err) ->
+            ( model |> withError err, Cmd.none )
 
         CloseModal ->
             ( { model | modalContent = Nothing }, Cmd.none )
 
         ExecutionProgress (Ok progress) ->
-            ( { model | progress = Just progress }, Cmd.batch [ replaceData (Progress.encode progress) ] )
+            Maybe.map2
+                (\execution (Session token _) ->
+                    if progress.progress == 1 then
+                        ( { model | ongoingExecution = Nothing }
+                        , Execution.complete execution
+                            { authToken = token, baseUrl = model.apiBaseUrl }
+                            |> Task.attempt ExecutionCompleted
+                        )
+
+                    else
+                        ( { model | ongoingExecution = Just { execution | progress = progress.progress } }
+                        , replaceData (Progress.encode progress)
+                        )
+                )
+                model.ongoingExecution
+                model.session
+                |> Maybe.withDefault ( model, Cmd.none )
 
         RequestChanged updateRequest ->
             ( { model | request = updateRequest model.request }, Cmd.none )
@@ -188,6 +212,13 @@ update msg model =
             ( model, Cmd.none )
 
 
+withError err model =
+    { model
+        | error = Just err
+    }
+
+
+view : Model -> Html Msg
 view model =
     div [ style "position" "relative" ]
         [ div [ id "fb-root" ] []
@@ -198,17 +229,27 @@ view model =
                 |> Maybe.map sessionView
                 |> Maybe.withDefault (p [] [])
             ]
+        , errorView model
         , mapView model
         , View.Control.view RequestChanged NoOp model.request
         , div []
             [ button [ onClick CreateExecution ] [ text "Start" ]
-            , model.progress
+            , model.ongoingExecution
                 |> Maybe.map (\{ progress } -> p [] [ text (String.fromFloat (progress * 100) ++ "% Done") ])
                 |> Maybe.withDefault (p [] [])
             ]
         , View.Facebook.view
         , modalView model
         ]
+
+
+errorView model =
+    case model.error of
+        Just err ->
+            p [ style "color" "red" ] [ text err ]
+
+        Nothing ->
+            p [] []
 
 
 sessionView (Session _ { displayName }) =
@@ -241,17 +282,25 @@ modalView model =
         , style "width" "100%"
         , style "height" "100%"
         , style "background" "rgba(0,0,0,.5)"
+        , style "align-items" "center"
+        , style "justify-content" "center"
         , style "display"
             (model.modalContent
-                |> Maybe.map (\_ -> "block")
+                |> Maybe.map (\_ -> "flex")
                 |> Maybe.withDefault "none"
             )
         ]
         [ case model.modalContent of
             Just SignInRequired ->
                 div
-                    [ style "background" "white", style "position" "fixed", style "padding" "2em" ]
-                    [ p [] [ text "To continue, please sign in." ]
+                    [ style "background" "white"
+                    , style "position" "fixed"
+                    , style "padding" "2em"
+                    , style "max-width" "500px"
+                    , style "border-radius" ".5em"
+                    ]
+                    [ p [ style "font-size" "1.5em" ] [ text "To continue, please sign in." ]
+                    , p [] [ text "For fair use for as many people as possible, we restrict the number of free executions per user." ]
                     , div [ id "google-signin-button-container" ] []
                     , button [ onClick CloseModal ] [ text "Close" ]
                     ]
