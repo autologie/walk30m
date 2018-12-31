@@ -1,6 +1,7 @@
 port module Main exposing (main)
 
 import Browser
+import Data.Execution as Execution exposing (Execution)
 import Data.LatLng as LatLng exposing (LatLng)
 import Data.MapOptions as MapOptions exposing (MapOptions)
 import Data.Preference as Preference exposing (Preference(..))
@@ -14,6 +15,7 @@ import Html.Events exposing (onClick, onInput)
 import Http exposing (Error)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Task
 import View.Control
 import View.Facebook
 
@@ -50,6 +52,7 @@ type Msg
     | ReceiveSessionCreateResponse (Result Error Session)
     | SignOut
     | SignedOut ()
+    | ExecutionCreated (Result String Execution)
     | ExecutionProgress (Result Decode.Error Progress)
     | CreateExecution
     | CloseModal
@@ -156,8 +159,17 @@ update msg model =
                     , Cmd.batch [ renderGoogleSignInButton () ]
                     )
 
-                Just _ ->
-                    ( model, Cmd.batch [ execute (Request.encode model.request) ] )
+                Just (Session token _) ->
+                    ( model
+                    , Execution.create token
+                        { id = Nothing
+                        , request = model.request
+                        }
+                        |> Task.attempt ExecutionCreated
+                    )
+
+        ExecutionCreated (Ok execution) ->
+            ( model, execute (Request.encode execution.request) )
 
         CloseModal ->
             ( { model | modalContent = Nothing }, Cmd.none )
