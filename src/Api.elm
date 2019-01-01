@@ -33,7 +33,10 @@ request method { body, path, decodeResponse } { authToken, baseUrl } =
         { method = method
         , body = Http.jsonBody body
         , url = baseUrl ++ path
-        , headers = [ Http.header "Authorization" ("Bearer " ++ authToken) ]
+        , headers =
+            [ Http.header "Authorization" ("Bearer " ++ authToken)
+            , Http.header "Accept" "application/json"
+            ]
         , timeout = Nothing
         , resolver =
             Http.stringResolver

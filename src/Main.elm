@@ -1,7 +1,7 @@
 port module Main exposing (main)
 
 import Browser
-import Data.Execution as Execution exposing (Execution)
+import Data.Execution as Execution exposing (Execution(..))
 import Data.LatLng as LatLng exposing (LatLng)
 import Data.MapOptions as MapOptions exposing (MapOptions)
 import Data.Preference as Preference exposing (Preference(..))
@@ -10,7 +10,7 @@ import Data.Request as Request exposing (Request)
 import Data.Session as Session exposing (Session(..))
 import Data.TravelMode as TravelMode exposing (TravelMode(..))
 import Html exposing (Html, button, div, h1, input, label, option, p, section, select, span, text)
-import Html.Attributes exposing (attribute, checked, class, id, selected, style, type_, value)
+import Html.Attributes exposing (attribute, checked, class, disabled, id, selected, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Http exposing (Error)
 import Json.Decode as Decode
@@ -173,8 +173,8 @@ update msg model =
                         |> Task.attempt ExecutionCreated
                     )
 
-        ExecutionCreated (Ok execution) ->
-            ( { model | ongoingExecution = Just execution }, execute (Request.encode execution.request) )
+        ExecutionCreated (Ok ((Ongoing _ request _) as execution)) ->
+            ( { model | ongoingExecution = Just execution }, execute (Request.encode request) )
 
         ExecutionCreated (Err err) ->
             ( model |> withError err, Cmd.none )
@@ -183,23 +183,24 @@ update msg model =
             ( { model | modalContent = Nothing }, Cmd.none )
 
         ExecutionProgress (Ok progress) ->
-            Maybe.map2
-                (\execution (Session token _) ->
-                    if progress.progress == 1 then
-                        ( { model | ongoingExecution = Nothing }
-                        , Execution.complete execution
-                            { authToken = token, baseUrl = model.apiBaseUrl }
+            case ( progress.progress == 1, model.ongoingExecution, model.session ) of
+                ( True, Just execution, Just (Session authToken _) ) ->
+                    ( { model | ongoingExecution = Nothing }
+                    , Cmd.batch
+                        [ Execution.complete execution
+                            { authToken = authToken, baseUrl = model.apiBaseUrl }
                             |> Task.attempt ExecutionCompleted
-                        )
-
-                    else
-                        ( { model | ongoingExecution = Just { execution | progress = progress.progress } }
                         , replaceData (Progress.encode progress)
-                        )
-                )
-                model.ongoingExecution
-                model.session
-                |> Maybe.withDefault ( model, Cmd.none )
+                        ]
+                    )
+
+                ( False, Just (Ongoing id request progressHistory), _ ) ->
+                    ( { model | ongoingExecution = Just (Ongoing id request ([ progress ] ++ progressHistory)) }
+                    , replaceData (Progress.encode progress)
+                    )
+
+                _ ->
+                    ( model, Cmd.none )
 
         RequestChanged updateRequest ->
             ( { model | request = updateRequest model.request }, Cmd.none )
@@ -233,10 +234,21 @@ view model =
         , mapView model
         , View.Control.view RequestChanged NoOp model.request
         , div []
-            [ button [ onClick CreateExecution ] [ text "Start" ]
-            , model.ongoingExecution
-                |> Maybe.map (\{ progress } -> p [] [ text (String.fromFloat (progress * 100) ++ "% Done") ])
-                |> Maybe.withDefault (p [] [])
+            [ button
+                [ onClick CreateExecution
+                , disabled
+                    (model.ongoingExecution
+                        |> Maybe.map (\_ -> True)
+                        |> Maybe.withDefault False
+                    )
+                ]
+                [ text "Start" ]
+            , case model.ongoingExecution of
+                Just (Ongoing _ _ (head :: tail)) ->
+                    p [] [ text (String.fromFloat (head.progress * 100) ++ "% Done") ]
+
+                _ ->
+                    p [] []
             ]
         , View.Facebook.view
         , modalView model

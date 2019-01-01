@@ -1,8 +1,9 @@
-module Data.Execution exposing (Execution, complete, create)
+module Data.Execution exposing (Execution(..), complete, create)
 
 import Api
 import Data.LatLng as LatLng
 import Data.Preference as Preference
+import Data.Progress exposing (Progress)
 import Data.Request as Request exposing (Request)
 import Data.TravelMode as TravelMode
 import Json.Decode as Decode
@@ -10,56 +11,59 @@ import Json.Encode as Encode
 import Task exposing (Task)
 
 
-type alias Execution =
-    { id : Maybe String
-    , request : Request
-    , progress : Float
-    }
+type Execution
+    = Unsaved Request
+    | Ongoing String Request (List Progress)
+    | Done String Request (List Progress)
 
 
 create : Request -> Api.Settings -> Task String Execution
 create request =
     Api.post
-        { body =
-            createBody
-                { id = Nothing
-                , progress = 0
-                , request = request
-                }
+        { body = body request Nothing Nothing
         , path = "/executions"
-        , decodeResponse = decodeResponse
+        , decodeResponse = decodeResponse Ongoing
         }
 
 
 complete : Execution -> Api.Settings -> Task String Execution
 complete execution =
-    case execution.id of
-        Just id ->
+    case execution of
+        Ongoing id request ({result} :: _) ->
             Api.put
-                { body = createBody execution
+                { body = body request (Just "completed") (List.head result)
                 , path = "/executions/" ++ id
-                , decodeResponse = decodeResponse
+                , decodeResponse = decodeResponse Done
                 }
 
-        Nothing ->
-            \_ -> Task.fail "ID is not assigned."
+        _ ->
+            \_ -> Task.fail "Execution state is unexpected."
 
 
-createBody { request } =
+body request status resultPath =
     Encode.object
-        [ ( "mode", TravelMode.encode request.travelMode )
-        , ( "time", Encode.int request.time )
-        , ( "originCoordinate", LatLng.encode request.origin )
-        , ( "originAddress", Encode.string "" )
-        , ( "preference", Preference.encode request.preference )
-        , ( "avoidFerries", Encode.bool request.avoidFerries )
-        , ( "avoidHighways", Encode.bool request.avoidHighways )
-        , ( "avoidTolls", Encode.bool request.avoidTolls )
-        ]
+        ((status
+            |> Maybe.map (\s -> [ ( "status", Encode.string s ) ])
+            |> Maybe.withDefault []
+         )
+            ++ (resultPath
+            |> Maybe.map (\s -> [ ( "resultPath", s ) ])
+            |> Maybe.withDefault []
+         )
+            ++ [ ( "mode", TravelMode.encode request.travelMode )
+               , ( "time", Encode.int request.time )
+               , ( "originCoordinate", LatLng.encode request.origin )
+               , ( "originAddress", Encode.string "" )
+               , ( "preference", Preference.encode request.preference )
+               , ( "avoidFerries", Encode.bool request.avoidFerries )
+               , ( "avoidHighways", Encode.bool request.avoidHighways )
+               , ( "avoidTolls", Encode.bool request.avoidTolls )
+               ]
+        )
 
 
-decodeResponse : Decode.Decoder Execution
-decodeResponse =
+decodeResponse : (String -> Request -> List Progress -> Execution) -> Decode.Decoder Execution
+decodeResponse toExecution =
     Decode.map8
         (\id avoidFerries avoidHighways avoidTolls mode origin preference time ->
             let
@@ -76,10 +80,7 @@ decodeResponse =
                     , dissolveGeometry = True
                     }
             in
-            { id = Just id
-            , request = request
-            , progress = 0
-            }
+            toExecution id request []
         )
         (Decode.field "id" Decode.string)
         (Decode.field "avoidFerries" Decode.bool)
