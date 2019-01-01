@@ -17,6 +17,8 @@
   },
   "dependencies": {
     "@walk30m/core": "^0.2.0",
-    "babel-polyfill": "^6.26.0"
+    "babel-polyfill": "^6.26.0",
+    "braintree-web": "^3.41.0",
+    "paypal-checkout": "^4.0.239"
   }
 }

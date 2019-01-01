@@ -20,7 +20,7 @@ type Execution
 create : Request -> Api.Settings -> Task String Execution
 create request =
     Api.post
-        { body = body request Nothing Nothing
+        { body = Just (body request Nothing Nothing)
         , path = "/executions"
         , decodeResponse = decodeResponse Ongoing
         }
@@ -29,9 +29,9 @@ create request =
 complete : Execution -> Api.Settings -> Task String Execution
 complete execution =
     case execution of
-        Ongoing id request ({result} :: _) ->
+        Ongoing id request ({ result } :: _) ->
             Api.put
-                { body = body request (Just "completed") (List.head result)
+                { body = Just (body request (Just "completed") (List.head result))
                 , path = "/executions/" ++ id
                 , decodeResponse = decodeResponse Done
                 }
@@ -47,9 +47,9 @@ body request status resultPath =
             |> Maybe.withDefault []
          )
             ++ (resultPath
-            |> Maybe.map (\s -> [ ( "resultPath", s ) ])
-            |> Maybe.withDefault []
-         )
+                    |> Maybe.map (\s -> [ ( "resultPath", s ) ])
+                    |> Maybe.withDefault []
+               )
             ++ [ ( "mode", TravelMode.encode request.travelMode )
                , ( "time", Encode.int request.time )
                , ( "originCoordinate", LatLng.encode request.origin )

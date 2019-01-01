@@ -8,6 +8,7 @@ import Data.Preference as Preference exposing (Preference(..))
 import Data.Progress as Progress exposing (Progress)
 import Data.Request as Request exposing (Request)
 import Data.Session as Session exposing (Session(..))
+import Data.Transaction as Transaction exposing (Currency(..), Transaction)
 import Data.TravelMode as TravelMode exposing (TravelMode(..))
 import Html exposing (Html, button, div, h1, input, label, option, p, section, select, span, text)
 import Html.Attributes exposing (attribute, checked, class, disabled, id, selected, style, type_, value)
@@ -35,6 +36,9 @@ port signOut : () -> Cmd msg
 port replaceData : Encode.Value -> Cmd msg
 
 
+port renderPaypalButton : String -> Cmd msg
+
+
 port receiveIdToken : (String -> msg) -> Sub msg
 
 
@@ -47,6 +51,9 @@ port executionProgress : (Encode.Value -> msg) -> Sub msg
 port markerPositionChanged : (Encode.Value -> msg) -> Sub msg
 
 
+port onPaypalAuthorize : (String -> msg) -> Sub msg
+
+
 type Msg
     = ReceiveIdToken String
     | ReceiveSessionCreateResponse (Result Error Session)
@@ -55,6 +62,9 @@ type Msg
     | ExecutionCreated (Result String Execution)
     | ExecutionCompleted (Result String Execution)
     | ExecutionProgress (Result Decode.Error Progress)
+    | PaypalTokenReceived (Result String String)
+    | TransactionCreated (Result String ())
+    | PaypalAuthorized String
     | CreateExecution
     | CloseModal
     | Execute
@@ -130,6 +140,7 @@ subscriptions _ =
                    )
                 >> RequestChanged
             )
+        , onPaypalAuthorize PaypalAuthorized
         ]
 
 
@@ -141,7 +152,7 @@ update msg model =
             , Session.create token ReceiveSessionCreateResponse
             )
 
-        ReceiveSessionCreateResponse (Ok session) ->
+        ReceiveSessionCreateResponse (Ok ((Session authToken _) as session)) ->
             ( { model
                 | session = Just session
                 , modalContent =
@@ -152,7 +163,11 @@ update msg model =
                         other ->
                             other
               }
-            , Cmd.none
+            , Transaction.fetchToken
+                { authToken = authToken
+                , baseUrl = model.apiBaseUrl
+                }
+                |> Task.attempt PaypalTokenReceived
             )
 
         SignOut ->
@@ -205,6 +220,28 @@ update msg model =
         RequestChanged updateRequest ->
             ( { model | request = updateRequest model.request }, Cmd.none )
 
+        PaypalTokenReceived (Ok token) ->
+            ( model, renderPaypalButton token )
+
+        PaypalAuthorized nonce ->
+            model.session
+                |> Maybe.map
+                    (\(Session authToken _) ->
+                        ( model
+                        , Transaction.create
+                            { itemAmount = 100
+                            , paymentAmount = 3000
+                            , currency = JPY
+                            , nonce = nonce
+                            }
+                            { authToken = authToken
+                            , baseUrl = model.apiBaseUrl
+                            }
+                            |> Task.attempt TransactionCreated
+                        )
+                    )
+                |> Maybe.withDefault ( model, Cmd.none )
+
         other ->
             let
                 _ =
@@ -251,6 +288,7 @@ view model =
                     p [] []
             ]
         , View.Facebook.view
+        , div [ id "paypal-button" ] []
         , modalView model
         ]
 

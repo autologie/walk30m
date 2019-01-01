@@ -1,4 +1,4 @@
-module Api exposing (Settings, post, put)
+module Api exposing (Settings, get, post, put)
 
 import Http
 import Json.Decode as Decode
@@ -11,10 +11,15 @@ type alias Settings =
 
 
 type alias RequestConfig a =
-    { body : Encode.Value
+    { body : Maybe Encode.Value
     , path : String
     , decodeResponse : Decode.Decoder a
     }
+
+
+get : RequestConfig a -> Settings -> Task String a
+get config settings =
+    request "GET" config settings
 
 
 post : RequestConfig a -> Settings -> Task String a
@@ -31,7 +36,10 @@ request : String -> RequestConfig a -> Settings -> Task String a
 request method { body, path, decodeResponse } { authToken, baseUrl } =
     Http.task
         { method = method
-        , body = Http.jsonBody body
+        , body =
+            body
+                |> Maybe.map (\theBody -> Http.jsonBody theBody)
+                |> Maybe.withDefault Http.emptyBody
         , url = baseUrl ++ path
         , headers =
             [ Http.header "Authorization" ("Bearer " ++ authToken)

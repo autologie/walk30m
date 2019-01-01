@@ -1,6 +1,8 @@
 import "babel-polyfill";
 import execute from "@walk30m/core";
 import { Elm } from "./Main.elm";
+import paypal from "paypal-checkout";
+import braintree from "braintree-web";
 
 function renderButton(callback) {
   gapi.signin2.render("google-signin-button-container", {
@@ -127,6 +129,31 @@ function onLoadScript() {
       .getAuthInstance()
       .signOut()
       .then(() => app.ports.signedOut.send(null))
+  );
+
+  app.ports.renderPaypalButton.subscribe(token =>
+    paypal.Button.render(
+      {
+        braintree,
+        client: {
+          sandbox: token,
+          production: token
+        },
+        env: "sandbox",
+        commit: true,
+        payment: (resolveData, actions) => {
+          return actions.braintree.create({
+            flow: "checkout",
+            intent: "sale",
+            amount: 3000,
+            currency: "JPY",
+            enableShippingAddress: false
+          });
+        },
+        onAuthorize: ({ nonce }) => app.ports.onPaypalAuthorize.send(nonce)
+      },
+      "#paypal-button"
+    )
   );
 }
 
